@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Anti-Slop (before)</title>
+<style>
+*{box-sizing:border-box;margin:0}
+body{font-family:-apple-system,system-ui,"Segoe UI",sans-serif;background:#0b0b14;color:#e8e8f0;text-align:center}
+.blob{position:fixed;top:-120px;left:50%;width:600px;height:400px;margin-left:-300px;background:radial-gradient(circle,#6366f1aa,transparent 70%);filter:blur(60px);z-index:0}
+.wrap{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:90px 24px}
+.pill{display:inline-flex;gap:8px;align-items:center;padding:6px 14px;border:1px solid #ffffff22;border-radius:999px;background:#ffffff0d;font-size:13px}
+.dot{width:8px;height:8px;border-radius:50%;background:#22ff88;box-shadow:0 0 10px #22ff88}
+.eyebrow{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:#a5b4fc;margin:60px 0 12px}
+h1{font-size:56px;line-height:1.1;margin:24px 0 16px}
+h1 span{background:linear-gradient(90deg,#6366f1,#a855f7);-webkit-background-clip:text;color:transparent}
+h2{font-size:34px;margin-bottom:36px}
+p.sub{font-size:19px;color:#a0a0b8;max-width:600px;margin:0 auto 32px}
+.btn{display:inline-block;padding:13px 26px;border-radius:12px;font-weight:600;margin:0 6px}
+.b1{background:linear-gradient(90deg,#6366f1,#8b5cf6);color:#fff;box-shadow:0 8px 30px #6366f155}
+.b2{border:1px solid #ffffff33;color:#fff}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.card{background:#ffffff0a;border:1px solid #ffffff1a;border-radius:16px;padding:28px;backdrop-filter:blur(10px);box-shadow:0 10px 30px #0006}
+.ic{width:48px;height:48px;border-radius:12px;background:#6366f133;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 16px}
+.card h3{margin-bottom:8px}.card p{color:#a0a0b8;font-size:15px}
+.logos{color:#6c6c85;font-size:14px;margin-top:80px}
+.logos b{margin:0 14px;font-size:18px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}h1{font-size:38px}}
+</style></head><body>
+<div class="blob"></div>
+<div class="wrap">
+<span class="pill"><span class="dot"></span> New: v2.0 is live</span>
+<h1>Supercharge Your Workflow with <span>Next-Gen Design</span></h1>
+<p class="sub">Empower your AI to build seamless, robust interfaces. Unlock the future of design today.</p>
+<a class="btn b1">Get started</a><a class="btn b2">Learn more</a>
+
+<div class="eyebrow">Features</div>
+<h2>Everything You Need To Succeed</h2>
+<div class="grid">
+<div class="card"><div class="ic">🚀</div><h3>Lightning Fast</h3><p>Streamline your process and ship faster than ever.</p></div>
+<div class="card"><div class="ic">🛡️</div><h3>Secure by Default</h3><p>Robust protection you can rely on every day.</p></div>
+<div class="card"><div class="ic">✨</div><h3>Beautiful Results</h3><p>Elevate every project with stunning output.</p></div>
+</div>
+
+<p class="logos">Trusted by 10,000+ developers at <b>Acme</b><b>Globex</b><b>Initech</b><b>Umbrella</b></p>
+</div></body></html>

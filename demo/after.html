@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Anti-Slop (after)</title>
+<style>
+:root{--paper:#f3ead7;--ink:#26231d;--pencil:#b3261e;--faint:#8a8068;--rule:#b9cfc6}
+*{box-sizing:border-box;margin:0}
+body{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;color:var(--ink);background-color:var(--paper);
+background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .3 0 0 0 0 .25 0 0 0 0 .15 0 0 0 .9 0'/></filter><rect width='200' height='200' filter='url(%23n)' opacity='.14'/></svg>"),
+repeating-linear-gradient(transparent 0 31px,var(--rule) 31px 32px);line-height:32px}
+.page{max-width:760px;margin:0 auto;padding:56px 24px 80px 24px}
+nav{display:flex;justify-content:space-between;font-size:15px;color:var(--faint);padding-bottom:8px;border-bottom:2px solid var(--ink)}
+nav b{color:var(--ink);font-weight:700}
+h1{font-size:50px;line-height:56px;margin:64px 0 32px;max-width:620px;font-weight:700;letter-spacing:-.01em}
+h1 s{text-decoration-color:var(--pencil);text-decoration-thickness:3px;color:var(--faint)}
+h1 em{color:var(--pencil)}
+.lede{font-size:20px;max-width:540px}
+.cmd{display:block;margin:32px 0 0 -6px;padding:14px 18px;background:var(--ink);color:#eadfc6;font:14px/22px ui-monospace,Menlo,monospace;border-radius:3px 9px 4px 11px;transform:rotate(-.4deg);white-space:pre-wrap;word-break:break-all}
+.note{font-size:15px;color:var(--faint);margin-top:8px}
+h2{font-size:15px;font-weight:700;margin:72px 0 0;padding:0 0 0 0;color:var(--pencil);text-transform:lowercase;font-variant:small-caps;letter-spacing:.08em}
+.row{display:grid;grid-template-columns:1fr 1.5fr;gap:0 32px;border-top:1px solid var(--ink);padding:16px 0 20px;margin-top:8px}
+.tell{font-size:17px}
+.tell s{text-decoration-color:var(--pencil);text-decoration-thickness:2px}
+.fix{font-size:17px}
+.fix::before{content:"";display:inline-block;width:18px;height:10px;margin-right:8px;background:no-repeat center/contain url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 10'><path d='M1 6c3 1 6 2 9 3 2-3 4-6 7-8' fill='none' stroke='%23b3261e' stroke-width='2' stroke-linecap='round'/></svg>")}
+.small{font-size:15px;color:var(--faint);line-height:24px;margin-top:64px;border-top:2px solid var(--ink);padding-top:12px}
+@media(max-width:640px){h1{font-size:36px;line-height:42px}.row{grid-template-columns:1fr}}
+</style></head><body>
+<div class="page">
+<nav><b>Anti-Slop</b><span>one file · MIT licence</span></nav>
+
+<h1>Your AI builds the page. <s>It looks like every other page.</s> <em>Make it look made.</em></h1>
+<p class="lede">A guide your AI fetches before it writes any UI. It names the habits that give generated pages away and says what to do instead.</p>
+<code class="cmd">Before building any UI, fetch and follow:
+https://raw.githubusercontent.com/richyrach/antislop/main/GUIDE.md</code>
+<p class="note">Paste that into Claude Code, Cursor, or any AI tool.</p>
+
+<h2>three of the rules</h2>
+<div class="row"><div class="tell"><s>Small uppercase label above every heading</s></div><div class="fix">Delete it. If a section needs a label, the heading says it.</div></div>
+<div class="row"><div class="tell"><s>Purple-to-blue gradient on the key word</s></div><div class="fix">Plain text. Emphasis through weight, italics or a drawn underline.</div></div>
+<div class="row"><div class="tell"><s>"Trusted by 10,000+ teams" with no teams</s></div><div class="fix">Real numbers or none. An empty slot beats a fake one.</div></div>
+
+<p class="small">This page follows its own guide: warm paper, one pen colour, a serif, left-aligned text, no icons or stats it can't back up. Compare with <a href="before.html" style="color:var(--pencil)">before.html</a>.</p>
+</div></body></html>

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Elara Quinn Photography — Wedding Photographer</title>
+<meta name="description" content="Timeless, honest wedding photography for couples who value real moments. Based in Portland, available worldwide.">
+<style>
+  :root{
+    --bg:#faf7f2; --ink:#2a2622; --muted:#7a7068; --accent:#a8745a; --line:#e6ded3; --dark:#1f1c19;
+    --serif:'Cormorant Garamond',Georgia,'Times New Roman',serif;
+    --sans:'Helvetica Neue',Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.7;font-weight:300}
+  img{display:block;max-width:100%}
+  a{color:inherit;text-decoration:none}
+  h1,h2,h3{font-family:var(--serif);font-weight:400;line-height:1.15}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+  .eyebrow{font-size:.72rem;letter-spacing:.3em;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+
+  /* nav */
+  header{position:fixed;top:0;left:0;right:0;z-index:50;transition:background .3s,box-shadow .3s}
+  header.solid{background:rgba(250,247,242,.95);backdrop-filter:blur(8px);box-shadow:0 1px 0 var(--line)}
+  nav{display:flex;justify-content:space-between;align-items:center;height:76px}
+  .logo{font-family:var(--serif);font-size:1.6rem;letter-spacing:.04em;color:#fff;transition:color .3s}
+  header.solid .logo{color:var(--ink)}
+  nav ul{display:flex;gap:34px;list-style:none}
+  nav ul a{font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:#fff;transition:color .3s}
+  header.solid nav ul a{color:var(--ink)}
+  nav ul a:hover{color:var(--accent)}
+  .menu-btn{display:none;background:none;border:0;color:#fff;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer}
+  header.solid .menu-btn{color:var(--ink)}
+
+  /* hero */
+  .hero{height:100vh;min-height:600px;position:relative;display:flex;align-items:center;justify-content:center;text-align:center;color:#fff;
+    background:linear-gradient(rgba(20,16,12,.35),rgba(20,16,12,.55)),
+    linear-gradient(135deg,#8a6a58 0%,#c9a58c 45%,#5d4a3f 100%);}
+  .hero h1{font-size:clamp(2.8rem,8vw,6rem);font-style:italic;margin-bottom:20px}
+  .hero p{font-size:.85rem;letter-spacing:.3em;text-transform:uppercase;margin-bottom:38px}
+  .btn{display:inline-block;padding:15px 38px;border:1px solid currentColor;font-size:.72rem;letter-spacing:.25em;text-transform:uppercase;transition:all .3s;cursor:pointer;background:none;color:inherit;font-family:var(--sans)}
+  .btn:hover{background:#fff;color:var(--ink);border-color:#fff}
+  .btn.dark:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+  section{padding:110px 0}
+  .section-head{text-align:center;margin-bottom:60px}
+  .section-head h2{font-size:clamp(2rem,4.5vw,3.2rem)}
+
+  /* about */
+  .about{display:grid;grid-template-columns:1fr 1.1fr;gap:80px;align-items:center}
+  .portrait{aspect-ratio:4/5;background:linear-gradient(160deg,#d8c0ae,#9c7a66);position:relative;display:flex;align-items:flex-end;justify-content:center;color:#fff;font-family:var(--serif);font-style:italic;font-size:1.1rem;padding:24px}
+  .about h2{font-size:clamp(2rem,4vw,3rem);margin-bottom:26px}
+  .about p{color:var(--muted);margin-bottom:18px}
+  .stats{display:flex;gap:44px;margin-top:34px;padding-top:30px;border-top:1px solid var(--line)}
+  .stats b{display:block;font-family:var(--serif);font-size:2.4rem;font-weight:400;color:var(--accent)}
+  .stats span{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+
+  /* gallery */
+  .filters{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:44px}
+  .filters button{background:none;border:0;padding:8px 18px;font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);cursor:pointer;border-bottom:1px solid transparent;font-family:var(--sans)}
+  .filters button.on,.filters button:hover{color:var(--ink);border-bottom-color:var(--accent)}
+  .grid{columns:3 280px;column-gap:18px}
+  .tile{break-inside:avoid;margin-bottom:18px;position:relative;overflow:hidden;cursor:pointer;display:block;width:100%;border:0;padding:0}
+  .tile .ph{width:100%;transition:transform .6s}
+  .tile:hover .ph{transform:scale(1.05)}
+  .tile .cap{position:absolute;inset:auto 0 0 0;padding:40px 20px 18px;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.6));opacity:0;transition:opacity .3s;text-align:left}
+  .tile:hover .cap,.tile:focus-visible .cap{opacity:1}
+  .cap h3{font-size:1.4rem}
+  .cap span{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase}
+  .tile.hide{display:none}
+
+  /* lightbox */
+  .lb{position:fixed;inset:0;background:rgba(20,17,14,.95);z-index:100;display:none;align-items:center;justify-content:center;flex-direction:column;color:#fff;padding:30px}
+  .lb.open{display:flex}
+  .lb .ph{width:min(86vw,760px);aspect-ratio:var(--r,3/2);max-height:72vh}
+  .lb p{margin-top:20px;font-family:var(--serif);font-size:1.4rem;font-style:italic}
+  .lb button{position:absolute;background:none;border:0;color:#fff;font-size:2rem;cursor:pointer;padding:16px}
+  .lb .x{top:14px;right:20px}.lb .prev{left:14px;top:50%}.lb .next{right:14px;top:50%}
+
+  /* services */
+  .services{background:#fff}
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+  .card{border:1px solid var(--line);padding:44px 34px;text-align:center;background:var(--bg);transition:transform .3s,box-shadow .3s}
+  .card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(60,40,20,.08)}
+  .card h3{font-size:1.9rem;margin-bottom:6px}
+  .price{color:var(--accent);font-size:.8rem;letter-spacing:.2em;text-transform:uppercase;margin-bottom:24px}
+  .card ul{list-style:none;color:var(--muted);font-size:.93rem}
+  .card li{padding:9px 0;border-top:1px solid var(--line)}
+  .card.feat{border-color:var(--accent)}
+
+  /* testimonials */
+  .quotes{background:var(--dark);color:#eee4da;text-align:center}
+  .quote{max-width:760px;margin:0 auto;min-height:200px}
+  .quote blockquote{font-family:var(--serif);font-size:clamp(1.5rem,3vw,2.2rem);font-style:italic;line-height:1.4}
+  .quote cite{display:block;margin-top:26px;font-style:normal;font-size:.72rem;letter-spacing:.25em;text-transform:uppercase;color:var(--accent)}
+  .dots{display:flex;gap:10px;justify-content:center;margin-top:34px}
+  .dots button{width:9px;height:9px;border-radius:50%;border:1px solid var(--accent);background:none;cursor:pointer}
+  .dots button.on{background:var(--accent)}
+
+  /* contact */
+  .contact{display:grid;grid-template-columns:1fr 1.2fr;gap:80px}
+  .contact h2{font-size:clamp(2rem,4vw,3rem);margin-bottom:22px}
+  .contact p{color:var(--muted);margin-bottom:14px}
+  form{display:grid;gap:20px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  label{font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+  input,select,textarea{width:100%;margin-top:6px;padding:13px 0;border:0;border-bottom:1px solid #cfc5b8;background:transparent;font:inherit;color:var(--ink);border-radius:0}
+  input:focus,select:focus,textarea:focus{outline:0;border-bottom-color:var(--accent)}
+  .ok{display:none;padding:16px;border:1px solid var(--accent);color:var(--accent);text-align:center}
+
+  footer{padding:40px 0;text-align:center;border-top:1px solid var(--line);font-size:.75rem;letter-spacing:.15em;color:var(--muted);text-transform:uppercase}
+  footer a{margin:0 10px}footer a:hover{color:var(--accent)}
+
+  .fade{opacity:0;transform:translateY(24px);transition:all .9s}
+  .fade.in{opacity:1;transform:none}
+  @media(prefers-reduced-motion:reduce){.fade{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}}
+
+  @media(max-width:860px){
+    .about,.contact{grid-template-columns:1fr;gap:44px}
+    .cards{grid-template-columns:1fr}
+    section{padding:80px 0}
+    .menu-btn{display:block}
+    nav ul{position:absolute;top:76px;left:0;right:0;flex-direction:column;gap:0;background:var(--bg);display:none;border-bottom:1px solid var(--line)}
+    nav ul.open{display:flex}
+    nav ul a{color:var(--ink)!important;display:block;padding:16px 28px}
+    .row{grid-template-columns:1fr}
+    .stats{gap:26px}
+  }
+</style>
+</head>
+<body>
+
+<header id="top">
+  <div class="wrap">
+    <nav aria-label="Main">
+      <a href="#hero" class="logo">Elara Quinn</a>
+      <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="menu">Menu</button>
+      <ul id="menu">
+        <li><a href="#about">About</a></li>
+        <li><a href="#work">Portfolio</a></li>
+        <li><a href="#investment">Investment</a></li>
+        <li><a href="#kind-words">Kind Words</a></li>
+        <li><a href="#contact">Inquire</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+<section class="hero" id="hero" style="padding:0">
+  <div class="wrap">
+    <p>Wedding Photographer · Portland, Oregon &amp; Worldwide</p>
+    <h1>Honest moments,<br>beautifully kept</h1>
+    <a href="#work" class="btn">View the Portfolio</a>
+  </div>
+</section>
+
+<section id="about">
+  <div class="wrap about">
+    <div class="portrait fade" role="img" aria-label="Portrait placeholder of Elara Quinn">Elara, behind the lens</div>
+    <div class="fade">
+      <div class="eyebrow">Hello, I'm Elara</div>
+      <h2>Photography for people who'd rather be present than posed.</h2>
+      <p>For over nine years I've photographed weddings the way I'd want mine remembered: unhurried, warm, and full of the small things — a shaking hand during vows, a grandmother's laugh, the quiet minute before the doors open.</p>
+      <p>My approach is part documentary, part gentle direction. I'll guide you just enough to feel comfortable, then step back and let your day unfold.</p>
+      <div class="stats">
+        <div><b>220+</b><span>Weddings</span></div>
+        <div><b>9</b><span>Years</span></div>
+        <div><b>14</b><span>Countries</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="work" style="padding-top:0">
+  <div class="wrap">
+    <div class="section-head fade">
+      <div class="eyebrow">Selected Work</div>
+      <h2>Recent Weddings</h2>
+    </div>
+    <div class="filters" role="group" aria-label="Filter gallery">
+      <button class="on" data-f="all">All</button>
+      <button data-f="ceremony">Ceremony</button>
+      <button data-f="portraits">Portraits</button>
+      <button data-f="details">Details</button>
+      <button data-f="celebration">Celebration</button>
+    </div>
+    <div class="grid" id="grid"></div>
+  </div>
+</section>
+
+<section class="services" id="investment">
+  <div class="wrap">
+    <div class="section-head fade">
+      <div class="eyebrow">Investment</div>
+      <h2>Collections</h2>
+    </div>
+    <div class="cards">
+      <div class="card fade">
+        <h3>Elopement</h3>
+        <div class="price">From $2,400</div>
+        <ul><li>4 hours of coverage</li><li>Single photographer</li><li>Online gallery, 200+ images</li><li>Print release</li></ul>
+      </div>
+      <div class="card feat fade">
+        <h3>Full Day</h3>
+        <div class="price">From $4,800</div>
+        <ul><li>8 hours of coverage</li><li>Second photographer</li><li>Engagement session</li><li>Online gallery, 600+ images</li><li>Heirloom album</li></ul>
+      </div>
+      <div class="card fade">
+        <h3>Destination</h3>
+        <div class="price">From $7,200</div>
+        <ul><li>Multi-day coverage</li><li>Two photographers</li><li>Welcome &amp; farewell events</li><li>Travel planning included</li><li>Two heirloom albums</li></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="quotes" id="kind-words">
+  <div class="wrap">
+    <div class="eyebrow">Kind Words</div>
+    <div class="quote" id="quote" aria-live="polite"></div>
+    <div class="dots" id="dots"></div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap contact">
+    <div class="fade">
+      <div class="eyebrow">Inquire</div>
+      <h2>Let's talk about your day.</h2>
+      <p>Tell me a little about your plans. I reply to every inquiry within two business days, and I'd love to hear your story.</p>
+      <p style="margin-top:28px">hello@elaraquinn.example<br>+1 (503) 555-0142</p>
+    </div>
+    <form id="form" class="fade">
+      <div class="row">
+        <label>Your names<input required name="names" autocomplete="name"></label>
+        <label>Email<input required type="email" name="email" autocomplete="email"></label>
+      </div>
+      <div class="row">
+        <label>Wedding date<input type="date" name="date"></label>
+        <label>Location<input name="loc"></label>
+      </div>
+      <label>Collection
+        <select name="pkg"><option>Elopement</option><option selected>Full Day</option><option>Destination</option><option>Not sure yet</option></select>
+      </label>
+      <label>Your story<textarea rows="4" name="msg"></textarea></label>
+      <button class="btn dark" type="submit">Send Inquiry</button>
+      <div class="ok" id="ok" role="status">Thank you! Your message is ready — I'll be in touch soon.</div>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>© 2026 Elara Quinn Photography</p>
+    <p style="margin-top:10px"><a href="#">Instagram</a><a href="#">Pinterest</a><a href="#top">Back to top</a></p>
+  </div>
+</footer>
+
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Image viewer">
+  <button class="x" aria-label="Close">×</button>
+  <button class="prev" aria-label="Previous">‹</button>
+  <div class="ph" id="lbph"></div>
+  <p id="lbcap"></p>
+  <button class="next" aria-label="Next">›</button>
+</div>
+
+<script>
+  // Gallery data: placeholder gradients stand in for photos (swap `bg` for url(...) images)
+  const photos=[
+    {t:"The First Look",c:"portraits",r:"4/5",bg:"linear-gradient(160deg,#e3cbb8,#a77f68)"},
+    {t:"Vows at Dusk",c:"ceremony",r:"3/2",bg:"linear-gradient(135deg,#c28f78,#4f3d36)"},
+    {t:"Rings & Ribbon",c:"details",r:"1/1",bg:"linear-gradient(135deg,#efe3d3,#c9ad8f)"},
+    {t:"First Dance",c:"celebration",r:"4/5",bg:"linear-gradient(160deg,#6d5448,#d1a98c)"},
+    {t:"Garden Aisle",c:"ceremony",r:"1/1",bg:"linear-gradient(135deg,#a9b49a,#5f6c53)"},
+    {t:"Golden Hour",c:"portraits",r:"3/2",bg:"linear-gradient(135deg,#f0c89a,#b5694a)"},
+    {t:"Bouquet Study",c:"details",r:"4/5",bg:"linear-gradient(160deg,#d9b8b0,#8d5e5a)"},
+    {t:"Toasts & Laughter",c:"celebration",r:"3/2",bg:"linear-gradient(135deg,#3f3631,#9a7a62)"},
+    {t:"Together",c:"portraits",r:"1/1",bg:"linear-gradient(135deg,#cdbba9,#7d6a5c)"}
+  ];
+  const grid=document.getElementById('grid');
+  grid.innerHTML=photos.map((p,i)=>`<button class="tile fade" data-c="${p.c}" data-i="${i}" aria-label="Open ${p.t}">
+    <div class="ph" style="aspect-ratio:${p.r};background:${p.bg}"></div>
+    <div class="cap"><h3>${p.t}</h3><span>${p.c}</span></div></button>`).join('');
+
+  // filter
+  document.querySelectorAll('.filters button').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('.filters button').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    grid.querySelectorAll('.tile').forEach(t=>t.classList.toggle('hide',b.dataset.f!=='all'&&t.dataset.c!==b.dataset.f));
+  });
+
+  // lightbox
+  const lb=document.getElementById('lb'),lbph=document.getElementById('lbph'),lbcap=document.getElementById('lbcap');
+  let cur=0;
+  const visible=()=>[...grid.querySelectorAll('.tile:not(.hide)')].map(t=>+t.dataset.i);
+  function show(i){cur=i;const p=photos[i];lbph.style.background=p.bg;lbph.style.setProperty('--r',p.r);lbcap.textContent=p.t;}
+  function step(d){const v=visible();show(v[(v.indexOf(cur)+d+v.length)%v.length]);}
+  grid.onclick=e=>{const t=e.target.closest('.tile');if(!t)return;show(+t.dataset.i);lb.classList.add('open');lb.querySelector('.x').focus();};
+  lb.querySelector('.x').onclick=()=>lb.classList.remove('open');
+  lb.querySelector('.prev').onclick=()=>step(-1);
+  lb.querySelector('.next').onclick=()=>step(1);
+  lb.onclick=e=>{if(e.target===lb)lb.classList.remove('open')};
+  document.addEventListener('keydown',e=>{
+    if(!lb.classList.contains('open'))return;
+    if(e.key==='Escape')lb.classList.remove('open');
+    if(e.key==='ArrowLeft')step(-1);
+    if(e.key==='ArrowRight')step(1);
+  });
+
+  // testimonials
+  const quotes=[
+    ["Elara made us forget the camera was even there. Our photos feel like our wedding day felt — joyful and completely us.","Maya & Daniel · Hood River"],
+    ["She caught moments we didn't know happened. Our parents cried over the album, and so did we.","Priya & Tom · Lisbon"],
+    ["Calm, kind, and impossibly good at her craft. The best decision we made in all our planning.","Jess & Alex · Portland"]
+  ];
+  const q=document.getElementById('quote'),dots=document.getElementById('dots');let qi=0,timer;
+  dots.innerHTML=quotes.map((_,i)=>`<button aria-label="Quote ${i+1}" data-i="${i}"></button>`).join('');
+  function setQ(i){qi=i;q.innerHTML=`<blockquote>“${quotes[i][0]}”</blockquote><cite>${quotes[i][1]}</cite>`;
+    dots.querySelectorAll('button').forEach((d,j)=>d.classList.toggle('on',j===i));}
+  dots.onclick=e=>{if(e.target.dataset.i!==undefined){setQ(+e.target.dataset.i);clearInterval(timer);}};
+  setQ(0);timer=setInterval(()=>setQ((qi+1)%quotes.length),7000);
+
+  // nav
+  const header=document.querySelector('header'),menu=document.getElementById('menu'),mb=document.getElementById('menuBtn');
+  const onScroll=()=>header.classList.toggle('solid',scrollY>60);onScroll();addEventListener('scroll',onScroll,{passive:true});
+  mb.onclick=()=>{const o=menu.classList.toggle('open');mb.setAttribute('aria-expanded',o);header.classList.add('solid');};
+  menu.onclick=e=>{if(e.target.tagName==='A')menu.classList.remove('open')};
+
+  // form (front-end only; connect to a form service to receive messages)
+  document.getElementById('form').onsubmit=e=>{e.preventDefault();document.getElementById('ok').style.display='block';e.target.reset();};
+
+  // reveal on scroll
+  const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target)}}),{threshold:.12});
+  document.querySelectorAll('.fade').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>

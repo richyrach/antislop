@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Team settings</title>
+<style>
+:root{
+  --ink:#15191e; --mute:#55606c; --line:#dde1e6; --wash:#f3f5f7; --paper:#fff;
+  --accent:#0e6a63; --accent-d:#0a514c; --accent-wash:#e3f1ef;
+  --danger:#b3261e; --danger-wash:#fbeceb;
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:40px; --s7:64px;
+  --r:6px;
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  color:var(--ink); background:var(--paper);
+}
+*{box-sizing:border-box}
+body{margin:0;font-size:15px;line-height:1.5}
+h1,h2,h3,p{margin:0}
+a{color:var(--accent)}
+.top{border-bottom:1px solid var(--line);padding:var(--s4) var(--s5);display:flex;gap:var(--s4);align-items:center;flex-wrap:wrap}
+.top b{font-size:15px}
+.top span{color:var(--mute);font-size:13px}
+.sample{margin-inline-start:auto;font-size:13px;color:var(--mute);background:var(--wash);padding:var(--s1) var(--s3);border-radius:var(--r)}
+.wrap{max-width:1040px;margin:0 auto;padding:var(--s6) var(--s5) 120px;display:grid;grid-template-columns:180px minmax(0,1fr);gap:var(--s7)}
+nav{position:sticky;top:var(--s5);align-self:start}
+nav ul{list-style:none;margin:0;padding:0;display:grid;gap:var(--s1)}
+nav a{display:block;padding:10px var(--s3);border-radius:var(--r);color:var(--mute);text-decoration:none;min-height:44px;line-height:24px}
+nav a:hover{background:var(--wash);color:var(--ink)}
+nav a:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+nav a:active{background:var(--line)}
+nav a.danger{color:var(--danger)}
+h1{font-size:28px;line-height:1.2;margin-bottom:var(--s2)}
+.lede{color:var(--mute);max-width:60ch;margin-bottom:var(--s6)}
+section{padding-top:var(--s5);border-top:1px solid var(--line);margin-bottom:var(--s6);scroll-margin-top:var(--s4)}
+h2{font-size:18px;line-height:1.3;margin-bottom:var(--s4)}
+.row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:var(--s5);padding:var(--s4) 0}
+.row + .row{border-top:1px solid var(--wash)}
+.row label,.row .lab{font-weight:600;display:block}
+.hint{color:var(--mute);font-size:13px;max-width:46ch}
+.ctl{display:grid;gap:var(--s2);align-content:start}
+input[type=text],textarea,select{width:100%;min-height:44px;padding:10px var(--s3);font:inherit;color:inherit;background:var(--paper);border:1px solid #9aa4ae;border-radius:var(--r)}
+textarea{resize:vertical;min-height:96px}
+input:hover,textarea:hover,select:hover{border-color:var(--ink)}
+input:disabled,select:disabled,button:disabled{opacity:.5;cursor:not-allowed}
+input[aria-invalid=true]{border-color:var(--danger);background:var(--danger-wash)}
+.err{color:var(--danger);font-size:13px}
+.affix{display:flex;align-items:stretch}
+.affix span{display:flex;align-items:center;padding:0 var(--s3);background:var(--wash);border:1px solid #9aa4ae;border-inline-end:0;border-radius:var(--r) 0 0 var(--r);color:var(--mute);font-size:14px;white-space:nowrap}
+.affix input{border-radius:0 var(--r) var(--r) 0}
+.sw{display:flex;gap:var(--s3);align-items:center;min-height:44px}
+.sw input{appearance:none;flex:none;width:44px;height:26px;border-radius:13px;background:#8b96a1;position:relative;cursor:pointer;margin:0;transition:background .15s}
+.sw input::after{content:"";position:absolute;top:3px;inset-inline-start:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .15s}
+.sw input:checked{background:var(--accent)}
+.sw input:checked::after{transform:translateX(18px)}
+.sw input:hover{filter:brightness(.9)}
+.sw input:disabled{cursor:not-allowed}
+.sw label{font-weight:400;cursor:pointer}
+.btn{font:inherit;min-height:44px;padding:0 var(--s4);border-radius:var(--r);border:1px solid #9aa4ae;background:var(--paper);color:var(--ink);cursor:pointer}
+.btn:hover:not(:disabled){background:var(--wash);border-color:var(--ink)}
+.btn:active:not(:disabled){background:var(--line)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.pri:hover:not(:disabled){background:var(--accent-d);border-color:var(--accent-d)}
+.btn.bad{color:var(--danger);border-color:var(--danger)}
+.btn.bad:hover:not(:disabled){background:var(--danger-wash);border-color:var(--danger)}
+.btn.bad.fill{background:var(--danger);color:#fff}
+.btn.bad.fill:hover:not(:disabled){background:#8f1d17}
+.inline{display:flex;gap:var(--s2)}
+.inline input{flex:1}
+.tools{display:flex;gap:var(--s3);margin-bottom:var(--s3);flex-wrap:wrap;align-items:center}
+.tools input{max-width:300px}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r)}
+table{width:100%;border-collapse:collapse;min-width:480px}
+th,td{padding:var(--s2) var(--s4);text-align:start;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+th{font-size:13px;font-weight:600;color:var(--mute);background:var(--wash)}
+td small{display:block;color:var(--mute);font-size:13px}
+td select{min-height:40px;width:auto;padding-inline:var(--s2)}
+.empty{padding:var(--s5);color:var(--mute);text-align:center}
+.status{font-size:13px;color:var(--mute);min-height:20px;margin-top:var(--s2)}
+.dz{border:1px solid var(--danger);border-radius:var(--r);padding:0 var(--s4)}
+.dz .row{padding:var(--s4) 0}
+.savebar{position:fixed;inset-inline:0;bottom:0;background:var(--ink);color:#fff;padding:var(--s3) var(--s5);display:flex;gap:var(--s3);align-items:center;justify-content:flex-end;transform:translateY(110%);transition:transform .2s}
+.savebar.on{transform:none}
+.savebar p{margin-inline-end:auto}
+.savebar .btn{background:transparent;color:#fff;border-color:#8b96a1}
+.savebar .btn:hover:not(:disabled){background:#2a3038;border-color:#fff}
+.savebar .btn.pri{background:#fff;color:var(--ink);border-color:#fff}
+.savebar .btn.pri:hover:not(:disabled){background:var(--accent-wash)}
+.savebar :focus-visible{outline-color:#fff}
+dialog{border:0;border-radius:var(--r);padding:var(--s5);max-width:440px;width:calc(100% - 32px);box-shadow:0 8px 40px rgba(0,0,0,.3)}
+dialog::backdrop{background:rgba(21,25,30,.55)}
+dialog h2{margin-bottom:var(--s3)}
+dialog p{margin-bottom:var(--s4)}
+.actions{display:flex;gap:var(--s2);justify-content:flex-end;margin-top:var(--s4)}
+@media (max-width:760px){
+  .wrap{grid-template-columns:1fr;gap:var(--s5);padding:var(--s5) var(--s4) 140px}
+  nav{position:static}
+  nav ul{display:flex;overflow-x:auto;gap:var(--s1)}
+  nav a{white-space:nowrap}
+  .row{grid-template-columns:1fr;gap:var(--s3)}
+  .hide-s{display:none}
+  .top{padding-inline:var(--s4)}
+  .sample{margin-inline-start:0}
+  .savebar{flex-wrap:wrap;padding-inline:var(--s4)}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <b>Settings</b><span id="crumb">Harbour Street</span>
+  <span class="sample">Sample data, nothing here is saved to a server</span>
+</header>
+
+<div class="wrap">
+  <nav aria-label="Settings sections">
+    <ul>
+      <li><a href="#general">General</a></li>
+      <li><a href="#joining">Joining</a></li>
+      <li><a href="#permissions">Permissions</a></li>
+      <li><a href="#retention">Message history</a></li>
+      <li><a href="#members">Members</a></li>
+      <li><a href="#delete" class="danger">Delete team</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <h1>Team settings</h1>
+    <p class="lede">Changes to the first four sections apply to everyone on the team once you save. Member changes apply immediately.</p>
+
+    <form id="f" novalidate>
+      <section id="general">
+        <h2>General</h2>
+        <div class="row">
+          <div><label for="name">Team name</label><p class="hint">Shown in the sidebar and in invitation emails.</p></div>
+          <div class="ctl"><input type="text" id="name" name="name" value="Harbour Street" maxlength="50" required>
+            <p class="err" id="name-err" hidden>Enter a team name.</p></div>
+        </div>
+        <div class="row">
+          <div><label for="handle">Team address</label><p class="hint">Lowercase letters, numbers and hyphens, 3 to 30 characters. Changing it breaks old links.</p></div>
+          <div class="ctl">
+            <div class="affix"><span>chat.example.com/</span><input type="text" id="handle" name="handle" value="harbour-street" autocapitalize="none" spellcheck="false" aria-describedby="handle-err"></div>
+            <p class="err" id="handle-err" hidden></p>
+          </div>
+        </div>
+        <div class="row">
+          <div><label for="desc">Description</label><p class="hint">One or two lines for people deciding whether to join.</p></div>
+          <div class="ctl"><textarea id="desc" name="desc" maxlength="200">Dispatch, warehouse and front desk in one place.</textarea></div>
+        </div>
+      </section>
+
+      <section id="joining">
+        <h2>Joining</h2>
+        <div class="row">
+          <div><span class="lab">Invite link</span><p class="hint">Anyone with the link can join as a Member. Turn it off to invite by email only.</p></div>
+          <div class="ctl">
+            <div class="sw"><input type="checkbox" role="switch" id="linkOn" name="linkOn" checked><label for="linkOn">Invite link enabled</label></div>
+            <div class="inline">
+              <input type="text" id="link" value="https://chat.example.com/join/k7Q2-xv9d" readonly aria-label="Invite link">
+              <button type="button" class="btn" id="copy">Copy link</button>
+            </div>
+            <p class="status" id="copy-s" role="status"></p>
+          </div>
+        </div>
+        <div class="row">
+          <div><label for="domain">Auto-approve email domain</label><p class="hint">People who verify an address at this domain join without waiting for approval. Leave blank to approve each request.</p></div>
+          <div class="ctl"><input type="text" id="domain" name="domain" placeholder="example.com" autocapitalize="none" spellcheck="false">
+            <p class="err" id="domain-err" hidden>Enter a domain such as example.com, without @ or spaces.</p></div>
+        </div>
+        <div class="row">
+          <div><label for="landing">New members start in</label><p class="hint">The channel they see first.</p></div>
+          <div class="ctl"><select id="landing" name="landing"><option>#general</option><option>#announcements</option><option>#welcome</option></select></div>
+        </div>
+      </section>
+
+      <section id="permissions">
+        <h2>Permissions</h2>
+        <div class="row">
+          <div><label for="create">Who can create channels</label></div>
+          <div class="ctl"><select id="create" name="create"><option>Everyone</option><option>Admins only</option></select></div>
+        </div>
+        <div class="row">
+          <div><label for="post">Who can post in #general</label><p class="hint">Others can still read and react.</p></div>
+          <div class="ctl"><select id="post" name="post"><option>Everyone</option><option>Admins only</option></select></div>
+        </div>
+        <div class="row">
+          <div><span class="lab">Mentions of @everyone</span><p class="hint">Notifies every member, including those who muted the channel.</p></div>
+          <div class="ctl"><div class="sw"><input type="checkbox" role="switch" id="everyone" name="everyone"><label for="everyone">Members can use @everyone</label></div></div>
+        </div>
+        <div class="row">
+          <div><span class="lab">Deleting messages</span><p class="hint">Admins can always delete any message.</p></div>
+          <div class="ctl"><div class="sw"><input type="checkbox" role="switch" id="del" name="del" checked><label for="del">Members can delete their own messages</label></div></div>
+        </div>
+      </section>
+
+      <section id="retention">
+        <h2>Message history</h2>
+        <div class="row">
+          <div><label for="keep">Keep messages for</label><p class="hint">Older messages and their files are removed permanently each night.</p></div>
+          <div class="ctl"><select id="keep" name="keep"><option>Forever</option><option>2 years</option><option>1 year</option><option>90 days</option><option>30 days</option></select>
+            <p class="err" id="keep-warn" hidden>Saving will permanently remove messages older than this period.</p></div>
+        </div>
+      </section>
+
+      <div class="savebar" id="bar" role="region" aria-label="Unsaved changes">
+        <p id="bar-msg">You have unsaved changes.</p>
+        <button type="button" class="btn" id="discard">Discard</button>
+        <button type="submit" class="btn pri">Save changes</button>
+      </div>
+    </form>
+
+    <section id="members">
+      <h2>Members</h2>
+      <div class="tools">
+        <input type="text" id="q" placeholder="Search by name or email" aria-label="Search members">
+        <span class="hint" id="count"></span>
+      </div>
+      <div class="tw">
+        <table>
+          <thead><tr><th scope="col">Name</th><th scope="col">Role</th><th scope="col" class="hide-s">Last active</th><th scope="col"><span class="sr" style="position:absolute;left:-9999px">Actions</span></th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+        <p class="empty" id="none" hidden>No member matches that search. Check the spelling or search by email.</p>
+      </div>
+      <p class="status" id="m-s" role="status"></p>
+    </section>
+
+    <section id="delete">
+      <h2>Delete team</h2>
+      <div class="dz">
+        <div class="row">
+          <div><span class="lab">Transfer ownership</span><p class="hint">Choose another admin to own the team. You become an admin.</p></div>
+          <div class="ctl"><button type="button" class="btn" id="transfer" disabled title="Make someone else an admin first">Transfer ownership</button>
+            <p class="hint" id="t-hint">Available once the team has a second admin.</p></div>
+        </div>
+        <div class="row">
+          <div><span class="lab">Delete this team</span><p class="hint">Removes all channels, messages and files for every member. This cannot be undone.</p></div>
+          <div class="ctl"><button type="button" class="btn bad" id="delBtn">Delete team…</button></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<dialog id="dlg" aria-labelledby="dt">
+  <form method="dialog" id="df">
+    <h2 id="dt">Delete this team?</h2>
+    <p>All channels, messages and files will be removed for every member. To confirm, type the team name <b id="dn"></b>.</p>
+    <label for="confirm" style="font-weight:600;display:block;margin-bottom:4px">Team name</label>
+    <input type="text" id="confirm" autocomplete="off">
+    <div class="actions">
+      <button type="button" class="btn" id="cancel">Keep team</button>
+      <button type="submit" class="btn bad fill" id="go" disabled>Delete team</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+const $=s=>document.querySelector(s);
+const f=$('#f'), bar=$('#bar');
+
+/* ---------- form dirty tracking ---------- */
+let base=snap();
+function snap(){return JSON.stringify([...f.elements].filter(e=>e.name).map(e=>e.type==='checkbox'?e.checked:e.value))}
+function refresh(){
+  const dirty=snap()!==base;
+  bar.classList.toggle('on',dirty);
+  $('#bar-msg').textContent='You have unsaved changes.';
+  $('#keep-warn').hidden=!(dirty&&$('#keep').value!=='Forever');
+  $('#link').disabled=$('#copy').disabled=!$('#linkOn').checked;
+}
+f.addEventListener('input',refresh);f.addEventListener('change',refresh);
+$('#discard').onclick=()=>{f.reset();clearErr();refresh()};
+function setErr(input,errEl,msg){errEl.textContent=msg;errEl.hidden=false;input.setAttribute('aria-invalid','true')}
+function clearErr(){document.querySelectorAll('[aria-invalid]').forEach(e=>e.removeAttribute('aria-invalid'));document.querySelectorAll('.err').forEach(e=>{if(e.id!=='keep-warn')e.hidden=true})}
+f.addEventListener('submit',e=>{
+  e.preventDefault();clearErr();
+  let bad=null;
+  const name=$('#name'),h=$('#handle'),d=$('#domain');
+  if(!name.value.trim()){setErr(name,$('#name-err'),'Enter a team name.');bad=bad||name}
+  const hv=h.value.trim();
+  if(!/^[a-z0-9-]{3,30}$/.test(hv)){setErr(h,$('#handle-err'),'Use 3 to 30 lowercase letters, numbers or hyphens, for example harbour-street.');bad=bad||h}
+  else if(['admin','support','api','www'].includes(hv)){setErr(h,$('#handle-err'),'“'+hv+'” is reserved. Try “'+hv+'-team”.');bad=bad||h}
+  if(d.value&&!/^[a-z0-9-]+(\.[a-z0-9-]+)+$/i.test(d.value.trim())){setErr(d,$('#domain-err'),'');$('#domain-err').textContent='Enter a domain such as example.com, without @ or spaces.';$('#domain-err').hidden=false;bad=bad||d}
+  if(bad){bad.focus();$('#bar-msg').textContent='Fix the highlighted fields to save.';return}
+  base=snap();$('#crumb').textContent=name.value.trim();$('#dn').textContent=name.value.trim();
+  bar.classList.remove('on');
+  $('#copy-s').textContent='';
+});
+
+/* ---------- invite link ---------- */
+$('#copy').onclick=async()=>{
+  const s=$('#copy-s');
+  try{await navigator.clipboard.writeText($('#link').value);s.textContent='Link copied.'}
+  catch{$('#link').select();s.textContent='Copy blocked by the browser. The link is selected, press Ctrl+C or ⌘C.'}
+};
+
+/* ---------- members (sample data) ---------- */
+let members=[
+ {n:'Maren Okafor',e:'maren@example.com',r:'Owner',a:'Today'},
+ {n:'Tomás Reyes',e:'tomas@example.com',r:'Admin',a:'Today'},
+ {n:'Priya Nair',e:'priya@example.com',r:'Member',a:'Yesterday'},
+ {n:'Jun Watanabe',e:'jun@example.com',r:'Member',a:'3 days ago'},
+ {n:'Dee Alvarez',e:'dee@example.com',r:'Guest',a:'2 weeks ago'}
+];
+function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function draw(){
+  const q=$('#q').value.trim().toLowerCase();
+  const list=members.filter(m=>!q||m.n.toLowerCase().includes(q)||m.e.includes(q));
+  $('#rows').innerHTML=list.map(m=>{
+    const i=members.indexOf(m),own=m.r==='Owner';
+    return `<tr><td>${esc(m.n)}<small>${esc(m.e)}</small></td>
+    <td><select data-i="${i}" aria-label="Role for ${esc(m.n)}" ${own?'disabled':''}>
+      ${(own?['Owner']:['Admin','Member','Guest']).map(r=>`<option${r===m.r?' selected':''}>${r}</option>`).join('')}</select></td>
+    <td class="hide-s">${m.a}</td>
+    <td style="text-align:end">${own?'':`<button class="btn bad" data-rm="${i}" aria-label="Remove ${esc(m.n)}">Remove</button>`}</td></tr>`}).join('');
+  $('#none').hidden=list.length>0;
+  $('#count').textContent=members.length+' members';
+  const admins=members.filter(m=>m.r==='Admin').length>0;
+  $('#transfer').disabled=!admins;$('#transfer').title=admins?'':'Make someone else an admin first';
+  $('#t-hint').textContent=admins?'Choose from your admins in the next step.':'Available once the team has a second admin.';
+}
+$('#q').oninput=draw;
+$('#rows').addEventListener('change',e=>{
+  if(e.target.matches('select')){const m=members[e.target.dataset.i];m.r=e.target.value;$('#m-s').textContent=m.n+' is now '+m.r+'.';draw()}
+});
+$('#rows').addEventListener('click',e=>{
+  const b=e.target.closest('[data-rm]');if(!b)return;
+  const m=members.splice(+b.dataset.rm,1)[0];
+  $('#m-s').textContent=m.n+' was removed from the team.';draw();
+});
+draw();
+
+/* ---------- delete dialog ---------- */
+const dlg=$('#dlg'),c=$('#confirm');
+$('#dn').textContent=$('#name').value;
+$('#delBtn').onclick=()=>{c.value='';$('#go').disabled=true;$('#dn').textContent=$('#name').value.trim();dlg.showModal();c.focus()};
+c.oninput=()=>{$('#go').disabled=c.value.trim()!==$('#name').value.trim()};
+$('#cancel').onclick=()=>dlg.close();
+$('#df').onsubmit=e=>{
+  e.preventDefault();
+  dlg.close();
+  document.querySelector('main').innerHTML='<h1>Team deleted</h1><p class="lede">In this preview nothing was deleted. Reload the page to start over.</p>';
+  bar.classList.remove('on');
+};
+$('#transfer').onclick=()=>{$('#m-s').textContent='Pick an admin in the Members list to transfer to. Transfer is not wired in this preview.';location.hash='members'};
+refresh();
+</script>
+</body>
+</html>

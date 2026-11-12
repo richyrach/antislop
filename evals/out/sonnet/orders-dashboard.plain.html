@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shop Orders Dashboard</title>
+<style>
+  :root{--bg:#f4f5f7;--card:#fff;--text:#1f2430;--muted:#6b7280;--border:#e5e7eb;--accent:#4f46e5;--green:#16a34a;--amber:#d97706;--blue:#2563eb;--red:#dc2626}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text)}
+  header{background:var(--card);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+  h1{margin:0;font-size:20px}
+  main{max-width:1200px;margin:0 auto;padding:24px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+  .card .label{color:var(--muted);font-size:13px}
+  .card .value{font-size:26px;font-weight:700;margin-top:4px}
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:24px}
+  .panel h2{margin:0 0 12px;font-size:16px}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+  input,select,button{font:inherit;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:#fff}
+  input[type=search]{flex:1;min-width:180px}
+  button{cursor:pointer}
+  button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .table-wrap{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--border);white-space:nowrap}
+  th{color:var(--muted);font-weight:600;cursor:pointer;user-select:none}
+  tbody tr:hover{background:#f9fafb}
+  .badge{padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600}
+  .Pending{background:#fef3c7;color:var(--amber)}
+  .Shipped{background:#dbeafe;color:var(--blue)}
+  .Delivered{background:#dcfce7;color:var(--green)}
+  .Cancelled{background:#fee2e2;color:var(--red)}
+  .chart{display:flex;align-items:flex-end;gap:8px;height:160px}
+  .bar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;font-size:11px;color:var(--muted)}
+  .bar div{width:100%;background:var(--accent);border-radius:4px 4px 0 0;min-height:2px}
+  .pager{display:flex;justify-content:space-between;align-items:center;margin-top:12px;color:var(--muted);font-size:14px}
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;padding:16px}
+  .modal.open{display:flex}
+  .modal .box{background:#fff;border-radius:12px;padding:20px;max-width:460px;width:100%}
+  .modal h3{margin-top:0}
+  .row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:14px}
+  .empty{text-align:center;color:var(--muted);padding:24px}
+</style>
+</head>
+<body>
+<header>
+  <h1>🛍️ Orders Dashboard</h1>
+  <div>
+    <button id="addBtn" class="primary">+ New order</button>
+    <button id="exportBtn">Export CSV</button>
+    <button id="resetBtn">Reset demo data</button>
+  </div>
+</header>
+<main>
+  <section class="cards" id="cards"></section>
+  <section class="panel">
+    <h2>Revenue – last 7 days</h2>
+    <div class="chart" id="chart"></div>
+  </section>
+  <section class="panel">
+    <h2>Orders</h2>
+    <div class="toolbar">
+      <input type="search" id="search" placeholder="Search by order #, customer or product…">
+      <select id="statusFilter">
+        <option value="">All statuses</option>
+        <option>Pending</option><option>Shipped</option><option>Delivered</option><option>Cancelled</option>
+      </select>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th data-k="id">Order</th><th data-k="date">Date</th><th data-k="customer">Customer</th>
+          <th data-k="product">Product</th><th data-k="qty">Qty</th><th data-k="total">Total</th><th data-k="status">Status</th>
+        </tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <div class="pager">
+      <span id="count"></span>
+      <span><button id="prev">Prev</button> <span id="page"></span> <button id="next">Next</button></span>
+    </div>
+  </section>
+</main>
+
+<div class="modal" id="modal"><div class="box" id="modalBox"></div></div>
+
+<script>
+const KEY='shop-orders-v1', PER=10;
+const STATUSES=['Pending','Shipped','Delivered','Cancelled'];
+const money=n=>'$'+Number(n).toFixed(2);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const dayStr=d=>d.toISOString().slice(0,10);
+
+function demo(){
+  const names=['Ava Johnson','Liam Smith','Mia Garcia','Noah Brown','Emma Davis','Lucas Miller','Zoe Wilson','Ethan Moore'];
+  const prods=[['Ceramic Mug',14],['Canvas Tote Bag',22],['Scented Candle',18],['Notebook Set',12.5],['Enamel Pin',6],['Poster Print',28]];
+  const out=[];
+  for(let i=0;i<34;i++){
+    const p=prods[(i*7)%prods.length], q=1+(i*3)%4, d=new Date();
+    d.setDate(d.getDate()-Math.floor(i/4.5));
+    const age=Math.floor(i/4.5);
+    const status=i%11===0?'Cancelled':age>4?'Delivered':age>2?'Shipped':'Pending';
+    out.push({id:1050-i,date:dayStr(d),customer:names[(i*5)%names.length],product:p[0],qty:q,total:+(p[1]*q).toFixed(2),status});
+  }
+  return out;
+}
+let orders=JSON.parse(localStorage.getItem(KEY)||'null')||demo();
+const save=()=>localStorage.setItem(KEY,JSON.stringify(orders));
+let sort={k:'date',dir:-1}, page=1;
+
+function filtered(){
+  const q=search.value.trim().toLowerCase(), s=statusFilter.value;
+  return orders.filter(o=>(!s||o.status===s)&&(!q||`${o.id} ${o.customer} ${o.product}`.toLowerCase().includes(q)))
+    .sort((a,b)=>{const x=a[sort.k],y=b[sort.k];return (x>y?1:x<y?-1:(b.id-a.id))*sort.dir});
+}
+
+function renderCards(){
+  const valid=orders.filter(o=>o.status!=='Cancelled');
+  const rev=valid.reduce((s,o)=>s+o.total,0);
+  const today=dayStr(new Date());
+  const items=[
+    ['Total orders',orders.length],
+    ['Revenue',money(rev)],
+    ['Avg. order value',money(valid.length?rev/valid.length:0)],
+    ['Pending',orders.filter(o=>o.status==='Pending').length],
+    ['Orders today',orders.filter(o=>o.date===today).length]
+  ];
+  cards.innerHTML=items.map(([l,v])=>`<div class="card"><div class="label">${l}</div><div class="value">${v}</div></div>`).join('');
+}
+
+function renderChart(){
+  const days=[];
+  for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(dayStr(d))}
+  const vals=days.map(d=>orders.filter(o=>o.date===d&&o.status!=='Cancelled').reduce((s,o)=>s+o.total,0));
+  const max=Math.max(...vals,1);
+  chart.innerHTML=days.map((d,i)=>`<div class="bar"><span>${money(vals[i]).replace('.00','')}</span><div style="height:${vals[i]/max*100*0.8}%"></div><span>${d.slice(5)}</span></div>`).join('');
+}
+
+function renderTable(){
+  const list=filtered(), pages=Math.max(1,Math.ceil(list.length/PER));
+  page=Math.min(page,pages);
+  const slice=list.slice((page-1)*PER,page*PER);
+  rows.innerHTML=slice.length?slice.map(o=>`<tr data-id="${o.id}" style="cursor:pointer">
+    <td>#${o.id}</td><td>${o.date}</td><td>${esc(o.customer)}</td><td>${esc(o.product)}</td><td>${o.qty}</td><td>${money(o.total)}</td>
+    <td><span class="badge ${o.status}">${o.status}</span></td></tr>`).join('')
+    :'<tr><td colspan="7" class="empty">No orders match your filters.</td></tr>';
+  count.textContent=`${list.length} order${list.length===1?'':'s'}`;
+  document.getElementById('page').textContent=`Page ${page} of ${pages}`;
+  prev.disabled=page<=1; next.disabled=page>=pages;
+}
+const render=()=>{renderCards();renderChart();renderTable()};
+
+document.querySelectorAll('th').forEach(th=>th.onclick=()=>{
+  const k=th.dataset.k;
+  sort=sort.k===k?{k,dir:-sort.dir}:{k,dir:1};
+  renderTable();
+});
+search.oninput=statusFilter.onchange=()=>{page=1;renderTable()};
+prev.onclick=()=>{page--;renderTable()};
+next.onclick=()=>{page++;renderTable()};
+
+function openModal(html){modalBox.innerHTML=html;modal.classList.add('open')}
+const closeModal=()=>modal.classList.remove('open');
+modal.onclick=e=>{if(e.target===modal)closeModal()};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+
+rows.onclick=e=>{
+  const tr=e.target.closest('tr[data-id]'); if(!tr) return;
+  const o=orders.find(x=>x.id==tr.dataset.id);
+  openModal(`<h3>Order #${o.id}</h3>
+    <div class="row"><span>Date</span><span>${o.date}</span></div>
+    <div class="row"><span>Customer</span><span>${esc(o.customer)}</span></div>
+    <div class="row"><span>Product</span><span>${esc(o.product)}</span></div>
+    <div class="row"><span>Quantity</span><span>${o.qty}</span></div>
+    <div class="row"><span>Total</span><span>${money(o.total)}</span></div>
+    <div class="row"><span>Status</span><span><select id="st">${STATUSES.map(s=>`<option${s===o.status?' selected':''}>${s}</option>`).join('')}</select></span></div>
+    <p style="text-align:right"><button id="del">Delete</button> <button id="close">Close</button> <button id="saveSt" class="primary">Save</button></p>`);
+  close.onclick=closeModal;
+  saveSt.onclick=()=>{o.status=st.value;save();closeModal();render()};
+  del.onclick=()=>{if(confirm('Delete this order?')){orders=orders.filter(x=>x!==o);save();closeModal();render()}};
+};
+
+addBtn.onclick=()=>{
+  openModal(`<h3>New order</h3>
+    <p><input id="nc" placeholder="Customer name" style="width:100%"></p>
+    <p><input id="np" placeholder="Product" style="width:100%"></p>
+    <p style="display:flex;gap:8px"><input id="nq" type="number" min="1" value="1" style="width:50%" placeholder="Qty"><input id="nt" type="number" min="0" step="0.01" style="width:50%" placeholder="Total $"></p>
+    <p style="text-align:right"><button id="close">Cancel</button> <button id="create" class="primary">Add</button></p>`);
+  close.onclick=closeModal;
+  create.onclick=()=>{
+    const c=nc.value.trim(),p=np.value.trim(),q=parseInt(nq.value),t=parseFloat(nt.value);
+    if(!c||!p||!(q>0)||!(t>=0)){alert('Please fill in all fields.');return}
+    const id=Math.max(1000,...orders.map(o=>o.id))+1;
+    orders.push({id,date:dayStr(new Date()),customer:c,product:p,qty:q,total:t,status:'Pending'});
+    save();closeModal();render();
+  };
+};
+
+exportBtn.onclick=()=>{
+  const q=v=>`"${String(v).replace(/"/g,'""')}"`;
+  const csv=['id,date,customer,product,qty,total,status',...filtered().map(o=>[o.id,o.date,q(o.customer),q(o.product),o.qty,o.total,o.status].join(','))].join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='orders.csv';a.click();
+};
+resetBtn.onclick=()=>{if(confirm('Replace all orders with demo data?')){orders=demo();save();render()}};
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pgferry — Postgres backups to S3, from one command</title>
+<meta name="description" content="pgferry is an open-source CLI that backs up PostgreSQL databases to Amazon S3. Streaming, encrypted, verifiable, and scriptable.">
+<style>
+  :root{
+    --bg:#0b1220;--bg2:#111a2e;--panel:#141f38;--line:#223052;
+    --text:#e6ecf8;--muted:#93a1c0;--accent:#38bdf8;--accent2:#34d399;--warn:#fbbf24;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+  header.nav{position:sticky;top:0;z-index:10;background:rgba(11,18,32,.85);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .logo{font-family:var(--mono);font-weight:700;font-size:1.15rem;color:var(--text);display:flex;align-items:center;gap:8px}
+  .logo:hover{text-decoration:none}
+  .logo span{color:var(--accent)}
+  .nav nav{display:flex;gap:22px;align-items:center;font-size:.95rem}
+  .nav nav a{color:var(--muted)}
+  .nav nav a:hover{color:var(--text);text-decoration:none}
+  .btn{display:inline-block;padding:10px 18px;border-radius:8px;font-weight:600;border:1px solid var(--line);color:var(--text);background:var(--panel);transition:.15s}
+  .btn:hover{text-decoration:none;border-color:var(--accent)}
+  .btn.primary{background:var(--accent);color:#04121f;border-color:var(--accent)}
+  .btn.primary:hover{background:#7dd3fc}
+  .hero{padding:80px 0 56px;text-align:center;background:radial-gradient(800px 360px at 50% -10%,rgba(56,189,248,.18),transparent)}
+  .badge{display:inline-block;font-family:var(--mono);font-size:.8rem;color:var(--accent2);border:1px solid rgba(52,211,153,.4);background:rgba(52,211,153,.08);padding:4px 12px;border-radius:999px;margin-bottom:22px}
+  h1{font-size:clamp(2.2rem,5.5vw,3.8rem);line-height:1.1;margin:0 0 18px;letter-spacing:-.02em}
+  h1 em{font-style:normal;color:var(--accent)}
+  .lead{max-width:640px;margin:0 auto 30px;color:var(--muted);font-size:1.15rem}
+  .cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .install{margin:34px auto 0;max-width:560px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:12px 16px;font-family:var(--mono);font-size:.92rem;text-align:left}
+  .install code{overflow-x:auto;white-space:nowrap}
+  .install .p{color:var(--accent2)}
+  button.copy{font:inherit;font-size:.8rem;font-family:var(--sans);background:var(--panel);color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:5px 10px;cursor:pointer}
+  button.copy:hover{color:var(--text);border-color:var(--accent)}
+  section{padding:64px 0}
+  h2{font-size:clamp(1.6rem,3.5vw,2.2rem);margin:0 0 10px;letter-spacing:-.01em}
+  .sub{color:var(--muted);margin:0 0 36px;max-width:640px}
+  .term{background:#070c17;border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+  .term .bar{display:flex;gap:7px;padding:11px 14px;background:var(--bg2);border-bottom:1px solid var(--line)}
+  .term .bar i{width:11px;height:11px;border-radius:50%;background:#33415f;display:block}
+  .term pre{margin:0;padding:20px;overflow-x:auto;font-family:var(--mono);font-size:.88rem;line-height:1.7}
+  .c{color:#5d6d8f}.g{color:var(--accent2)}.b{color:var(--accent)}.y{color:var(--warn)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:24px}
+  .card h3{margin:0 0 8px;font-size:1.05rem}
+  .card p{margin:0;color:var(--muted);font-size:.95rem}
+  .ico{font-size:1.4rem;margin-bottom:10px;display:block}
+  .steps{counter-reset:s;display:grid;gap:18px}
+  .step{display:grid;grid-template-columns:44px 1fr;gap:16px;align-items:start}
+  .step:before{counter-increment:s;content:counter(s);width:44px;height:44px;border-radius:50%;background:var(--panel);border:1px solid var(--accent);color:var(--accent);display:grid;place-items:center;font-weight:700;font-family:var(--mono)}
+  .step h3{margin:6px 0 6px;font-size:1.05rem}
+  .step .term{margin-top:8px}
+  .step p{margin:0;color:var(--muted)}
+  table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:.93rem}
+  th,td{padding:12px 16px;text-align:left;border-bottom:1px solid var(--line)}
+  th{background:var(--bg2);color:var(--muted);font-weight:600;font-size:.82rem;text-transform:uppercase;letter-spacing:.05em}
+  tr:last-child td{border-bottom:none}
+  td code{font-family:var(--mono);color:var(--accent);font-size:.88rem}
+  .tablewrap{overflow-x:auto}
+  details{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin-bottom:12px}
+  summary{cursor:pointer;font-weight:600}
+  details p{color:var(--muted);margin:10px 0 0}
+  .final{text-align:center;background:radial-gradient(600px 260px at 50% 100%,rgba(52,211,153,.12),transparent)}
+  footer{border-top:1px solid var(--line);padding:30px 0;color:var(--muted);font-size:.9rem}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  @media(max-width:640px){.nav nav a.hide{display:none}.hero{padding:56px 0 40px}}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="logo" href="#top" aria-label="pgferry home">⛴ pg<span>ferry</span></a>
+    <nav>
+      <a class="hide" href="#features">Features</a>
+      <a class="hide" href="#how">How it works</a>
+      <a class="hide" href="#reference">Reference</a>
+      <a class="hide" href="#faq">FAQ</a>
+      <a class="btn" href="https://github.com/pgferry/pgferry">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="hero">
+    <div class="wrap">
+      <span class="badge">Open source · MIT licensed</span>
+      <h1>Ferry your Postgres data<br>to <em>S3</em>, safely.</h1>
+      <p class="lead">pgferry is a small command-line tool that streams PostgreSQL backups straight to Amazon S3 (or any S3-compatible store). Compressed, encrypted, and verifiable, with no temp files and no glue scripts.</p>
+      <div class="cta">
+        <a class="btn primary" href="#how">Get started</a>
+        <a class="btn" href="https://github.com/pgferry/pgferry">View on GitHub</a>
+      </div>
+      <div class="install">
+        <code><span class="p">$</span> <span id="cmd">brew install pgferry/tap/pgferry</span></code>
+        <button class="copy" type="button" id="copyBtn">Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <section id="demo" style="padding-top:24px">
+    <div class="wrap">
+      <div class="term">
+        <div class="bar"><i></i><i></i><i></i></div>
+<pre><span class="c"># back up a database to S3</span>
+<span class="g">$</span> pgferry backup postgres://app@db.internal/orders s3://acme-backups/orders
+<span class="b">→</span> connecting to db.internal ... <span class="g">ok</span>
+<span class="b">→</span> streaming pg_dump | zstd | age | s3 ... <span class="g">4.2 GiB → 812 MiB</span>
+<span class="b">→</span> verifying checksum ... <span class="g">sha256 match</span>
+<span class="g">✓</span> done in 1m 48s  s3://acme-backups/orders/2026-11-12T03-00-00Z.dump.zst.age
+
+<span class="c"># and bring it back</span>
+<span class="g">$</span> pgferry restore s3://acme-backups/orders --latest postgres://app@staging/orders</pre>
+      </div>
+    </div>
+  </section>
+
+  <section id="features">
+    <div class="wrap">
+      <h2>Built for boring, reliable backups</h2>
+      <p class="sub">Everything you need to trust your backups, and nothing you have to babysit.</p>
+      <div class="grid">
+        <div class="card"><span class="ico">🌊</span><h3>Streaming, no temp files</h3><p>Data flows from Postgres to S3 through a pipe. You don't need spare disk the size of your database.</p></div>
+        <div class="card"><span class="ico">🔐</span><h3>Client-side encryption</h3><p>Encrypt with age or a KMS key before anything leaves your machine. S3 only ever sees ciphertext.</p></div>
+        <div class="card"><span class="ico">🗜️</span><h3>Fast compression</h3><p>zstd by default, with gzip available. Multipart uploads run in parallel to saturate your link.</p></div>
+        <div class="card"><span class="ico">✅</span><h3>Verify every backup</h3><p>Checksums are recorded and checked on upload. Run <code>pgferry verify</code> to test-restore into a scratch database.</p></div>
+        <div class="card"><span class="ico">♻️</span><h3>Retention policies</h3><p>Keep the last N backups, or daily, weekly, and monthly sets. Old objects are pruned automatically.</p></div>
+        <div class="card"><span class="ico">🧩</span><h3>S3-compatible</h3><p>Works with AWS S3, Cloudflare R2, Backblaze B2, MinIO, and Wasabi via a custom endpoint.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how" style="background:var(--bg2)">
+    <div class="wrap">
+      <h2>Up and running in three steps</h2>
+      <p class="sub">From install to a scheduled, verified backup in a couple of minutes.</p>
+      <div class="steps">
+        <div class="step"><div>
+          <h3>Install</h3>
+          <div class="term"><pre><span class="g">$</span> brew install pgferry/tap/pgferry
+<span class="c"># or</span>
+<span class="g">$</span> go install github.com/pgferry/pgferry@latest</pre></div>
+        </div></div>
+        <div class="step"><div>
+          <h3>Configure</h3>
+          <p>Use environment variables or a small config file. AWS credentials are picked up from the standard chain.</p>
+          <div class="term"><pre><span class="g">$</span> export PGFERRY_AGE_RECIPIENT=age1qyq...
+<span class="g">$</span> export AWS_REGION=us-east-1</pre></div>
+        </div></div>
+        <div class="step"><div>
+          <h3>Back up and schedule</h3>
+          <div class="term"><pre><span class="c"># nightly at 03:00</span>
+0 3 * * * pgferry backup $DATABASE_URL s3://acme-backups/orders --keep-daily 7 --keep-weekly 4</pre></div>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="reference">
+    <div class="wrap">
+      <h2>Command reference</h2>
+      <p class="sub">A small surface area that's easy to remember.</p>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td><code>pgferry backup</code></td><td>Dump a database and stream it to S3.</td></tr>
+            <tr><td><code>pgferry restore</code></td><td>Restore a chosen or latest backup into a target database.</td></tr>
+            <tr><td><code>pgferry list</code></td><td>List backups for a prefix with size, age, and checksum.</td></tr>
+            <tr><td><code>pgferry verify</code></td><td>Test-restore a backup into a scratch database and report.</td></tr>
+            <tr><td><code>pgferry prune</code></td><td>Apply retention rules and delete expired backups.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq" style="background:var(--bg2)">
+    <div class="wrap">
+      <h2>FAQ</h2>
+      <p class="sub">Quick answers to common questions.</p>
+      <details><summary>Which Postgres versions are supported?</summary><p>pgferry wraps <code>pg_dump</code> and <code>pg_restore</code>, so it supports the versions those tools support. Use a client version equal to or newer than your server.</p></details>
+      <details><summary>Does it support point-in-time recovery?</summary><p>No. pgferry takes logical backups. For PITR, use WAL archiving tools alongside it. pgferry is ideal for portable, easy-to-restore snapshots.</p></details>
+      <details><summary>Will it lock my database?</summary><p>No. Backups use a consistent snapshot via <code>pg_dump</code>, which doesn't block normal reads and writes.</p></details>
+      <details><summary>How do I lose the encryption key safely?</summary><p>You shouldn't. Store your age identity in a password manager or secrets vault. Without it, encrypted backups can't be restored.</p></details>
+      <details><summary>Can I contribute?</summary><p>Yes. Issues and pull requests are welcome on GitHub. Check the contributing guide for setup instructions.</p></details>
+    </div>
+  </section>
+
+  <section class="final">
+    <div class="wrap">
+      <h2>Your next restore should be boring.</h2>
+      <p class="sub" style="margin-left:auto;margin-right:auto">Install pgferry, point it at a bucket, and sleep better tonight.</p>
+      <div class="cta">
+        <a class="btn primary" href="https://github.com/pgferry/pgferry">Star on GitHub</a>
+        <a class="btn" href="https://github.com/pgferry/pgferry#readme">Read the docs</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 pgferry contributors. Released under the MIT License.</span>
+    <span><a href="https://github.com/pgferry/pgferry">GitHub</a> · <a href="https://github.com/pgferry/pgferry/issues">Issues</a> · <a href="https://github.com/pgferry/pgferry/releases">Releases</a></span>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('copyBtn').addEventListener('click', function () {
+    var b = this, t = document.getElementById('cmd').textContent;
+    var done = function () { b.textContent = 'Copied!'; setTimeout(function () { b.textContent = 'Copy'; }, 1500); };
+    if (navigator.clipboard) { navigator.clipboard.writeText(t).then(done); } else { done(); }
+  });
+</script>
+</body>
+</html>

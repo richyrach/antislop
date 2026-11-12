@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orders · Shop dashboard</title>
+<meta name="description" content="A working list of online shop orders: what to pack, what to ship, and who has not paid.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%231c2220'/%3E%3Cpath d='M7 12l9-5 9 5v10l-9 5-9-5z' fill='none' stroke='%23f7f8f4' stroke-width='2'/%3E%3Cpath d='M7 12l9 5 9-5M16 17v10' fill='none' stroke='%23f7f8f4' stroke-width='2'/%3E%3C/svg%3E">
+<style>
+:root{
+  --ground:#e6e9e3;
+  --paper:#f7f8f4;
+  --ink:#1c2220;
+  --muted:#556059;
+  --line:#c5ccc4;
+  --faint:#eef0ea;
+  --action:#c8381b;
+  --action-dark:#a82c14;
+  --focus:#1f4fd1;
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:72px;
+  --display:"Bahnschrift","DIN Condensed","Avenir Next Condensed","Franklin Gothic Medium","Arial Narrow",system-ui,sans-serif;
+  --body:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono",Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--ground);color:var(--ink);font:16px/1.5 var(--body);}
+::selection{background:var(--ink);color:var(--paper)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.wrap{max-width:1240px;margin:0 auto;padding:0 var(--s5)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* header */
+header.top{padding:var(--s5) 0 var(--s4)}
+.top-row{display:flex;flex-wrap:wrap;gap:var(--s4);align-items:flex-end;justify-content:space-between}
+h1{font:700 clamp(2rem,4vw,2.75rem)/1 var(--display);letter-spacing:-.01em;margin:0}
+.date{color:var(--muted);margin:var(--s1) 0 0}
+.actions{display:flex;flex-wrap:wrap;gap:var(--s2);align-items:center}
+
+.btn{min-height:44px;padding:0 var(--s4);border:1.5px solid var(--ink);background:transparent;border-radius:3px;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);white-space:nowrap}
+.btn:hover{background:var(--ink);color:var(--paper)}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.45;cursor:not-allowed;background:transparent;color:var(--ink)}
+.btn.primary{background:var(--action);border-color:var(--action);color:#fff}
+.btn.primary:hover{background:var(--action-dark);border-color:var(--action-dark)}
+.btn.quiet{border-color:var(--line)}
+.btn.quiet:hover{border-color:var(--ink)}
+.btn.danger{border-color:transparent;color:var(--action-dark);text-decoration:underline;padding:0 var(--s2)}
+.btn.danger:hover{background:var(--action-dark);color:#fff}
+.btn.small{min-height:44px;padding:0 var(--s3);font-size:.9rem}
+
+/* sample banner */
+.sample{display:flex;flex-wrap:wrap;gap:var(--s3);align-items:center;justify-content:space-between;border:1.5px dashed var(--ink);padding:var(--s3) var(--s4);margin-bottom:var(--s4);background:var(--paper);border-radius:3px}
+.sample p{margin:0}
+.sample[hidden]{display:none}
+
+/* queue band */
+.band{background:var(--ink);color:var(--paper);display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;border-radius:4px;overflow:hidden}
+.q{all:unset;box-sizing:border-box;cursor:pointer;padding:var(--s5);display:flex;flex-direction:column;justify-content:space-between;gap:var(--s3);border-inline-start:1px solid #3a433f;min-height:150px}
+.q:first-child{border-inline-start:0}
+.q:hover{background:#27302c}
+.q:focus-visible{outline:3px solid #fff;outline-offset:-6px}
+.q[aria-pressed="true"]{background:var(--paper);color:var(--ink)}
+.q .lbl{font:600 1rem/1.2 var(--display);letter-spacing:.04em;text-transform:uppercase}
+.q .num{font:700 3.25rem/1 var(--display);font-variant-numeric:tabular-nums}
+.q:first-child .num{font-size:6rem}
+.q .sub{font-size:.875rem;color:#c3cbc5}
+.q[aria-pressed="true"] .sub{color:var(--muted)}
+.q.hot .num::after{content:"";display:inline-block;width:.16em;height:.16em;margin-inline-start:.1em;background:var(--action);vertical-align:.7em;border-radius:1px}
+
+/* toolbar */
+.tools{display:flex;flex-wrap:wrap;gap:var(--s3);align-items:flex-end;margin:var(--s5) 0 var(--s3)}
+.field{display:flex;flex-direction:column;gap:var(--s1);font-size:.875rem;color:var(--muted)}
+.field input,.field select,.field textarea{min-height:44px;padding:var(--s2) var(--s3);border:1.5px solid var(--ink);background:var(--paper);border-radius:3px;color:var(--ink);font-size:1rem}
+.field textarea{min-height:88px;resize:vertical}
+.field input::placeholder,.field textarea::placeholder{color:#6d776f}
+.field.grow{flex:1 1 240px}
+.field .err{color:var(--action-dark);font-weight:600;font-size:.875rem}
+.count{margin-inline-start:auto;color:var(--muted);align-self:center;font-variant-numeric:tabular-nums}
+
+/* table */
+.panel{background:var(--paper);border:1.5px solid var(--ink);border-radius:4px;overflow:hidden}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:860px}
+caption{text-align:start}
+th{font:600 .8125rem/1.2 var(--display);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:start;padding:var(--s3) var(--s4);border-bottom:1.5px solid var(--ink);background:var(--faint);white-space:nowrap}
+td{padding:var(--s3) var(--s4);border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--faint)}
+.num-col{text-align:end;font-variant-numeric:tabular-nums}
+.ordno{all:unset;cursor:pointer;font:700 1rem var(--mono);text-decoration:underline;text-underline-offset:3px;padding:var(--s2) 0;display:inline-block;min-height:44px;line-height:28px;box-sizing:border-box}
+.ordno:hover{background:var(--ink);color:var(--paper)}
+.ordno:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.sub{color:var(--muted);font-size:.875rem}
+.late{color:var(--action-dark);font-weight:700}
+.items-cell{max-width:240px}
+.cust small{display:block;color:var(--muted);font-size:.875rem;overflow-wrap:anywhere}
+
+.chip{display:inline-flex;align-items:center;gap:var(--s2);font-weight:600;font-size:.875rem;white-space:nowrap}
+.pip{--p:0%;width:14px;height:14px;border-radius:50%;border:2px solid currentColor;background:conic-gradient(currentColor var(--p),transparent 0);flex:none}
+.st-awaiting{color:var(--action-dark)}
+.st-awaiting .pip{border-style:dashed}
+.st-topack .pip{--p:25%}
+.st-toship .pip{--p:50%}
+.st-transit .pip{--p:75%}
+.st-delivered{color:var(--muted)}
+.st-delivered .pip{--p:100%}
+.st-cancelled{color:var(--muted);text-decoration:line-through}
+
+.empty{padding:var(--s7) var(--s5);text-align:start;max-width:56ch}
+.empty h2{font:700 1.5rem/1.2 var(--display);margin:0 0 var(--s2)}
+.empty p{margin:0 0 var(--s4);color:var(--muted)}
+
+/* dialog */
+dialog{border:1.5px solid var(--ink);border-radius:4px;padding:0;background:var(--paper);color:var(--ink);width:min(640px,calc(100vw - 24px));max-height:calc(100dvh - 24px)}
+dialog::backdrop{background:rgba(28,34,32,.6)}
+.dlg{padding:var(--s5);display:flex;flex-direction:column;gap:var(--s4)}
+.dlg-head{display:flex;justify-content:space-between;gap:var(--s3);align-items:flex-start}
+.dlg h2{font:700 1.75rem/1.1 var(--display);margin:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:var(--s3)}
+.lines{width:100%;min-width:0;border-collapse:collapse}
+.lines th,.lines td{padding:var(--s2) var(--s2);font-size:.9375rem}
+.lines th{background:none;border-bottom:1px solid var(--ink)}
+.line-row{display:grid;grid-template-columns:1fr 72px 96px 44px;gap:var(--s2);align-items:end}
+.line-row .field input{min-width:0}
+.foot{display:flex;flex-wrap:wrap;gap:var(--s2);justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding-top:var(--s4)}
+.foot .r{display:flex;gap:var(--s2);flex-wrap:wrap}
+.check{display:flex;gap:var(--s2);align-items:center;min-height:44px}
+.check input{width:22px;height:22px;accent-color:var(--ink)}
+dl.facts{display:grid;grid-template-columns:auto 1fr;gap:var(--s1) var(--s4);margin:0}
+dl.facts dt{color:var(--muted)}
+dl.facts dd{margin:0;white-space:pre-line;overflow-wrap:anywhere}
+.total-line{display:flex;justify-content:space-between;font-weight:700;border-top:1.5px solid var(--ink);padding-top:var(--s2);font-variant-numeric:tabular-nums}
+
+/* toast */
+.toast{position:fixed;inset-inline:var(--s4);bottom:var(--s4);margin:0 auto;max-width:520px;background:var(--ink);color:var(--paper);padding:var(--s3) var(--s4);border-radius:4px;display:flex;gap:var(--s4);align-items:center;justify-content:space-between;opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .2s ease-out,transform .2s ease-out;z-index:50}
+.toast.on{opacity:1;transform:none;pointer-events:auto}
+.toast button{background:none;border:0;color:#fff;text-decoration:underline;font-weight:700;cursor:pointer;min-height:44px;padding:0 var(--s2)}
+.toast button:focus-visible{outline-color:#fff}
+
+footer{padding:var(--s6) 0 var(--s7);color:var(--muted);font-size:.875rem}
+footer p{margin:0 0 var(--s1);max-width:70ch}
+
+/* phone */
+@media (max-width:900px){
+  .band{grid-template-columns:1fr 1fr}
+  .q:first-child{grid-column:1/-1;min-height:170px}
+  .q{border-inline-start:0;border-top:1px solid #3a433f}
+  .q:first-child{border-top:0}
+  .q:nth-child(odd):not(:first-child){border-inline-end:1px solid #3a433f}
+}
+@media (max-width:760px){
+  .wrap{padding:0 var(--s4)}
+  table{min-width:0}
+  thead{display:none}
+  tbody tr{display:grid;grid-template-columns:1fr auto;grid-template-areas:"no total" "cust stage" "items placed" "act act";gap:2px var(--s3);padding:var(--s3) var(--s4);border-bottom:1px solid var(--line)}
+  tbody tr:last-child{border-bottom:0}
+  td{padding:0;border:0}
+  .c-no{grid-area:no}.c-total{grid-area:total;text-align:end}.c-cust{grid-area:cust}.c-stage{grid-area:stage;text-align:end;align-self:center}
+  .c-items{grid-area:items;max-width:none}.c-placed{grid-area:placed;text-align:end}
+  .c-act{grid-area:act;padding-top:var(--s2)}
+  .c-act .btn{width:100%}
+  .c-date{display:none}
+  .count{margin-inline-start:0;width:100%}
+  .grid2{grid-template-columns:1fr}
+  .line-row{grid-template-columns:1fr 64px 88px 44px}
+  .q:first-child .num{font-size:5rem}
+}
+@media (max-width:420px){.band{grid-template-columns:1fr}.q:nth-child(odd):not(:first-child){border-inline-end:0}.q{min-height:110px}.q:first-child{min-height:150px}}
+@media (prefers-reduced-motion:reduce){.toast{transition:opacity .01s}.btn:active{transform:none}}
+@media print{
+  body{background:#fff}
+  header .actions,.sample,.band,.tools,.c-act,.toast,footer,th:last-child{display:none!important}
+  .panel{border:0}
+  .scroll{overflow:visible}
+  table{min-width:0}
+  .c-act,th:last-child{display:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="top-row">
+      <div>
+        <h1>Orders</h1>
+        <p class="date" id="today"></p>
+      </div>
+      <div class="actions">
+        <button class="btn quiet" id="btn-print" type="button">Print list</button>
+        <button class="btn quiet" id="btn-export" type="button">Export CSV</button>
+        <button class="btn quiet" id="btn-import" type="button">Import CSV</button>
+        <input type="file" id="file" accept=".csv,text/csv" hidden>
+        <button class="btn primary" id="btn-add" type="button">Add order</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="sample" id="sample" hidden>
+    <p><strong>Sample orders are showing.</strong> Customers and products here are made up so you can try the buttons.</p>
+    <button class="btn small" id="btn-clear-sample" type="button">Remove sample orders</button>
+  </div>
+
+  <div id="msg" class="sample" role="status" hidden></div>
+
+  <section aria-label="Work queue">
+    <div class="band" id="band"></div>
+  </section>
+
+  <section aria-label="All orders">
+    <div class="tools">
+      <label class="field grow">Search
+        <input type="search" id="q" placeholder="Customer, order number, product, tracking" autocomplete="off">
+      </label>
+      <label class="field">Show
+        <select id="filter"></select>
+      </label>
+      <label class="field">Sort by
+        <select id="sort">
+          <option value="new">Newest first</option>
+          <option value="old">Oldest first</option>
+          <option value="high">Highest total</option>
+          <option value="cust">Customer A to Z</option>
+        </select>
+      </label>
+      <label class="field">Currency
+        <select id="cur">
+          <option>EUR</option><option>USD</option><option>GBP</option><option>CAD</option><option>AUD</option>
+        </select>
+      </label>
+      <div class="count" id="count" aria-live="polite"></div>
+    </div>
+
+    <div class="panel">
+      <div class="scroll">
+        <table>
+          <caption class="sr">Orders</caption>
+          <thead>
+            <tr>
+              <th scope="col">Order</th>
+              <th scope="col" class="c-date">Placed</th>
+              <th scope="col">Customer</th>
+              <th scope="col">Items</th>
+              <th scope="col" class="num-col" id="th-total">Total</th>
+              <th scope="col">Status</th>
+              <th scope="col">Next step</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <div id="empty" class="empty" hidden></div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Orders are stored in this browser only. Export a CSV regularly if you want a backup, or to open it on another device.</p>
+    <p>Late means paid, not yet packed, and placed two or more days ago.</p>
+  </footer>
+</div>
+
+<dialog id="dlg-add" aria-labelledby="add-title">
+  <form class="dlg" id="form-add" novalidate>
+    <div class="dlg-head">
+      <h2 id="add-title">Add order</h2>
+      <button class="btn quiet small" type="button" data-close>Close</button>
+    </div>
+    <div class="grid2">
+      <label class="field">Order number
+        <input id="a-no" inputmode="numeric" required>
+        <span class="err" data-err="no"></span>
+      </label>
+      <label class="field">Customer name
+        <input id="a-cust" autocomplete="off" required>
+        <span class="err" data-err="cust"></span>
+      </label>
+      <label class="field">Email (optional)
+        <input id="a-email" type="email" inputmode="email" autocomplete="off">
+        <span class="err" data-err="email"></span>
+      </label>
+      <label class="field">Shipping address (optional)
+        <textarea id="a-addr" rows="2"></textarea>
+      </label>
+    </div>
+    <fieldset style="border:0;padding:0;margin:0;display:flex;flex-direction:column;gap:8px">
+      <legend style="font-weight:600;padding:0;margin-bottom:8px">Items</legend>
+      <div id="a-lines" style="display:flex;flex-direction:column;gap:8px"></div>
+      <span class="err" style="color:var(--action-dark);font-weight:600;font-size:.875rem" data-err="lines"></span>
+      <div><button class="btn quiet small" type="button" id="a-addline">Add item line</button></div>
+    </fieldset>
+    <label class="check"><input type="checkbox" id="a-paid"> Already paid</label>
+    <div class="foot">
+      <div class="total-line" style="width:100%;border:0;padding:0"><span>Total</span><span id="a-total"></span></div>
+      <div></div>
+      <div class="r">
+        <button class="btn quiet" type="button" data-close>Cancel</button>
+        <button class="btn primary" type="submit">Create order</button>
+      </div>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlg-edit" aria-labelledby="ed-title">
+  <form class="dlg" id="form-edit"></form>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"><span id="toast-text"></span><button type="button" id="toast-undo" hidden>Undo</button></div>
+
+<script>
+(function(){
+"use strict";
+var KEY="shop-orders-v1";
+var STAGES={awaiting:"Awaiting payment",topack:"To pack",toship:"To ship",transit:"In transit",delivered:"Delivered",cancelled:"Cancelled"};
+var STATUS_LABEL={new:"Not packed",packed:"Packed",shipped:"Shipped",delivered:"Delivered",cancelled:"Cancelled"};
+var NEXT={awaiting:"Mark paid",topack:"Mark packed",toship:"Mark shipped",transit:"Mark delivered"};
+var state={orders:[],currency:"EUR",filter:"all",sort:"new",q:""};
+var undoSnap=null,toastTimer=null,lastFocus=null;
+
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({orders:state.orders,currency:state.currency}))}catch(e){}}
+function load(){
+  var raw=null;try{raw=localStorage.getItem(KEY)}catch(e){}
+  if(raw){try{var d=JSON.parse(raw);state.orders=d.orders||[];state.currency=d.currency||"EUR";return}catch(e){}}
+  seed();save();
+}
+function daysAgoISO(n){var d=new Date();d.setHours(10,0,0,0);d.setDate(d.getDate()-n);return d.toISOString()}
+function seed(){
+  var S=[
+    [0,"Customer A",[["Product A",1,24]],1,"new"],
+    [0,"Customer B",[["Product B",2,12.5],["Product C",1,9]],1,"new"],
+    [1,"Customer C",[["Product A",3,24]],0,"new"],
+    [1,"Customer L",[["Product E",2,40]],0,"new"],
+    [2,"Customer D",[["Product D",1,58]],1,"new"],
+    [3,"Customer E",[["Product C",2,9]],1,"packed"],
+    [3,"Customer F",[["Product B",1,12.5],["Product A",1,24]],1,"packed"],
+    [4,"Customer G",[["Product E",1,40]],1,"shipped","SAMPLE-0001"],
+    [5,"Customer H",[["Product A",2,24]],1,"shipped","SAMPLE-0002"],
+    [6,"Customer I",[["Product C",4,9]],1,"delivered","SAMPLE-0003"],
+    [8,"Customer J",[["Product D",1,58]],1,"delivered","SAMPLE-0004"],
+    [9,"Customer K",[["Product B",1,12.5]],1,"cancelled"],
+    [10,"Customer M",[["Product A",1,24]],1,"delivered","SAMPLE-0005"],
+    [12,"Customer N",[["Product C",1,9],["Product B",3,12.5]],1,"delivered","SAMPLE-0006"]
+  ];
+  S.sort(function(a,b){return b[0]-a[0]});
+  state.orders=S.map(function(r,i){
+    return {id:"s"+i,no:1001+i,created:daysAgoISO(r[0]),customer:r[1],email:"",address:"",
+      items:r[2].map(function(x){return{name:x[0],qty:x[1],price:x[2]}}),
+      paid:!!r[3],status:r[4],tracking:r[5]||"",note:"",sample:true};
+  });
+}
+function total(o){return o.items.reduce(function(s,i){return s+i.qty*i.price},0)}
+function money(n){try{return new Intl.NumberFormat(undefined,{style:"currency",currency:state.currency}).format(n)}catch(e){return n.toFixed(2)}}
+function age(o){return Math.max(0,Math.floor((Date.now()-new Date(o.created).getTime())/864e5))}
+function dshort(iso){return new Intl.DateTimeFormat(undefined,{day:"numeric",month:"short"}).format(new Date(iso))}
+function stage(o){
+  if(o.status==="cancelled")return"cancelled";
+  if(o.status==="delivered")return"delivered";
+  if(o.status==="shipped")return"transit";
+  if(!o.paid)return"awaiting";
+  return o.status==="packed"?"toship":"topack";
+}
+function isLate(o){return stage(o)==="topack"&&age(o)>=2}
+function chip(s){return '<span class="chip st-'+s+'"><span class="pip" aria-hidden="true"></span>'+STAGES[s]+'</span>'}
+function agoText(n){return n===0?"today":n===1?"1 day ago":n+" days ago"}
+
+/* render */
+function counts(){
+  var c={all:state.orders.length,awaiting:0,topack:0,toship:0,transit:0,delivered:0,cancelled:0,unpaid:0,oldestPack:-1};
+  state.orders.forEach(function(o){
+    var s=stage(o);c[s]++;
+    if(s==="awaiting")c.unpaid+=total(o);
+    if(s==="topack")c.oldestPack=Math.max(c.oldestPack,age(o));
+  });
+  return c;
+}
+function renderBand(){
+  var c=counts();
+  var defs=[
+    ["topack","To pack",c.topack,c.topack?(c.oldestPack>=2?"Oldest waiting "+c.oldestPack+" days":"Paid and waiting for the box"):"Nothing waiting",c.topack>0],
+    ["toship","To ship",c.toship,"Packed, not yet with the carrier",false],
+    ["awaiting","Awaiting payment",c.awaiting,c.awaiting?money(c.unpaid)+" unpaid":"Nothing unpaid",false],
+    ["transit","In transit",c.transit,"Shipped, not yet delivered",false],
+    ["all","All orders",c.all,"Including delivered and cancelled",false]
+  ];
+  $("band").innerHTML=defs.map(function(d){
+    return '<button type="button" class="q'+(d[4]?" hot":"")+'" data-f="'+d[0]+'" aria-pressed="'+(state.filter===d[0])+'">'+
+      '<span class="lbl">'+d[1]+'</span><span class="num">'+d[2]+'</span><span class="sub">'+esc(d[3])+'</span></button>';
+  }).join("");
+  var sel=$("filter");
+  sel.innerHTML='<option value="all">All orders ('+c.all+')</option>'+Object.keys(STAGES).map(function(k){return '<option value="'+k+'">'+STAGES[k]+' ('+c[k]+')</option>'}).join("");
+  sel.value=state.filter;
+}
+function visible(){
+  var q=state.q.trim().toLowerCase();
+  var list=state.orders.filter(function(o){
+    if(state.filter!=="all"&&stage(o)!==state.filter)return false;
+    if(!q)return true;
+    var hay=[o.no,o.customer,o.email,o.tracking,o.items.map(function(i){return i.name}).join(" ")].join(" ").toLowerCase();
+    return hay.indexOf(q.replace(/^#/,""))>-1;
+  });
+  list.sort(function(a,b){
+    if(state.sort==="old")return new Date(a.created)-new Date(b.created)||a.no-b.no;
+    if(state.sort==="high")return total(b)-total(a);
+    if(state.sort==="cust")return a.customer.localeCompare(b.customer);
+    return new Date(b.created)-new Date(a.created)||b.no-a.no;
+  });
+  return list;
+}
+function renderRows(){
+  var list=visible();
+  $("th-total").textContent="Total ("+state.currency+")";
+  $("rows").innerHTML=list.map(function(o){
+    var s=stage(o),n=age(o),first=o.items[0]?o.items[0].name:"",more=o.items.length>1?" + "+(o.items.length-1)+" more":"";
+    var qty=o.items.reduce(function(a,i){return a+i.qty},0);
+    var act=NEXT[s]?'<button class="btn small" type="button" data-next="'+o.id+'">'+NEXT[s]+'</button>':'<span class="sub">None</span>';
+    return '<tr>'+
+      '<td class="c-no"><button class="ordno" type="button" data-open="'+o.id+'" aria-label="Open order '+o.no+'">#'+o.no+'</button></td>'+
+      '<td class="c-date">'+dshort(o.created)+'<div class="sub">'+agoText(n)+'</div></td>'+
+      '<td class="c-cust cust">'+esc(o.customer)+(o.email?'<small>'+esc(o.email)+'</small>':'')+'</td>'+
+      '<td class="c-items items-cell">'+esc(first)+esc(more)+'<div class="sub">'+qty+' '+(qty===1?'unit':'units')+'</div></td>'+
+      '<td class="c-total num-col">'+money(total(o))+'</td>'+
+      '<td class="c-stage">'+chip(s)+'</td>'+
+      '<td class="c-act">'+act+'</td>'+
+      '</tr>';
+  }).join("").replace(/<td class="c-date">/g,'<td class="c-date c-placed-d">');
+  // add mobile "placed" cell text inside items row via duplicate cell
+  var trs=$("rows").querySelectorAll("tr");
+  for(var i=0;i<trs.length;i++){
+    var o=list[i];var td=document.createElement("td");td.className="c-placed sub";
+    var late=isLate(o);
+    td.innerHTML=(window.matchMedia("(max-width:760px)").matches?dshort(o.created)+", "+agoText(age(o)):"")+(late?' <span class="late">late</span>':'');
+    if(late||window.matchMedia("(max-width:760px)").matches)trs[i].insertBefore(td,trs[i].querySelector(".c-act"));
+  }
+  // desktop late flag
+  if(!window.matchMedia("(max-width:760px)").matches){
+    for(var j=0;j<trs.length;j++){
+      if(isLate(list[j])){var st=trs[j].querySelector(".c-stage");st.insertAdjacentHTML("beforeend",' <span class="late">late</span>');var p=trs[j].querySelector(".c-placed");if(p)p.remove();}
+    }
+  }
+  var total_=state.orders.length;
+  $("count").textContent="Showing "+list.length+" of "+total_+" orders";
+  var empty=$("empty");
+  if(!list.length){
+    empty.hidden=false;
+    if(!total_){
+      empty.innerHTML='<h2>No orders yet</h2><p>Orders you add or import will appear here, sorted into what needs packing, shipping and chasing.</p><button class="btn primary" type="button" data-act="add">Add the first order</button> <button class="btn" type="button" data-act="import">Import a CSV</button>';
+    }else{
+      var what=state.q?'No orders match “'+esc(state.q)+'”'+(state.filter!=="all"?' in '+STAGES[state.filter]:''):'No orders in '+STAGES[state.filter];
+      empty.innerHTML='<h2>'+what+'</h2><p>Clear the search or show all orders to see the other '+total_+'.</p><button class="btn" type="button" data-act="reset">Show all orders</button>';
+    }
+  }else empty.hidden=true;
+  $("rows").closest("table").style.display=list.length?"":"none";
+}
+function render(){
+  renderBand();renderRows();
+  $("sample").hidden=!state.orders.some(function(o){return o.sample});
+  $("cur").value=state.currency;
+}
+
+/* toast */
+function toast(text,undo){
+  $("toast-text").textContent=text;
+  $("toast-undo").hidden=!undo;
+  undoSnap=undo||null;
+  var t=$("toast");t.classList.add("on");
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(function(){t.classList.remove("on");undoSnap=null},6000);
+}
+function banner(text,isErr){var m=$("msg");m.hidden=!text;m.textContent=text||"";m.style.borderStyle=isErr?"solid":"dashed"}
+
+/* actions */
+function find(id){return state.orders.filter(function(o){return o.id===id})[0]}
+function advance(id){
+  var o=find(id);if(!o)return;
+  var prev=JSON.stringify(o),s=stage(o),msg="";
+  if(s==="awaiting"){o.paid=true;msg="Order #"+o.no+" marked paid."}
+  else if(s==="topack"){o.status="packed";msg="Order #"+o.no+" marked packed."}
+  else if(s==="toship"){o.status="shipped";msg="Order #"+o.no+" marked shipped. Add a tracking number by opening the order."}
+  else if(s==="transit"){o.status="delivered";msg="Order #"+o.no+" marked delivered."}
+  else return;
+  save();render();
+  toast(msg,function(){var i=state.orders.findIndex(function(x){return x.id===id});state.orders[i]=JSON.parse(prev);save();render();toast("Change undone.")});
+}
+
+/* edit dialog */
+function openEdit(id){
+  var o=find(id);if(!o)return;
+  lastFocus=document.activeElement;
+  var rows=o.items.map(function(i){return '<tr><td>'+esc(i.name)+'</td><td class="num-col">'+i.qty+'</td><td class="num-col">'+money(i.price)+'</td><td class="num-col">'+money(i.qty*i.price)+'</td></tr>'}).join("");
+  var f=$("form-edit");
+  f.innerHTML=
+   '<div class="dlg-head"><div><h2 id="ed-title">Order #'+o.no+'</h2><div class="sub">Placed '+dshort(o.created)+', '+agoText(age(o))+(o.sample?' · sample order':'')+'</div></div><button class="btn quiet small" type="button" data-close>Close</button></div>'+
+   '<dl class="facts"><dt>Customer</dt><dd>'+esc(o.customer)+'</dd>'+(o.email?'<dt>Email</dt><dd>'+esc(o.email)+'</dd>':'')+(o.address?'<dt>Ship to</dt><dd>'+esc(o.address)+'</dd>':'')+'</dl>'+
+   '<div class="scroll"><table class="lines"><thead><tr><th>Item</th><th class="num-col">Qty</th><th class="num-col">Price</th><th class="num-col">Line</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
+   '<div class="total-line"><span>Total</span><span>'+money(total(o))+'</span></div>'+
+   '<div class="grid2">'+
+   '<label class="field">Status<select id="e-status">'+Object.keys(STATUS_LABEL).map(function(k){return '<option value="'+k+'"'+(o.status===k?' selected':'')+'>'+STATUS_LABEL[k]+'</option>'}).join("")+'</select></label>'+
+   '<label class="field">Tracking number<input id="e-track" value="'+esc(o.tracking)+'" autocomplete="off"></label></div>'+
+   '<label class="check"><input type="checkbox" id="e-paid"'+(o.paid?' checked':'')+'> Paid</label>'+
+   '<label class="field">Note (only you see this)<textarea id="e-note">'+esc(o.note)+'</textarea></label>'+
+   '<div class="sub">Changes on this form are applied when you press Save changes.</div>'+
+   '<div class="foot"><button class="btn danger" type="button" id="e-del">Delete order</button><div class="r"><button class="btn quiet" type="button" data-close>Cancel</button><button class="btn primary" type="submit">Save changes</button></div></div>';
+  f.dataset.id=id;
+  $("dlg-edit").showModal();
+}
+$("form-edit").addEventListener("submit",function(e){
+  e.preventDefault();
+  var o=find(this.dataset.id);if(!o)return;
+  o.status=$("e-status").value;o.paid=$("e-paid").checked;o.tracking=$("e-track").value.trim();o.note=$("e-note").value.trim();
+  save();render();$("dlg-edit").close();toast("Order #"+o.no+" saved.");
+});
+$("form-edit").addEventListener("click",function(e){
+  if(e.target.id==="e-del"){
+    var o=find(this.dataset.id);
+    if(o&&confirm("Delete order #"+o.no+" for "+o.customer+"? This cannot be undone.")){
+      state.orders=state.orders.filter(function(x){return x.id!==o.id});save();render();$("dlg-edit").close();toast("Order #"+o.no+" deleted.");
+    }
+  }
+});
+
+/* add dialog */
+function lineRow(v){
+  v=v||{};
+  var d=document.createElement("div");d.className="line-row";
+  d.innerHTML='<label class="field">Product<input class="l-name" value="'+esc(v.name||"")+'" autocomplete="off"></label>'+
+   '<label class="field">Qty<input class="l-qty" type="number" min="1" step="1" inputmode="numeric" value="'+(v.qty||1)+'"></label>'+
+   '<label class="field">Unit price<input class="l-price" type="number" min="0" step="0.01" inputmode="decimal" value="'+(v.price!=null?v.price:"")+'"></label>'+
+   '<button class="btn quiet" type="button" data-rm aria-label="Remove this item line" style="padding:0">✕</button>';
+  return d;
+}
+function nextNo(){return state.orders.reduce(function(m,o){return Math.max(m,o.no)},1000)+1}
+function openAdd(){
+  var f=$("form-add");f.reset();
+  $("a-no").value=nextNo();
+  var L=$("a-lines");L.innerHTML="";L.appendChild(lineRow());
+  clearErr();calcAdd();$("dlg-add").showModal();$("a-cust").focus();
+}
+function clearErr(){var el=document.querySelectorAll("[data-err]");for(var i=0;i<el.length;i++)el[i].textContent=""}
+function setErr(k,t){document.querySelector('[data-err="'+k+'"]').textContent=t}
+function readLines(){
+  return Array.prototype.map.call($("a-lines").querySelectorAll(".line-row"),function(r){
+    return{name:r.querySelector(".l-name").value.trim(),qty:parseInt(r.querySelector(".l-qty").value,10),price:parseFloat(r.querySelector(".l-price").value)};
+  });
+}
+function calcAdd(){
+  var t=readLines().reduce(function(s,i){return s+((i.qty>0&&i.price>=0)?i.qty*i.price:0)},0);
+  $("a-total").textContent=money(t);
+}
+$("a-lines").addEventListener("input",calcAdd);
+$("a-lines").addEventListener("click",function(e){
+  if(e.target.hasAttribute("data-rm")){
+    var rows=$("a-lines").querySelectorAll(".line-row");
+    if(rows.length>1){e.target.closest(".line-row").remove();calcAdd()}
+    else setErr("lines","An order needs at least one item.");
+  }
+});
+$("a-addline").addEventListener("click",function(){var r=lineRow();$("a-lines").appendChild(r);r.querySelector("input").focus()});
+$("a-no").addEventListener("blur",function(){
+  var n=parseInt(this.value,10);
+  setErr("no",!n||n<1?"Enter a number, for example "+nextNo()+".":state.orders.some(function(o){return o.no===n})?"Order #"+n+" already exists. Try "+nextNo()+".":"");
+});
+$("a-cust").addEventListener("blur",function(){setErr("cust",this.value.trim()?"":"Enter the customer's name.")});
+$("a-email").addEventListener("blur",function(){setErr("email",this.value&&!this.checkValidity()?"That email address looks incomplete, for example name@example.com.":"")});
+$("form-add").addEventListener("submit",function(e){
+  e.preventDefault();clearErr();
+  var ok=true,no=parseInt($("a-no").value,10);
+  if(!no||no<1){setErr("no","Enter a number, for example "+nextNo()+".");ok=false}
+  else if(state.orders.some(function(o){return o.no===no})){setErr("no","Order #"+no+" already exists. Try "+nextNo()+".");ok=false}
+  if(!$("a-cust").value.trim()){setErr("cust","Enter the customer's name.");ok=false}
+  if($("a-email").value&&!$("a-email").checkValidity()){setErr("email","That email address looks incomplete, for example name@example.com.");ok=false}
+  var lines=readLines().filter(function(l){return l.name||!isNaN(l.price)});
+  if(!lines.length||lines.some(function(l){return !l.name||!(l.qty>0)||isNaN(l.price)||l.price<0})){
+    setErr("lines","Each item needs a product name, a quantity of 1 or more, and a price.");ok=false;
+  }
+  if(!ok)return;
+  state.orders.push({id:"o"+Date.now(),no:no,created:new Date().toISOString(),customer:$("a-cust").value.trim(),email:$("a-email").value.trim(),address:$("a-addr").value.trim(),items:lines,paid:$("a-paid").checked,status:"new",tracking:"",note:""});
+  save();state.filter="all";$("q").value="";state.q="";render();$("dlg-add").close();toast("Order #"+no+" added.");
+});
+
+/* CSV */
+var HEAD=["order","date","customer","email","address","item","qty","price","paid","status","tracking","note"];
+function csvCell(v){v=String(v==null?"":v);return /[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
+function exportCSV(){
+  if(!state.orders.length){banner("There are no orders to export yet.",true);return}
+  var out=[HEAD.join(",")];
+  state.orders.forEach(function(o){
+    o.items.forEach(function(i){
+      out.push([o.no,o.created.slice(0,10),o.customer,o.email,o.address,i.name,i.qty,i.price,o.paid?"yes":"no",o.status,o.tracking,o.note].map(csvCell).join(","));
+    });
+  });
+  var blob=new Blob([out.join("\r\n")],{type:"text/csv;charset=utf-8"});
+  var a=document.createElement("a");a.href=URL.createObjectURL(blob);
+  a.download="orders-"+new Date().toISOString().slice(0,10)+".csv";
+  document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},1000);
+  banner("");toast("Exported "+state.orders.length+" orders.");
+}
+function parseCSV(t){
+  var rows=[],row=[],cell="",q=false;
+  t=t.replace(/^\uFEFF/,"");
+  for(var i=0;i<t.length;i++){
+    var c=t[i];
+    if(q){if(c==='"'){if(t[i+1]==='"'){cell+='"';i++}else q=false}else cell+=c}
+    else if(c==='"')q=true;
+    else if(c===","){row.push(cell);cell=""}
+    else if(c==="\n"||c==="\r"){if(c==="\r"&&t[i+1]==="\n")i++;row.push(cell);cell="";if(row.length>1||row[0]!=="")rows.push(row);row=[]}
+    else cell+=c;
+  }
+  row.push(cell);if(row.length>1||row[0]!=="")rows.push(row);
+  return rows;
+}
+function importCSV(text){
+  var rows=parseCSV(text);
+  if(!rows.length){banner("That file is empty. Export a CSV from this page to see the expected columns.",true);return}
+  var head=rows.shift().map(function(h){return h.trim().toLowerCase()});
+  var need=["order","customer","item","qty","price"];
+  var missing=need.filter(function(n){return head.indexOf(n)<0});
+  if(missing.length){banner("Import stopped: the first row is missing these columns: "+missing.join(", ")+". Nothing was imported. Export from this page to get a file in the right format.",true);return}
+  var col=function(r,n){var i=head.indexOf(n);return i<0?"":(r[i]||"").trim()};
+  var map={},order=[],bad=0;
+  rows.forEach(function(r){
+    var no=parseInt(col(r,"order").replace("#",""),10),qty=parseInt(col(r,"qty"),10),price=parseFloat(col(r,"price")),name=col(r,"item");
+    if(!no||!name||!(qty>0)||isNaN(price)){bad++;return}
+    if(!map[no]){
+      var st=col(r,"status").toLowerCase();if(!STATUS_LABEL[st])st="new";
+      var d=new Date(col(r,"date"));if(isNaN(d))d=new Date();
+      map[no]={id:"i"+Date.now()+"-"+no,no:no,created:d.toISOString(),customer:col(r,"customer")||"Unnamed customer",email:col(r,"email"),address:col(r,"address"),items:[],paid:/^(yes|y|true|1|paid)$/i.test(col(r,"paid")),status:st,tracking:col(r,"tracking"),note:col(r,"note")};
+      order.push(no);
+    }
+    map[no].items.push({name:name,qty:qty,price:price});
+  });
+  var added=0,dup=0;
+  order.forEach(function(no){
+    if(state.orders.some(function(o){return o.no===no})){dup++;return}
+    state.orders.push(map[no]);added++;
+  });
+  save();render();
+  var parts=["Imported "+added+" "+(added===1?"order":"orders")+"."];
+  if(dup)parts.push(dup+" skipped because that order number already exists.");
+  if(bad)parts.push(bad+" "+(bad===1?"row was":"rows were")+" skipped for a missing item name, quantity or price.");
+  banner(parts.join(" "),!!(dup||bad)&&!added);
+}
+
+/* events */
+$("band").addEventListener("click",function(e){var b=e.target.closest("[data-f]");if(b){state.filter=b.dataset.f;render()}});
+$("filter").addEventListener("change",function(){state.filter=this.value;render()});
+$("sort").addEventListener("change",function(){state.sort=this.value;renderRows()});
+$("cur").addEventListener("change",function(){state.currency=this.value;save();render()});
+$("q").addEventListener("input",function(){state.q=this.value;renderRows()});
+$("rows").addEventListener("click",function(e){
+  var n=e.target.closest("[data-next]");if(n){advance(n.dataset.next);return}
+  var o=e.target.closest("[data-open]");if(o)openEdit(o.dataset.open);
+});
+$("empty").addEventListener("click",function(e){
+  var a=e.target.getAttribute("data-act");
+  if(a==="add")openAdd();
+  if(a==="import")$("file").click();
+  if(a==="reset"){state.filter="all";state.q="";$("q").value="";render()}
+});
+$("btn-add").addEventListener("click",openAdd);
+$("btn-export").addEventListener("click",exportCSV);
+$("btn-print").addEventListener("click",function(){window.print()});
+$("btn-import").addEventListener("click",function(){$("file").click()});
+$("file").addEventListener("change",function(){
+  var f=this.files[0];if(!f)return;
+  var r=new FileReader();
+  r.onload=function(){importCSV(String(r.result))};
+  r.onerror=function(){banner("Could not read that file. Check that it is a .csv file and try again.",true)};
+  r.readAsText(f);this.value="";
+});
+$("btn-clear-sample").addEventListener("click",function(){
+  var n=state.orders.filter(function(o){return o.sample}).length;
+  if(confirm("Remove the "+n+" sample orders? Orders you added yourself stay.")){
+    state.orders=state.orders.filter(function(o){return !o.sample});save();render();toast("Sample orders removed.");
+  }
+});
+$("toast-undo").addEventListener("click",function(){if(undoSnap){var f=undoSnap;undoSnap=null;f()}});
+document.addEventListener("click",function(e){
+  if(e.target.hasAttribute&&e.target.hasAttribute("data-close")){var d=e.target.closest("dialog");if(d)d.close()}
+});
+["dlg-add","dlg-edit"].forEach(function(id){
+  var d=$(id);
+  d.addEventListener("click",function(e){if(e.target===d)d.close()});
+  d.addEventListener("close",function(){if(lastFocus&&lastFocus.focus&&document.contains(lastFocus))lastFocus.focus()});
+});
+$("btn-add").addEventListener("click",function(){lastFocus=this});
+window.matchMedia("(max-width:760px)").addEventListener("change",renderRows);
+
+$("today").textContent=new Intl.DateTimeFormat(undefined,{weekday:"long",day:"numeric",month:"long",year:"numeric"}).format(new Date());
+load();render();
+})();
+</script>
+</body>
+</html>

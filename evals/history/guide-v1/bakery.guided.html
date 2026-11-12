@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Forno da Graça, padaria de família em Lisboa</title>
+<meta name="description" content="Forno da Graça, padaria de família em Lisboa.">
+<!--
+  Direction: the page is the mouth of a brick oven (the "forno" in the name),
+  on a whitewashed wall, with lettering in the slab style of painted shopfronts.
+  The generic version would have been a cream page with a serif headline and a
+  hero photo.
+
+  No hours, address, prices or contacts were supplied, so none are invented.
+  Fill in the DATA object below and each section appears by itself.
+  Empty fields stay hidden.
+-->
+<style>
+  :root{
+    --cal:#F2EFE6;        /* whitewash on the wall */
+    --tijolo:#8E3B26;     /* oven brick */
+    --tijolo-escuro:#6F2C1B;
+    --boca:#24130E;       /* inside the oven */
+    --brasa:#E8923F;      /* embers, only used inside the oven */
+    --tinta:#2B1A14;
+    --suave:#5E4F46;
+    --linha:#CFC6B4;
+    --s1:.5rem; --s2:1rem; --s3:1.5rem; --s4:2.5rem; --s5:4rem;
+    --slab:Rockwell,"Roboto Slab","Rockwell Nova","Courier New",Georgia,serif;
+    --texto:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;background:var(--cal);color:var(--tinta);
+    font:1.0625rem/1.55 var(--texto);
+    min-height:100vh;display:flex;flex-direction:column;
+  }
+  a{color:var(--tijolo);text-decoration-thickness:1px;text-underline-offset:.2em}
+  a:hover{color:var(--tijolo-escuro);text-decoration-thickness:3px}
+  a:active{color:var(--tinta)}
+  a:focus-visible{outline:3px solid var(--tinta);outline-offset:3px;border-radius:2px}
+
+  main{
+    flex:1;width:100%;max-width:70rem;margin:0 auto;
+    padding:var(--s4) var(--s3) var(--s5);
+    display:grid;gap:var(--s4);
+    grid-template-columns:minmax(0,1fr);
+    align-items:end;
+  }
+  @media (min-width:52rem){
+    main{grid-template-columns:minmax(0,26rem) minmax(0,1fr);gap:var(--s5);padding-top:var(--s5)}
+  }
+
+  /* The oven mouth */
+  .arco{
+    width:100%;max-width:26rem;margin-inline:auto;aspect-ratio:4/5;
+    border-radius:999px 999px 0 0;
+    padding:clamp(.9rem,4vw,1.5rem) clamp(.9rem,4vw,1.5rem) 0;
+    background:
+      repeating-linear-gradient(0deg,transparent 0 2.2rem,rgba(242,239,230,.28) 2.2rem calc(2.2rem + 2px)),
+      var(--tijolo);
+  }
+  .boca{
+    height:100%;border-radius:999px 999px 0 0;
+    background:
+      radial-gradient(ellipse 80% 45% at 50% 100%,rgba(232,146,63,.55),rgba(232,146,63,0) 70%),
+      var(--boca);
+    display:flex;flex-direction:column;justify-content:flex-end;align-items:center;
+    padding:var(--s3) var(--s2) var(--s4);text-align:center;color:var(--cal);
+  }
+  h1{
+    margin:0;font:700 clamp(2.4rem,9vw,3.4rem)/1 var(--slab);
+    letter-spacing:.01em;
+  }
+  h1 span{display:block;font-size:.5em;font-weight:400;letter-spacing:.3em;text-transform:uppercase;color:var(--brasa);margin-bottom:.5em}
+  .sub{margin:var(--s2) 0 0;color:#E9DFCF;font-size:1rem}
+
+  /* Information beside the oven */
+  .info{display:grid;gap:var(--s4);align-content:end}
+  .info section{border-top:3px solid var(--tijolo);padding-top:var(--s2)}
+  h2{margin:0 0 var(--s2);font:700 1.5rem/1.2 var(--slab)}
+  dl,ul{margin:0;padding:0;list-style:none}
+  .linha{display:flex;justify-content:space-between;gap:var(--s2);padding:.45rem 0;border-bottom:1px solid var(--linha)}
+  .linha:last-child{border-bottom:0}
+  .linha dt,.linha .nome{margin:0}
+  .linha dd,.linha .preco{margin:0;text-align:end;font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+  address{font-style:normal}
+  .acao{
+    display:inline-flex;align-items:center;min-height:44px;margin-top:var(--s1);
+    padding:0 var(--s3);background:var(--tijolo);color:var(--cal);
+    font-weight:600;text-decoration:none;border-radius:2px;border:2px solid var(--tijolo);
+  }
+  .acao:hover{background:var(--tijolo-escuro);border-color:var(--tijolo-escuro);color:var(--cal)}
+  .acao:active{background:var(--tinta);border-color:var(--tinta);color:var(--cal)}
+  .acao:focus-visible{outline:3px solid var(--tinta);outline-offset:3px}
+  .acoes{display:flex;flex-wrap:wrap;gap:var(--s2)}
+  .contacto a:not(.acao){display:inline-block;min-height:44px;padding-block:.6rem}
+  .vazio{margin:0;color:var(--suave);max-width:34ch}
+
+  footer{padding:var(--s3);text-align:center;color:var(--suave);font-size:.9rem;border-top:1px solid var(--linha)}
+</style>
+</head>
+<body>
+<main>
+  <div class="arco">
+    <div class="boca">
+      <h1><span>Padaria</span>Forno da Graça</h1>
+      <p class="sub">Padaria de família em Lisboa.</p>
+    </div>
+  </div>
+
+  <div class="info" id="info"></div>
+</main>
+
+<footer>© 2026 Forno da Graça, Lisboa</footer>
+
+<script>
+/* ---- DATA: fill in what is true, leave the rest empty ---- */
+const DATA = {
+  horario:  [],   // e.g. [["Segunda a sexta", "07:00–19:00"], ["Sábado", "07:00–14:00"]]
+  morada:   "",   // e.g. "Rua Exemplo 12, 1170-000 Lisboa"
+  produtos: [],   // e.g. [{nome: "Pão de trigo", preco: "1,20 €"}]
+  telefone: "",   // e.g. "+351 210 000 000"
+  email:    ""
+};
+/* ----------------------------------------------------------- */
+
+(function(){
+  const root = document.getElementById("info");
+  const el = (tag, props, ...kids) => {
+    const n = document.createElement(tag);
+    if (props) Object.assign(n, props);
+    kids.forEach(k => n.append(k));
+    return n;
+  };
+  const section = (title, ...content) => {
+    const s = el("section", null, el("h2", {textContent: title}), ...content);
+    root.append(s);
+    return s;
+  };
+
+  if (DATA.horario.length) {
+    const dl = el("dl");
+    DATA.horario.forEach(([dia, horas]) =>
+      dl.append(el("div", {className:"linha"}, el("dt",{textContent:dia}), el("dd",{textContent:horas}))));
+    section("Horário", dl);
+  }
+
+  if (DATA.produtos.length) {
+    const ul = el("ul");
+    DATA.produtos.forEach(p =>
+      ul.append(el("li", {className:"linha"},
+        el("span",{className:"nome",textContent:p.nome}),
+        el("span",{className:"preco",textContent:p.preco || ""}))));
+    section("Do forno", ul);
+  }
+
+  if (DATA.morada) {
+    const url = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(DATA.morada);
+    section("Onde estamos",
+      el("address", {textContent: DATA.morada}),
+      el("a", {className:"acao", href:url, textContent:"Abrir no mapa", rel:"noopener"}));
+  }
+
+  if (DATA.telefone || DATA.email) {
+    const box = el("div", {className:"acoes contacto"});
+    if (DATA.telefone) box.append(el("a", {className:"acao", href:"tel:" + DATA.telefone.replace(/[^\d+]/g,""), textContent:"Ligar " + DATA.telefone}));
+    if (DATA.email) box.append(el("a", {href:"mailto:" + DATA.email, textContent:DATA.email}));
+    section("Contacto", box);
+  }
+
+  if (!root.children.length) {
+    root.append(el("p", {className:"vazio", textContent:"Horário, morada e o que sai do forno ficam aqui em breve."}));
+  }
+})();
+</script>
+</body>
+</html>

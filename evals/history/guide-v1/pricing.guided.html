@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Punchlist pricing: Free, Team and Business plans</title>
+<meta name="description" content="Punchlist plans: Free for small groups, Team at $10 per member per month, Business at $18 per member per month.">
+<style>
+  :root {
+    --ink: #17212f;
+    --muted: #4a5565;
+    --rule: #d9dee5;
+    --wash: #f1f4f7;
+    --paper: #ffffff;
+    --marker: #1f5fd1;
+    --marker-dark: #1649a3;
+    --s1: 4px; --s2: 8px; --s3: 16px; --s4: 24px; --s5: 40px; --s6: 72px;
+    --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font: 1rem/1.55 var(--font);
+  }
+  .wrap { max-width: 1080px; margin-inline: auto; padding-inline: var(--s4); }
+  a { color: var(--marker); }
+  :focus-visible { outline: 3px solid var(--marker); outline-offset: 3px; border-radius: 2px; }
+
+  header.top { padding-block: var(--s4); border-bottom: 1px solid var(--rule); }
+  header.top .wrap { display: flex; justify-content: space-between; align-items: center; gap: var(--s3); }
+  .brand { font-weight: 700; font-size: 1.125rem; letter-spacing: -0.01em; color: var(--ink); text-decoration: none; display: inline-flex; align-items: center; gap: var(--s2); min-height: 44px; }
+  .brand svg { display: block; }
+  nav a { display: inline-flex; align-items: center; min-height: 44px; padding-inline: var(--s2); color: var(--ink); }
+  nav a:hover { color: var(--marker); }
+
+  .intro { padding-block: var(--s6) var(--s5); }
+  h1 { font-size: clamp(2rem, 5vw, 3.25rem); line-height: 1.08; letter-spacing: -0.025em; margin: 0 0 var(--s3); max-width: 18ch; }
+  .intro p { margin: 0; max-width: 58ch; color: var(--muted); font-size: 1.125rem; }
+
+  .billing { display: flex; align-items: center; gap: var(--s3); flex-wrap: wrap; margin-top: var(--s4); }
+  .seg { display: inline-flex; border: 1.5px solid var(--ink); border-radius: 6px; overflow: hidden; }
+  .seg button {
+    font: inherit; font-weight: 600; background: var(--paper); color: var(--ink);
+    border: 0; padding: 0 var(--s4); min-height: 44px; cursor: pointer;
+  }
+  .seg button + button { border-inline-start: 1.5px solid var(--ink); }
+  .seg button:hover { background: var(--wash); }
+  .seg button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+  .seg button:active { transform: translateY(1px); }
+  .seg button:focus-visible { outline-offset: -4px; outline-color: var(--marker); }
+  .seg button[aria-pressed="true"]:focus-visible { outline-color: #fff; }
+  .saving { color: var(--muted); font-size: 0.9375rem; }
+
+  .plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s4); padding-block-end: var(--s6); }
+  .plan {
+    border: 1.5px solid var(--rule); border-radius: 6px; padding: var(--s4);
+    display: flex; flex-direction: column; background: var(--paper);
+    border-block-start: 6px solid var(--rule);
+  }
+  .plan.pick { border-color: var(--marker); border-block-start-color: var(--marker); }
+  .plan h2 { margin: 0; font-size: 1.25rem; display: flex; justify-content: space-between; align-items: center; gap: var(--s2); }
+  .tag { font-size: 0.8125rem; font-weight: 600; background: var(--marker); color: #fff; padding: 2px var(--s2); border-radius: 3px; }
+  .for { margin: var(--s2) 0 var(--s4); color: var(--muted); min-height: 3.1em; }
+  .price { display: flex; align-items: baseline; gap: var(--s2); margin: 0; }
+  .price .amt { font-size: 3rem; line-height: 1; font-weight: 700; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .price .unit { color: var(--muted); font-size: 0.9375rem; }
+  .billed { margin: var(--s1) 0 var(--s4); color: var(--muted); font-size: 0.9375rem; min-height: 1.5em; }
+  .plan ul { list-style: none; margin: 0 0 var(--s4); padding: var(--s4) 0 0; border-top: 1px solid var(--rule); display: grid; gap: var(--s2); flex: 1; align-content: start; }
+  .plan li { padding-inline-start: 28px; position: relative; }
+  .plan li::before {
+    content: ""; position: absolute; inset-inline-start: 2px; top: 0.35em;
+    width: 14px; height: 8px; border-inline-start: 2.5px solid var(--marker); border-block-end: 2.5px solid var(--marker);
+    transform: rotate(-45deg) scale(0.9); transform-origin: center;
+  }
+  .btn {
+    display: flex; align-items: center; justify-content: center; min-height: 48px;
+    font-weight: 600; text-decoration: none; border-radius: 6px; padding-inline: var(--s3);
+    border: 1.5px solid var(--ink); color: var(--ink); background: var(--paper);
+  }
+  .btn:hover { background: var(--ink); color: #fff; }
+  .btn:active { transform: translateY(1px); }
+  .btn.primary { background: var(--marker); border-color: var(--marker); color: #fff; }
+  .btn.primary:hover { background: var(--marker-dark); border-color: var(--marker-dark); }
+  .btn[aria-disabled="true"] { opacity: .5; pointer-events: none; }
+
+  h2.sec { font-size: 1.75rem; letter-spacing: -0.02em; margin: 0 0 var(--s4); }
+  .tablewrap { overflow-x: auto; border: 1.5px solid var(--rule); border-radius: 6px; }
+  table { border-collapse: collapse; width: 100%; min-width: 640px; font-variant-numeric: tabular-nums; }
+  caption { text-align: start; }
+  th, td { padding: 12px var(--s3); text-align: start; vertical-align: top; border-block-end: 1px solid var(--rule); }
+  thead th { background: var(--wash); font-size: 0.9375rem; position: sticky; top: 0; }
+  tbody th[scope="row"] { font-weight: 600; width: 28%; background: var(--paper); }
+  tbody tr:last-child th, tbody tr:last-child td { border-block-end: 0; }
+  tr.group th { background: var(--wash); font-size: 0.875rem; color: var(--muted); font-weight: 600; padding-block: var(--s2); }
+  td.pickcol, thead th.pickcol { box-shadow: inset 3px 0 0 var(--marker), inset -3px 0 0 var(--marker); }
+  .no { color: var(--muted); }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  .faq { padding-block: var(--s6); }
+  .faq details { border-block-start: 1px solid var(--rule); }
+  .faq details:last-child { border-block-end: 1px solid var(--rule); }
+  .faq summary { cursor: pointer; padding: var(--s3) 0; min-height: 44px; font-weight: 600; list-style: none; display: flex; justify-content: space-between; gap: var(--s3); }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: "+"; font-size: 1.5rem; line-height: 1; color: var(--marker); }
+  .faq details[open] summary::after { content: "\2212"; }
+  .faq summary:hover { color: var(--marker); }
+  .faq p { margin: 0 0 var(--s3); max-width: 62ch; color: var(--muted); }
+
+  footer { border-top: 1px solid var(--rule); padding-block: var(--s4); color: var(--muted); font-size: 0.9375rem; }
+
+  @media (max-width: 880px) {
+    .plans { grid-template-columns: 1fr; }
+    .for { min-height: 0; }
+    .intro { padding-block: var(--s5); }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .btn, .seg button { transition: background-color .15s, color .15s, transform .1s; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="/">
+      <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><rect x="1" y="1" width="20" height="20" rx="4" fill="#1f5fd1"/><path d="M6 11.5l3.5 3.5L16 7.5" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Punchlist
+    </a>
+    <nav aria-label="Main"><a href="/login">Log in</a></nav>
+  </div>
+</header>
+
+<main>
+  <section class="wrap intro" aria-labelledby="h1">
+    <h1 id="h1">Pay per member, not per project</h1>
+    <p>Free for groups of up to five. Team and Business are billed per member, and members you remove stop costing you the next billing day.</p>
+    <div class="billing">
+      <div class="seg" role="group" aria-label="Billing period">
+        <button type="button" id="mo" aria-pressed="true">Monthly</button>
+        <button type="button" id="yr" aria-pressed="false">Yearly</button>
+      </div>
+      <span class="saving">Yearly billing takes about 20% off Team and Business.</span>
+    </div>
+  </section>
+
+  <section class="wrap plans" aria-label="Plans">
+    <article class="plan">
+      <h2>Free</h2>
+      <p class="for">For a small group tracking its first few projects.</p>
+      <p class="price"><span class="amt">$0</span><span class="unit">forever</span></p>
+      <p class="billed">No card needed</p>
+      <ul>
+        <li>Up to 5 members</li>
+        <li>3 active projects</li>
+        <li>List and board views</li>
+        <li>2 GB file storage</li>
+        <li>30 days of task history</li>
+      </ul>
+      <a class="btn" href="/signup?plan=free">Start free</a>
+    </article>
+
+    <article class="plan pick">
+      <h2>Team <span class="tag">Most chosen for growing teams</span></h2>
+      <p class="for">For teams running several projects with deadlines that depend on each other.</p>
+      <p class="price"><span class="amt" data-m="10" data-y="8">$10</span><span class="unit">per member / month</span></p>
+      <p class="billed" data-m="Billed monthly" data-y="Billed yearly, $96 per member">Billed monthly</p>
+      <ul>
+        <li>Unlimited members and projects</li>
+        <li>Adds timeline and calendar views</li>
+        <li>Task dependencies and milestones</li>
+        <li>250 automation runs per month</li>
+        <li>10 guest seats for clients</li>
+        <li>1 year of task history</li>
+      </ul>
+      <a class="btn primary" href="/signup?plan=team" data-plan="team" data-href="/signup?plan=team">Start Team trial</a>
+    </article>
+
+    <article class="plan">
+      <h2>Business</h2>
+      <p class="for">For companies that need roll-ups across projects and control over who sees what.</p>
+      <p class="price"><span class="amt" data-m="18" data-y="15">$18</span><span class="unit">per member / month</span></p>
+      <p class="billed" data-m="Billed monthly" data-y="Billed yearly, $180 per member">Billed monthly</p>
+      <ul>
+        <li>Everything in Team</li>
+        <li>Portfolio view across projects</li>
+        <li>Project-level roles</li>
+        <li>SAML single sign-on and audit log</li>
+        <li>5,000 automation runs per month</li>
+        <li>Unlimited task history</li>
+      </ul>
+      <a class="btn" href="/signup?plan=business" data-plan="business" data-href="/signup?plan=business">Start Business trial</a>
+    </article>
+  </section>
+
+  <section class="wrap" aria-labelledby="cmp">
+    <h2 class="sec" id="cmp">Plan limits side by side</h2>
+    <div class="tablewrap" tabindex="0" role="region" aria-label="Plan comparison table, scrolls sideways on narrow screens">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col"><span class="sr">Feature</span></th>
+            <th scope="col">Free</th>
+            <th scope="col" class="pickcol">Team</th>
+            <th scope="col">Business</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="group"><th colspan="4" scope="colgroup">Workspace</th></tr>
+          <tr><th scope="row">Members</th><td>Up to 5</td><td class="pickcol">Unlimited</td><td>Unlimited</td></tr>
+          <tr><th scope="row">Active projects</th><td>3</td><td class="pickcol">Unlimited</td><td>Unlimited</td></tr>
+          <tr><th scope="row">Guest seats</th><td class="no">None</td><td class="pickcol">10</td><td>Unlimited</td></tr>
+          <tr><th scope="row">File storage</th><td>2 GB</td><td class="pickcol">100 GB</td><td>1 TB</td></tr>
+          <tr><th scope="row">Task history</th><td>30 days</td><td class="pickcol">1 year</td><td>Unlimited</td></tr>
+
+          <tr class="group"><th colspan="4" scope="colgroup">Planning</th></tr>
+          <tr><th scope="row">Views</th><td>List, board</td><td class="pickcol">+ timeline, calendar</td><td>+ portfolio</td></tr>
+          <tr><th scope="row">Dependencies and milestones</th><td class="no">Not included</td><td class="pickcol">Included</td><td>Included</td></tr>
+          <tr><th scope="row">Automation runs</th><td class="no">Not included</td><td class="pickcol">250 / month</td><td>5,000 / month</td></tr>
+
+          <tr class="group"><th colspan="4" scope="colgroup">Admin and support</th></tr>
+          <tr><th scope="row">Permissions</th><td>Admin, member</td><td class="pickcol">Admin, member, guest</td><td>+ project-level roles</td></tr>
+          <tr><th scope="row">SAML SSO and audit log</th><td class="no">Not included</td><td class="pickcol no">Not included</td><td>Included</td></tr>
+          <tr><th scope="row">Support</th><td>Help articles</td><td class="pickcol">Email</td><td>Priority email</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="wrap faq" aria-labelledby="faq">
+    <h2 class="sec" id="faq">Billing questions</h2>
+    <details>
+      <summary>Who counts as a member?</summary>
+      <p>Anyone who can create and edit tasks. Guests on the Team plan have their own seats and are not billed.</p>
+    </details>
+    <details>
+      <summary>What happens when I go over 5 members on Free?</summary>
+      <p>You can keep reading and commenting, but inviting a sixth member prompts you to move to Team first. Nothing is deleted.</p>
+    </details>
+    <details>
+      <summary>Can I switch plans later?</summary>
+      <p>Yes. Upgrades apply immediately. Downgrades apply at the end of the billing period, and anything over the lower plan's limits becomes read-only rather than removed.</p>
+    </details>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">Prices are in US dollars and exclude tax.</div>
+</footer>
+
+<script>
+(function () {
+  var mo = document.getElementById('mo'), yr = document.getElementById('yr');
+  function set(yearly) {
+    mo.setAttribute('aria-pressed', String(!yearly));
+    yr.setAttribute('aria-pressed', String(yearly));
+    document.querySelectorAll('.amt[data-m]').forEach(function (el) {
+      el.textContent = '$' + (yearly ? el.dataset.y : el.dataset.m);
+    });
+    document.querySelectorAll('.billed[data-m]').forEach(function (el) {
+      el.textContent = yearly ? el.dataset.y : el.dataset.m;
+    });
+    document.querySelectorAll('a[data-href]').forEach(function (a) {
+      a.setAttribute('href', a.dataset.href + (yearly ? '&billing=yearly' : ''));
+    });
+  }
+  mo.addEventListener('click', function () { set(false); });
+  yr.addEventListener('click', function () { set(true); });
+})();
+</script>
+</body>
+</html>

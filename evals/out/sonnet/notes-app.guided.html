@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tern: write it down, find it later</title>
+<meta name="description" content="Tern is a note-taking app. Try the working notepad on this page: write a note, save it, search it.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 34'%3E%3Crect width='44' height='34' rx='6' fill='%2314222b'/%3E%3Cpath d='M5 15C12 7 18 8 22 13C26 8 32 7 39 15C33 13 28 15 24 20L26 28L22 24L18 28L20 20C16 15 11 13 5 15Z' fill='%23fbfcfb'/%3E%3C/svg%3E">
+<style>
+:root{
+  --ground:#eef2f1;
+  --paper:#fbfcfb;
+  --ink:#14222b;
+  --muted:#4a5b64;
+  --rule:#c6d2d1;
+  --sea:#14222b;
+  --sea-text:#e6eeee;
+  --sea-muted:#a9bcc2;
+  --bill:#c8321a;
+  --bill-dark:#a82913;
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:72px;--s9:112px;
+  --display:"Avenir Next Condensed","DIN Condensed","Bahnschrift SemiCondensed","Arial Narrow","Franklin Gothic Medium",sans-serif;
+  --body:"Avenir Next",Seravek,"Segoe UI",Candara,Calibri,system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+body{margin:0;background:var(--ground);color:var(--ink);font:18px/1.55 var(--body);-webkit-font-smoothing:antialiased}
+::selection{background:var(--ink);color:var(--paper)}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--bill);outline-offset:3px;border-radius:2px}
+.wrap{max-width:1240px;margin-inline:auto;padding-inline:var(--s5)}
+.skip{position:absolute;left:var(--s4);top:-60px;background:var(--ink);color:var(--paper);padding:var(--s3) var(--s4);z-index:10}
+.skip:focus{top:var(--s4)}
+
+header.top{display:flex;align-items:center;justify-content:space-between;padding-block:var(--s5);gap:var(--s4);flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:var(--s3);text-decoration:none;font:700 2rem/1 var(--display);letter-spacing:.01em}
+.brand svg{width:44px;height:34px}
+nav ul{display:flex;gap:var(--s5);list-style:none;margin:0;padding:0}
+nav a{text-decoration:none;padding:var(--s3) 0;display:inline-block;min-height:44px;border-bottom:2px solid transparent}
+nav a:hover{border-color:var(--ink)}
+
+.btn{font:600 1rem/1 var(--body);display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 var(--s5);border-radius:4px;border:2px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer;text-decoration:none;transition:background-color .15s,color .15s,transform .1s}
+.btn:hover{background:var(--ink);color:var(--paper)}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.45;cursor:not-allowed;background:transparent;color:var(--ink)}
+.btn.primary{background:var(--bill);border-color:var(--bill);color:#fff}
+.btn.primary:hover{background:var(--bill-dark);border-color:var(--bill-dark)}
+.btn.primary:disabled{background:var(--bill);color:#fff}
+.btn.small{min-height:44px;padding:0 var(--s4);font-size:.9rem}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:var(--s8);align-items:start;padding-block:var(--s7) var(--s9)}
+h1{font:700 clamp(3.6rem,9.5vw,8.2rem)/.9 var(--display);letter-spacing:-.01em;margin:0 0 var(--s6);text-wrap:balance}
+.lede{max-width:34ch;font-size:1.3rem;margin:0 0 var(--s6)}
+.actions{display:flex;gap:var(--s4);flex-wrap:wrap}
+
+/* the log page */
+.log{background:var(--paper);border:1px solid var(--rule);border-radius:6px;box-shadow:0 18px 40px -24px rgba(20,34,43,.45);position:relative;overflow:hidden}
+.log::before{content:"";position:absolute;inset-block:0;left:56px;width:2px;background:var(--bill);opacity:.55}
+.log-head{display:flex;justify-content:space-between;align-items:baseline;padding:var(--s4) var(--s5) var(--s4) 76px;border-bottom:2px solid var(--ink);gap:var(--s3);flex-wrap:wrap}
+.log-head h2{font:700 1.5rem/1 var(--display);margin:0}
+.log-head span{font-size:.85rem;color:var(--muted)}
+.compose{padding:var(--s4) var(--s5) var(--s4) 76px;border-bottom:1px solid var(--rule)}
+label{display:block;font-weight:600;font-size:.9rem;margin-bottom:var(--s2)}
+textarea,input[type=search]{width:100%;font:inherit;color:var(--ink);background:var(--ground);border:1px solid var(--rule);border-radius:4px;padding:var(--s3)}
+textarea{min-height:108px;resize:vertical;line-height:1.5}
+textarea::placeholder,input::placeholder{color:#5f717a}
+textarea:focus-visible,input:focus-visible{outline:3px solid var(--bill);outline-offset:1px}
+.compose .row{display:flex;gap:var(--s3);margin-top:var(--s3);align-items:center;flex-wrap:wrap}
+.hint{font-size:.85rem;color:var(--muted)}
+.tools{display:flex;gap:var(--s3);padding:var(--s4) var(--s5) var(--s4) 76px;align-items:end;flex-wrap:wrap;border-bottom:1px solid var(--rule)}
+.tools .grow{flex:1 1 180px}
+.entries{list-style:none;margin:0;padding:0;max-height:360px;overflow:auto}
+.entries li{display:grid;grid-template-columns:auto 1fr auto;gap:var(--s4);padding:var(--s4) var(--s5) var(--s4) 0;border-bottom:1px solid var(--rule)}
+.entries time{width:76px;padding-left:var(--s4);font-size:.8rem;line-height:1.3;color:var(--muted);font-variant-numeric:tabular-nums}
+.entries p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.tag{display:inline-block;font-size:.75rem;border:1px solid var(--muted);color:var(--muted);border-radius:3px;padding:0 var(--s2);margin-left:var(--s2)}
+.del{background:none;border:0;color:var(--muted);font:inherit;font-size:.85rem;cursor:pointer;min-height:44px;min-width:44px;text-decoration:underline;border-radius:4px}
+.del:hover{color:var(--bill-dark)}
+.empty{padding:var(--s6) var(--s5) var(--s6) 76px;color:var(--muted)}
+.status{padding:var(--s3) var(--s5) var(--s3) 76px;font-size:.85rem;color:var(--muted);display:flex;justify-content:space-between;gap:var(--s3);flex-wrap:wrap}
+.err{color:var(--bill-dark);font-weight:600}
+
+/* name section */
+.sea{background:var(--sea);color:var(--sea-text)}
+.name{display:grid;grid-template-columns:1fr 1fr;gap:var(--s8);padding-block:var(--s9);align-items:center}
+h2.big{font:700 clamp(2.6rem,6vw,5rem)/.95 var(--display);margin:0 0 var(--s5);text-wrap:balance}
+.name p{max-width:46ch;margin:0 0 var(--s4)}
+.name .muted{color:var(--sea-muted)}
+.route{width:100%;height:auto;max-height:560px}
+.route text{font:600 14px var(--body);fill:var(--sea-text)}
+.route .sm{font-weight:400;fill:var(--sea-muted);font-size:12px}
+.note{border:2px dashed currentColor;border-radius:4px;padding:var(--s3) var(--s4);font-size:.95rem;max-width:46ch}
+.sea .note{color:var(--sea-muted)}
+
+/* demo does */
+.does{padding-block:var(--s9) var(--s8);display:grid;grid-template-columns:.8fr 1.2fr;gap:var(--s8);align-items:start}
+.does h2{font:700 clamp(2.4rem,5vw,4rem)/.95 var(--display);margin:0 0 var(--s4);text-wrap:balance}
+table{width:100%;border-collapse:collapse}
+caption{text-align:left;font-size:.9rem;color:var(--muted);padding-bottom:var(--s3)}
+th,td{text-align:left;padding:var(--s4) var(--s3) var(--s4) 0;border-bottom:1px solid var(--rule);vertical-align:top}
+thead th{border-bottom:2px solid var(--ink);font-size:.85rem}
+tbody th{font-weight:700;white-space:nowrap;padding-right:var(--s5)}
+kbd{font:inherit;font-size:.85em;border:1px solid var(--ink);border-radius:3px;padding:0 var(--s2);background:var(--paper)}
+
+/* get */
+.get{padding-block:var(--s8) var(--s9);border-top:2px solid var(--ink)}
+.get h2{font:700 clamp(2.6rem,6vw,5rem)/.95 var(--display);margin:0 0 var(--s6)}
+.slots{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:var(--s5)}
+.slot{border:2px dashed var(--muted);border-radius:4px;padding:var(--s5);color:var(--muted);min-height:132px}
+.slot strong{display:block;color:var(--ink);margin-bottom:var(--s2);font-size:1.05rem}
+footer{padding-block:var(--s6);border-top:1px solid var(--rule);font-size:.9rem;color:var(--muted)}
+
+@media (max-width:900px){
+  .hero,.name,.does{grid-template-columns:1fr;gap:var(--s7)}
+  .hero{padding-block:var(--s6) var(--s8)}
+  .name,.does{padding-block:var(--s8)}
+}
+@media (max-width:520px){
+  body{font-size:17px}
+  .wrap{padding-inline:var(--s4)}
+  .log::before{left:36px}
+  .log-head,.compose,.tools,.status{padding-left:52px;padding-right:var(--s4)}
+  .empty{padding-left:52px}
+  .entries time{width:52px;padding-left:var(--s2);font-size:.7rem}
+  tbody th{white-space:normal}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="#top" aria-label="Tern, home">
+      <svg viewBox="0 0 44 34" aria-hidden="true"><rect width="44" height="34" rx="6" fill="#14222b"/><path d="M5 15C12 7 18 8 22 13C26 8 32 7 39 15C33 13 28 15 24 20L26 28L22 24L18 28L20 20C16 15 11 13 5 15Z" fill="#fbfcfb"/></svg>
+      Tern
+    </a>
+    <nav aria-label="Main">
+      <ul>
+        <li><a href="#pad">Try the pad</a></li>
+        <li><a href="#name">The name</a></li>
+        <li><a href="#get">Get Tern</a></li>
+      </ul>
+    </nav>
+  </header>
+</div>
+
+<main id="main">
+<div class="wrap hero" id="top">
+  <div>
+    <h1>Write it down. Find it later.</h1>
+    <p class="lede">Tern is a note-taking app. The pad on this page is a working demo: type a note, save it, search for it.</p>
+    <div class="actions">
+      <a class="btn primary" href="#get">Get Tern</a>
+      <a class="btn" href="#pad" id="tryBtn">Write a note</a>
+    </div>
+  </div>
+
+  <section class="log" id="pad" aria-labelledby="padTitle">
+    <div class="log-head">
+      <h2 id="padTitle">Notes</h2>
+      <span>Demo. Saved in this browser only.</span>
+    </div>
+    <form class="compose" id="form">
+      <label for="text">New note</label>
+      <textarea id="text" placeholder="What do you want to remember?"></textarea>
+      <div class="row">
+        <button class="btn primary small" id="save" type="submit" disabled>Save note</button>
+        <span class="hint"><kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>Enter</kbd> also saves</span>
+      </div>
+    </form>
+    <div class="tools">
+      <div class="grow">
+        <label for="q">Search notes</label>
+        <input id="q" type="search" placeholder="Type a word" autocomplete="off">
+      </div>
+      <button class="btn small" id="export" type="button">Export as .txt</button>
+      <button class="btn small" id="clearSamples" type="button" hidden>Remove samples</button>
+    </div>
+    <ul class="entries" id="list"></ul>
+    <noscript><p class="empty">The demo pad needs JavaScript.</p></noscript>
+    <div class="status" role="status" aria-live="polite"><span id="count"></span><span class="err" id="err"></span></div>
+  </section>
+</div>
+
+<section class="sea" id="name" aria-labelledby="nameTitle">
+  <div class="wrap name">
+    <div>
+      <h2 class="big" id="nameTitle">Named after a bird that never stays put</h2>
+      <p>Tern takes its name from the Arctic tern, a seabird that breeds in the far north and spends the northern winter around Antarctica, then flies back.</p>
+      <p class="muted">The drawing shows the two ends of that route. It is a sketch of the idea, not a map.</p>
+      <p class="note">Note to owner: add your own reason for the name here, if there is one.</p>
+    </div>
+    <svg class="route" viewBox="0 0 400 440" role="img" aria-label="Diagram of an Arctic tern's yearly route: south from the Arctic breeding ground to the Antarctic coast, and back north.">
+      <line x1="30" y1="50" x2="370" y2="50" stroke="#a9bcc2" stroke-width="2"/>
+      <line x1="30" y1="390" x2="370" y2="390" stroke="#a9bcc2" stroke-width="2"/>
+      <text x="30" y="34">Arctic: breeding season</text>
+      <text x="30" y="416">Antarctic: northern winter</text>
+      <path d="M150 50 C60 130 250 170 140 220 C50 265 230 320 160 390" fill="none" stroke="#e6eeee" stroke-width="3" stroke-linecap="round"/>
+      <path d="M250 390 C340 310 160 270 270 220 C350 175 190 130 250 50" fill="none" stroke="#e6eeee" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 9"/>
+      <text class="sm" x="40" y="225">south</text>
+      <text class="sm" x="318" y="225">north</text>
+      <path d="M150 50l-7 12m7-12l9 10" stroke="#e6eeee" stroke-width="3" stroke-linecap="round" fill="none"/>
+      <path d="M160 390l-9-10m9 10l8-12" stroke="#e6eeee" stroke-width="3" stroke-linecap="round" fill="none"/>
+    </svg>
+  </div>
+</section>
+
+<div class="wrap does">
+  <div>
+    <h2>What the demo pad does</h2>
+    <p>Everything in this table works on this page right now. Nothing you write leaves your browser.</p>
+  </div>
+  <table>
+    <caption>Actions in the demo pad</caption>
+    <thead><tr><th scope="col">Action</th><th scope="col">How it behaves</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Write and save</th><td>Each note gets a date and time. Newest first.</td></tr>
+      <tr><th scope="row">Search</th><td>Filters the list as you type, matching any part of a note.</td></tr>
+      <tr><th scope="row">Delete</th><td>Removes one note straight away. There is no undo.</td></tr>
+      <tr><th scope="row">Export</th><td>Downloads every note as one plain text file.</td></tr>
+      <tr><th scope="row">Storage</th><td>Kept in this browser's local storage. Clearing site data erases it.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<section class="wrap get" id="get" aria-labelledby="getTitle">
+  <h2 id="getTitle">Get Tern</h2>
+  <div class="slots">
+    <div class="slot"><strong>Download links</strong>Note to owner: add the store or download links and the platforms Tern runs on.</div>
+    <div class="slot"><strong>Screenshot of the app</strong>Note to owner: add a real screenshot of Tern, about 1600 × 1000.</div>
+    <div class="slot"><strong>Features and price</strong>Note to owner: list what Tern actually does and what it costs.</div>
+  </div>
+</section>
+</main>
+
+<div class="wrap"><footer>Tern. The notepad above is a demo and stores notes only in your browser.</footer></div>
+
+<script>
+(function(){
+  var KEY='tern-demo-notes-v1';
+  var $=function(id){return document.getElementById(id)};
+  var form=$('form'),text=$('text'),save=$('save'),q=$('q'),list=$('list'),count=$('count'),err=$('err'),clr=$('clearSamples'),exp=$('export');
+  var notes=null,memoryOnly=false;
+
+  function load(){
+    try{var raw=localStorage.getItem(KEY);if(raw){var p=JSON.parse(raw);if(Array.isArray(p))return p;}}catch(e){memoryOnly=true}
+    var now=Date.now();
+    return [
+      {id:now-3,t:now-86400000*2,sample:true,text:'Shopping list: rice, lemons, batteries.'},
+      {id:now-2,t:now-86400000,sample:true,text:'Ideas for Thursday\nOpen with the short version. Keep the second half for questions.'},
+      {id:now-1,t:now-3600000*5,sample:true,text:'Password reset email arrives from a no-reply address. Check spam.'}
+    ];
+  }
+  function persist(){
+    try{localStorage.setItem(KEY,JSON.stringify(notes));err.textContent=memoryOnly?'Storage is blocked. Notes last until you close this tab.':''}
+    catch(e){err.textContent='This browser blocked saving. Notes last until you close this tab.'}
+  }
+  function fmt(t){
+    var d=new Date(t);
+    return d.toLocaleDateString(undefined,{day:'numeric',month:'short'})+' '+d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
+  }
+  function render(){
+    var term=q.value.trim().toLowerCase();
+    var shown=notes.filter(function(n){return !term||n.text.toLowerCase().indexOf(term)>-1}).sort(function(a,b){return b.t-a.t});
+    list.innerHTML='';
+    shown.forEach(function(n){
+      var li=document.createElement('li');
+      var tm=document.createElement('time');tm.dateTime=new Date(n.t).toISOString();tm.textContent=fmt(n.t);
+      var body=document.createElement('p');body.textContent=n.text;
+      if(n.sample){var tg=document.createElement('span');tg.className='tag';tg.textContent='sample';body.appendChild(tg)}
+      var b=document.createElement('button');b.type='button';b.className='del';b.textContent='Delete';
+      b.setAttribute('aria-label','Delete note from '+fmt(n.t));
+      b.onclick=function(){notes=notes.filter(function(x){return x.id!==n.id});persist();render()};
+      li.appendChild(tm);li.appendChild(body);li.appendChild(b);list.appendChild(li);
+    });
+    if(!shown.length){
+      var e=document.createElement('li');e.className='empty';e.style.display='block';
+      e.textContent=notes.length?'No notes contain "'+q.value.trim()+'". Try a shorter word.':'No notes yet. Write one above and press Save note.';
+      list.appendChild(e);
+    }
+    count.textContent=notes.length+(notes.length===1?' note':' notes')+(term?', '+shown.length+' shown':'');
+    clr.hidden=!notes.some(function(n){return n.sample});
+    exp.disabled=!notes.length;
+  }
+  function add(){
+    var v=text.value.trim();if(!v)return;
+    var now=Date.now();
+    notes.push({id:now,t:now,text:v});
+    text.value='';save.disabled=true;persist();render();text.focus();
+  }
+  text.addEventListener('input',function(){save.disabled=!text.value.trim()});
+  text.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();add()}});
+  form.addEventListener('submit',function(e){e.preventDefault();add()});
+  q.addEventListener('input',render);
+  clr.onclick=function(){notes=notes.filter(function(n){return !n.sample});persist();render()};
+  exp.onclick=function(){
+    var out=notes.slice().sort(function(a,b){return a.t-b.t}).map(function(n){return fmt(n.t)+'\n'+n.text}).join('\n\n---\n\n');
+    var url=URL.createObjectURL(new Blob([out],{type:'text/plain'}));
+    var a=document.createElement('a');a.href=url;a.download='tern-notes.txt';document.body.appendChild(a);a.click();a.remove();
+    setTimeout(function(){URL.revokeObjectURL(url)},1000);
+  };
+  $('tryBtn').addEventListener('click',function(){setTimeout(function(){text.focus()},300)});
+
+  notes=load();
+  if(memoryOnly)err.textContent='Storage is blocked. Notes last until you close this tab.';
+  render();
+})();
+</script>
+</body>
+</html>

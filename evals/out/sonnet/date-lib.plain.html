@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tempo — a tiny date library for JavaScript</title>
+<meta name="description" content="Tempo is a 2 KB, immutable, tree-shakable date library for JavaScript.">
+<style>
+:root{
+  --bg:#fbfaf7;--fg:#1b1b1f;--muted:#62626b;--line:#e4e1d8;--card:#fff;
+  --accent:#d9480f;--accent-fg:#fff;--code-bg:#16161a;--code-fg:#e8e6e1;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#121214;--fg:#eeece6;--muted:#9a9aa3;--line:#2a2a30;--card:#1a1a1e;--accent:#ff7a3d;--accent-fg:#111;--code-bg:#0b0b0d}
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 var(--sans)}
+a{color:inherit}
+.wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+header.top{border-bottom:1px solid var(--line);position:sticky;top:0;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(8px);z-index:10}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
+.logo{font-weight:800;font-size:20px;text-decoration:none;letter-spacing:-.02em}
+.logo span{color:var(--accent)}
+nav a{margin-left:22px;text-decoration:none;color:var(--muted);font-size:15px}
+nav a:hover{color:var(--fg)}
+.hero{padding:88px 0 56px;text-align:center}
+.badge{display:inline-block;font:13px var(--mono);border:1px solid var(--line);border-radius:99px;padding:4px 12px;color:var(--muted);background:var(--card)}
+h1{font-size:clamp(36px,6vw,62px);line-height:1.08;letter-spacing:-.035em;margin:22px 0 16px}
+.hero p.lead{font-size:20px;color:var(--muted);max-width:620px;margin:0 auto 32px}
+.cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-block;padding:11px 22px;border-radius:8px;text-decoration:none;font-weight:600;border:1px solid var(--line);background:var(--card)}
+.btn.primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.btn:focus-visible,button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.install{display:inline-flex;align-items:center;gap:12px;margin-top:28px;background:var(--code-bg);color:var(--code-fg);padding:10px 12px 10px 18px;border-radius:8px;font:15px var(--mono)}
+.install button{background:#2b2b32;color:#ddd;border:0;border-radius:5px;padding:5px 10px;font:12px var(--sans);cursor:pointer}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin:24px 0 72px}
+.stat{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:18px;text-align:center}
+.stat b{display:block;font-size:26px;letter-spacing:-.02em}
+.stat span{color:var(--muted);font-size:14px}
+section{padding:40px 0}
+h2{font-size:30px;letter-spacing:-.02em;margin:0 0 8px}
+.sub{color:var(--muted);margin:0 0 28px}
+pre{background:var(--code-bg);color:var(--code-fg);padding:18px 20px;border-radius:10px;overflow:auto;font:14px/1.65 var(--mono);margin:0}
+code{font-family:var(--mono)}
+.c{color:#7d7d88}.k{color:#ff9d6c}.s{color:#9fd98f}
+.playground{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:760px){.playground{grid-template-columns:1fr}nav a:not(.keep){display:none}}
+.panel{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:20px}
+label{font-size:13px;color:var(--muted);display:block;margin:0 0 4px}
+input{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:7px;background:var(--bg);color:var(--fg);font:15px var(--mono);margin-bottom:14px}
+.out{font:14px/1.9 var(--mono)}
+.out div{display:flex;justify-content:space-between;gap:12px;border-bottom:1px dashed var(--line)}
+.out div:last-child{border:0}
+.out em{font-style:normal;color:var(--accent);text-align:right}
+.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.feature{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:22px}
+.feature h3{margin:0 0 6px;font-size:18px}
+.feature p{margin:0;color:var(--muted);font-size:15px}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:15px}
+th,td{text-align:left;padding:11px 16px;border-bottom:1px solid var(--line)}
+th{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+tr:last-child td{border:0}
+td code{background:color-mix(in srgb,var(--accent) 12%,transparent);padding:2px 6px;border-radius:4px;font-size:13.5px}
+.tablewrap{overflow-x:auto}
+footer{border-top:1px solid var(--line);margin-top:56px;padding:32px 0;color:var(--muted);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="logo" href="#">tempo<span>.</span></a>
+    <nav aria-label="Main">
+      <a href="#try">Try it</a>
+      <a href="#start">Quick start</a>
+      <a href="#api">API</a>
+      <a class="keep" href="#">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="hero">
+    <span class="badge">v2.4.0 · MIT licensed</span>
+    <h1>Dates, without the weight.</h1>
+    <p class="lead">Tempo is a 2 KB, immutable, tree-shakable date library. Parse, format, and do math with a small, predictable API.</p>
+    <div class="cta">
+      <a class="btn primary" href="#start">Get started</a>
+      <a class="btn" href="#api">API reference</a>
+    </div>
+    <div class="install"><code id="cmd">npm install tempo-date</code><button id="copy" type="button">Copy</button></div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><b>2 KB</b><span>min + gzip</span></div>
+    <div class="stat"><b>0</b><span>dependencies</span></div>
+    <div class="stat"><b>100%</b><span>immutable</span></div>
+    <div class="stat"><b>ESM + CJS</b><span>TypeScript types</span></div>
+  </div>
+
+  <section id="try">
+    <h2>Try it live</h2>
+    <p class="sub">A small demo of the formatting and math helpers. Edit the date or the format.</p>
+    <div class="playground">
+      <div class="panel">
+        <label for="d">Date (ISO 8601)</label>
+        <input id="d" value="2026-11-12T09:30:00">
+        <label for="f">Format tokens: YYYY MM DD HH mm ddd MMMM</label>
+        <input id="f" value="ddd, MMMM DD YYYY · HH:mm">
+        <label for="n">Add days</label>
+        <input id="n" type="number" value="30">
+      </div>
+      <div class="panel out" id="out" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <section id="start">
+    <h2>Quick start</h2>
+    <p class="sub">Import only what you use. Every function returns a new value and never mutates its input.</p>
+<pre><code><span class="c">// 1. Install</span>
+<span class="c">// npm install tempo-date</span>
+
+<span class="k">import</span> { format, add, diff, isBefore } <span class="k">from</span> <span class="s">'tempo-date'</span>;
+
+<span class="k">const</span> start = <span class="k">new</span> Date(<span class="s">'2026-11-12'</span>);
+
+format(start, <span class="s">'MMMM D, YYYY'</span>);     <span class="c">// "November 12, 2026"</span>
+add(start, { weeks: <span class="k">2</span> });         <span class="c">// Date: 2026-11-26</span>
+diff(add(start, { days: <span class="k">10</span> }), start, <span class="s">'days'</span>); <span class="c">// 10</span>
+isBefore(start, <span class="k">new</span> Date());      <span class="c">// boolean</span></code></pre>
+  </section>
+
+  <section>
+    <h2>Why Tempo</h2>
+    <p class="sub">Built for the cases that make up 95% of date code.</p>
+    <div class="features">
+      <div class="feature"><h3>Tiny by design</h3><p>Each function is its own module, so bundlers ship only the code you call.</p></div>
+      <div class="feature"><h3>Immutable</h3><p>No surprise mutations. Inputs are never modified, so state updates stay safe.</p></div>
+      <div class="feature"><h3>Native Date compatible</h3><p>Works with plain <code>Date</code> objects. No wrapper classes to learn or unwrap.</p></div>
+      <div class="feature"><h3>Locale aware</h3><p>Month and weekday names come from <code>Intl</code>, so there are no locale bundles to load.</p></div>
+    </div>
+  </section>
+
+  <section id="api">
+    <h2>API overview</h2>
+    <p class="sub">The full surface area, in one table.</p>
+    <div class="tablewrap">
+    <table>
+      <thead><tr><th>Function</th><th>Description</th><th>Returns</th></tr></thead>
+      <tbody>
+        <tr><td><code>parse(str)</code></td><td>Parse an ISO 8601 string into a Date.</td><td>Date</td></tr>
+        <tr><td><code>format(date, pattern)</code></td><td>Format a date using tokens like <code>YYYY-MM-DD</code>.</td><td>string</td></tr>
+        <tr><td><code>add(date, duration)</code></td><td>Add years, months, weeks, days, hours, minutes or seconds.</td><td>Date</td></tr>
+        <tr><td><code>sub(date, duration)</code></td><td>Subtract a duration from a date.</td><td>Date</td></tr>
+        <tr><td><code>diff(a, b, unit)</code></td><td>Whole-unit difference between two dates.</td><td>number</td></tr>
+        <tr><td><code>startOf(date, unit)</code></td><td>Snap to the start of a day, week, month or year.</td><td>Date</td></tr>
+        <tr><td><code>isBefore(a, b)</code></td><td>Compare two dates. Also <code>isAfter</code>, <code>isSame</code>.</td><td>boolean</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Tempo contributors. Released under the MIT license.</span>
+    <span><a href="#">GitHub</a> · <a href="#">Changelog</a> · <a href="#">npm</a></span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var M=["January","February","March","April","May","June","July","August","September","October","November","December"];
+  var D=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  var p=function(n){return String(n).padStart(2,"0")};
+  function format(d,f){
+    var t={YYYY:d.getFullYear(),MMMM:M[d.getMonth()],MM:p(d.getMonth()+1),DD:p(d.getDate()),
+      dddd:D[d.getDay()],ddd:D[d.getDay()].slice(0,3),HH:p(d.getHours()),mm:p(d.getMinutes())};
+    return f.replace(/YYYY|MMMM|MM|DD|dddd|ddd|HH|mm/g,function(k){return t[k]});
+  }
+  function add(d,days){var r=new Date(d.getTime());r.setDate(r.getDate()+days);return r}
+  function startOfWeek(d){var r=new Date(d.getFullYear(),d.getMonth(),d.getDate());r.setDate(r.getDate()-r.getDay());return r}
+  var $=function(id){return document.getElementById(id)};
+  function row(k,v){return "<div><span>"+k+"</span><em>"+v+"</em></div>"}
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+  function render(){
+    var d=new Date($("d").value),out=$("out");
+    if(isNaN(d)){out.innerHTML=row("error","Invalid date");return}
+    var n=parseInt($("n").value,10)||0,a=add(d,n);
+    out.innerHTML=
+      row("format()",esc(format(d,$("f").value)))+
+      row("add(date, {days:"+n+"})",esc(format(a,"YYYY-MM-DD")))+
+      row("startOf(date,'week')",esc(format(startOfWeek(d),"YYYY-MM-DD")))+
+      row("isBefore(date, result)",String(d<a));
+  }
+  ["d","f","n"].forEach(function(id){$(id).addEventListener("input",render)});
+  render();
+  $("copy").addEventListener("click",function(){
+    var b=this,txt=$("cmd").textContent;
+    function done(){b.textContent="Copied!";setTimeout(function(){b.textContent="Copy"},1500)}
+    if(navigator.clipboard){navigator.clipboard.writeText(txt).then(done,done)}else done();
+  });
+})();
+</script>
+</body>
+</html>

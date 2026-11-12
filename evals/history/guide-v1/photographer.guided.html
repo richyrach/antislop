@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wedding photography, in the order the day happens</title>
+<meta name="description" content="Wedding photography laid out as a contact sheet, one strip for each part of the day.">
+<!--
+  DIRECTION
+  The native document of a photographer is the contact sheet: film strips on a light table, numbered frames.
+  Each strip here is one part of the wedding day, in the order it happens, so a couple can see how a whole day is covered.
+  A generic version would have been a full-bleed hero, a masonry gallery and three testimonial cards.
+
+  WHAT YOU NEED TO FILL IN (nothing was invented)
+  1. Photos: each <figure> is an empty frame. To add a photo, delete role/aria-label and put
+     <img src="your-photo.jpg" alt="what the photo shows"> inside the figure. Landscape frames are 3:2, portrait frames are 2:3.
+  2. Contact: set the address in the mailto link in the #enquire section (currently it opens a blank message).
+  3. Your name: add it to the header brand and the <title>.
+  No client names, reviews, prices or numbers are on this page because none were supplied.
+-->
+<style>
+  :root{
+    --table:#e8e9e4;      /* light table, the sheet the strips lie on */
+    --ink:#16130f;        /* film base */
+    --film:#1b1713;
+    --edge:#e39a4d;       /* orange edge print on film */
+    --pencil:#c8321f;     /* grease pencil */
+    --muted:#4d4a44;
+    --frame:#d9dbd4;
+    --s1:.5rem; --s2:1rem; --s3:1.5rem; --s4:2.5rem; --s5:4.5rem;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--table);color:var(--ink);font:1.0625rem/1.6 var(--sans)}
+  a{color:inherit}
+  :focus-visible{outline:3px solid var(--ink);outline-offset:4px}
+  .wrap{max-width:70rem;margin-inline:auto;padding-inline:var(--s3)}
+
+  header{padding-block:var(--s3);border-bottom:1px solid var(--ink)}
+  header .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:var(--s2)}
+  .brand{font-family:var(--serif);font-size:1.25rem;text-decoration:none}
+  nav{display:flex;gap:var(--s1)}
+  nav a{display:inline-flex;align-items:center;min-height:44px;padding-inline:var(--s2);text-decoration:none;border:1px solid transparent;transition:background-color .15s,color .15s}
+  nav a:hover{background:var(--ink);color:var(--table)}
+  nav a:active{transform:translateY(1px)}
+
+  .intro{padding-block:var(--s5) var(--s4)}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(2.25rem,6.5vw,4.5rem);line-height:1.05;margin:0 0 var(--s3);max-width:16ch;letter-spacing:-.01em}
+  .intro p{max-width:46ch;margin:0;color:var(--muted)}
+
+  .moment{display:grid;gap:var(--s2);padding-block:var(--s4);border-top:1px solid var(--ink)}
+  @media(min-width:800px){.moment{grid-template-columns:15rem 1fr;gap:var(--s4)}}
+  h2{font-family:var(--serif);font-weight:400;font-size:1.75rem;line-height:1.15;margin:0 0 var(--s1)}
+  .moment p{margin:0;color:var(--muted);max-width:34ch}
+
+  .strip{counter-reset:none;position:relative;background:var(--film);padding:26px var(--s2) 34px;display:flex;gap:var(--s1);align-items:flex-start}
+  .strip::before,.strip::after{content:"";position:absolute;inset-inline:0;height:10px;
+    background:repeating-linear-gradient(90deg,var(--table) 0 9px,transparent 9px 20px);
+    background-size:20px 10px;background-position:6px 0;-webkit-mask:linear-gradient(#000,#000);opacity:.9}
+  .strip::before{top:8px}
+  .strip::after{bottom:8px}
+  figure{margin:0;position:relative;counter-increment:frame;flex-basis:0;min-width:0;
+    background:linear-gradient(160deg,#dcded7,#c6c9c1);overflow:hidden}
+  figure.l{flex-grow:9;aspect-ratio:3/2}
+  figure.p{flex-grow:4;aspect-ratio:2/3}
+  figure img{display:block;width:100%;height:100%;object-fit:cover}
+  .strip{counter-reset:frame var(--start,0)}
+  figure::after{content:counter(frame);position:absolute;inset-inline-start:0;top:calc(100% + 8px);color:var(--edge);font:600 .75rem/1 var(--sans);font-variant-numeric:tabular-nums;letter-spacing:.04em}
+  .strip figure{overflow:visible}
+  .strip figure>img{position:relative}
+
+  #enquire{padding-block:var(--s5);border-top:1px solid var(--ink)}
+  #enquire .wrap{display:grid;gap:var(--s3)}
+  @media(min-width:800px){#enquire .wrap{grid-template-columns:15rem 1fr;gap:var(--s4)}}
+  ul.ask{margin:0 0 var(--s3);padding-inline-start:1.1rem;max-width:40ch}
+  ul.ask li{margin-block:var(--s1)}
+  .cta{position:relative;display:inline-flex;align-items:center;min-height:48px;padding:.5rem var(--s3);font-family:var(--serif);font-size:1.25rem;text-decoration:none;background:var(--ink);color:var(--table);transition:background-color .15s,color .15s}
+  .cta::after{content:"";position:absolute;inset:-8px -12px;border:2px solid var(--pencil);border-radius:50%;opacity:0;transform:scale(.94) rotate(-2deg);transition:opacity .2s,transform .2s;pointer-events:none}
+  .cta:hover::after,.cta:focus-visible::after{opacity:1;transform:scale(1) rotate(-2deg)}
+  .cta:active{background:#000;transform:translateY(1px)}
+  .cta[aria-disabled="true"]{opacity:.5;pointer-events:none}
+
+  footer{padding-block:var(--s3);border-top:1px solid var(--ink);font-size:.9rem;color:var(--muted)}
+
+  @media(max-width:480px){
+    .strip{padding-inline:var(--s1);gap:6px}
+    figure::after{font-size:.65rem}
+  }
+  @media(prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    *,*::before,*::after{transition:none!important}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <a class="brand" href="#top">Wedding photography</a>
+    <nav aria-label="Page">
+      <a href="#day">The day</a>
+      <a href="#enquire">Enquire</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="intro wrap">
+    <h1>A wedding day, in the order it happens</h1>
+    <p>Six strips, one for each part of the day. Every strip is a set of frames from a single stretch of it, so you can see how a whole day gets covered.</p>
+  </section>
+
+  <section id="day" class="wrap" aria-label="The day, strip by strip">
+
+    <article class="moment">
+      <div>
+        <h2>Getting ready</h2>
+        <p>The dress on its hanger, the rings in their box, the last button, the room before anyone is watching.</p>
+      </div>
+      <div class="strip" style="--start:0">
+        <figure class="l" role="img" aria-label="Getting ready, landscape frame, photo to be added"></figure>
+        <figure class="p" role="img" aria-label="Getting ready, portrait frame, photo to be added"></figure>
+        <figure class="l" role="img" aria-label="Getting ready, landscape frame, photo to be added"></figure>
+      </div>
+    </article>
+
+    <article class="moment">
+      <div>
+        <h2>First look</h2>
+        <p>The moment the two of you see each other, and the minute after it.</p>
+      </div>
+      <div class="strip" style="--start:3">
+        <figure class="p" role="img" aria-label="First look, portrait frame, photo to be added"></figure>
+        <figure class="l" role="img" aria-label="First look, landscape frame, photo to be added"></figure>
+        <figure class="p" role="img" aria-label="First look, portrait frame, photo to be added"></figure>
+      </div>
+    </article>
+
+    <article class="moment">
+      <div>
+        <h2>Ceremony</h2>
+        <p>The aisle, the vows, the faces in the front row, the walk back out.</p>
+      </div>
+      <div class="strip" style="--start:6">
+        <figure class="l" role="img" aria-label="Ceremony, landscape frame, photo to be added"></figure>
+        <figure class="l" role="img" aria-label="Ceremony, landscape frame, photo to be added"></figure>
+        <figure class="p" role="img" aria-label="Ceremony, portrait frame, photo to be added"></figure>
+      </div>
+    </article>
+
+    <article class="moment">
+      <div>
+        <h2>Portraits</h2>
+        <p>Couple, families and friends, in the light that is available when the time comes.</p>
+      </div>
+      <div class="strip" style="--start:9">
+        <figure class="p" role="img" aria-label="Portraits, portrait frame, photo to be added"></figure>
+        <figure class="p" role="img" aria-label="Portraits, portrait frame, photo to be added"></figure>
+        <figure class="l" role="img" aria-label="Portraits, landscape frame, photo to be added"></figure>
+      </div>
+    </article>
+
+    <article class="moment">
+      <div>
+        <h2>Speeches and dinner</h2>
+        <p>Tables, toasts, the laugh that follows, the cake being cut.</p>
+      </div>
+      <div class="strip" style="--start:12">
+        <figure class="l" role="img" aria-label="Speeches and dinner, landscape frame, photo to be added"></figure>
+        <figure class="p" role="img" aria-label="Speeches and dinner, portrait frame, photo to be added"></figure>
+        <figure class="l" role="img" aria-label="Speeches and dinner, landscape frame, photo to be added"></figure>
+      </div>
+    </article>
+
+    <article class="moment">
+      <div>
+        <h2>First dance and after</h2>
+        <p>The first dance, then the floor filling up, until the last song.</p>
+      </div>
+      <div class="strip" style="--start:15">
+        <figure class="l" role="img" aria-label="First dance, landscape frame, photo to be added"></figure>
+        <figure class="l" role="img" aria-label="Dance floor, landscape frame, photo to be added"></figure>
+        <figure class="p" role="img" aria-label="Last song, portrait frame, photo to be added"></figure>
+      </div>
+    </article>
+  </section>
+
+  <section id="enquire" aria-labelledby="enq-h">
+    <div class="wrap">
+      <h2 id="enq-h">Ask about your date</h2>
+      <div>
+        <ul class="ask">
+          <li>The date, or the few dates you are choosing between</li>
+          <li>The venue, or the town if you have not chosen one</li>
+          <li>Which parts of the day you want covered</li>
+        </ul>
+        <!-- Replace the empty address after "mailto:" with your own, e.g. mailto:you@example.com?subject=... -->
+        <a class="cta" href="mailto:?subject=Wedding%20enquiry">Write an email about your date</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">Wedding photography</div>
+</footer>
+</body>
+</html>

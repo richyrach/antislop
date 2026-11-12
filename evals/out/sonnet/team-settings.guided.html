@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Team settings</title>
+<meta name="description" content="Manage the name, members, invites, permissions and message retention of your team.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f6b63'/%3E%3Cpath d='M9 11h14M9 16h14M9 21h8' stroke='white' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+:root{
+  --ink:#14292b;          /* text, sidebar */
+  --ink-2:#4a5d5f;        /* secondary text */
+  --ink-3:#5d6f71;        /* meta text, AA on canvas */
+  --canvas:#eef2f2;
+  --panel:#fafcfc;
+  --line:#d3dcdc;
+  --action:#0f6b63;
+  --action-d:#0a524c;
+  --tint:#dcebe9;
+  --danger:#a8261d;
+  --danger-bg:#fbeceb;
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:72px;
+  --r:8px;
+  --sans:"Avenir Next","Segoe UI",Seravek,Candara,Calibri,"Trebuchet MS",system-ui,sans-serif;
+  --mono:Menlo,"Cascadia Mono",Consolas,"Roboto Mono",monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:var(--s7)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+body{margin:0;background:var(--canvas);color:var(--ink);font:17px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+::selection{background:var(--tint)}
+h1,h2,h3,p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--action);outline-offset:2px;border-radius:4px}
+
+.sample{background:var(--ink);color:#d8e6e4;font-size:14px;padding:var(--s2) var(--s5);text-align:center}
+
+.shell{display:grid;grid-template-columns:240px minmax(0,1fr);max-width:1180px;margin:0 auto;gap:var(--s7);padding:var(--s6) var(--s5) var(--s8)}
+nav.side{position:sticky;top:var(--s5);align-self:start}
+nav.side .team{display:flex;align-items:center;gap:var(--s3);margin-bottom:var(--s5)}
+nav.side .team b{font-size:15px;line-height:1.2}
+nav.side .team small{display:block;color:var(--ink-3);font-size:13px;font-weight:400}
+nav.side ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:var(--s1)}
+nav.side a{display:flex;justify-content:space-between;min-height:44px;align-items:center;padding:0 var(--s3);border-radius:var(--r);color:var(--ink-2);text-decoration:none;font-size:16px;border-left:3px solid transparent}
+nav.side a:hover{background:#e1e9e9;color:var(--ink)}
+nav.side a[aria-current="true"]{background:var(--ink);color:#fff;font-weight:600}
+nav.side a.danger{color:var(--danger)}
+nav.side a.danger[aria-current="true"]{background:var(--danger);color:#fff}
+nav.side .n{font-size:13px;opacity:.8;font-variant-numeric:tabular-nums}
+
+.tile{--tile:#0f6b63;width:44px;height:44px;flex:none;border-radius:12px;background:var(--tile);color:#fff;display:grid;place-items:center;font-weight:700;font-size:20px;letter-spacing:-.02em}
+
+main{min-width:0}
+.page-title{font-size:clamp(34px,5vw,56px);line-height:1.02;letter-spacing:-.035em;font-weight:700;margin-bottom:var(--s2)}
+.lede{color:var(--ink-2);max-width:52ch;margin-bottom:var(--s7)}
+
+section.block{padding:var(--s6) 0;border-top:2px solid var(--ink)}
+section.block+section.block{margin-top:var(--s5)}
+.block>header{display:grid;grid-template-columns:minmax(0,260px) minmax(0,1fr);gap:var(--s6)}
+.block h2{font-size:24px;line-height:1.15;letter-spacing:-.02em}
+.block .why{color:var(--ink-3);font-size:15px;margin-top:var(--s2);max-width:30ch}
+.when{display:inline-block;margin-top:var(--s3);font-size:13px;font-weight:600;background:var(--tint);color:var(--action-d);padding:2px var(--s2);border-radius:4px}
+.body{min-width:0}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:var(--s5)}
+
+label,.lbl{display:block;font-weight:600;font-size:15px;margin-bottom:var(--s1)}
+.opt{font-weight:400;color:var(--ink-3)}
+.hint{color:var(--ink-3);font-size:14px;margin-top:var(--s1)}
+.err{color:var(--danger);font-size:14px;margin-top:var(--s1);min-height:0}
+input[type=text],input[type=search],select,textarea{width:100%;min-height:44px;padding:var(--s2) var(--s3);border:1.5px solid #8ea0a1;border-radius:6px;background:#fff}
+textarea{resize:vertical;min-height:88px}
+input:hover,select:hover,textarea:hover{border-color:var(--ink-2)}
+input[aria-invalid=true]{border-color:var(--danger)}
+input:disabled,select:disabled,button:disabled{opacity:.5;cursor:not-allowed}
+.field+.field{margin-top:var(--s4)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:var(--s4)}
+.handle{display:flex;align-items:stretch}
+.handle span{display:flex;align-items:center;padding:0 var(--s3);background:var(--tint);border:1.5px solid #8ea0a1;border-right:0;border-radius:6px 0 0 6px;font-family:var(--mono);font-size:14px;color:var(--ink-2)}
+.handle input{border-radius:0 6px 6px 0;font-family:var(--mono);font-size:15px}
+
+.btn{min-height:44px;padding:0 var(--s4);border-radius:6px;border:1.5px solid var(--ink);background:transparent;font-weight:600;cursor:pointer;transition:background .15s,transform .15s}
+.btn:hover{background:#e1e9e9}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--action);border-color:var(--action);color:#fff}
+.btn.primary:hover{background:var(--action-d)}
+.btn.danger{background:var(--danger);border-color:var(--danger);color:#fff}
+.btn.danger:hover{background:#861b14}
+.btn.sm{min-height:44px;padding:0 var(--s3);font-size:15px}
+.actions{display:flex;gap:var(--s3);margin-top:var(--s5);flex-wrap:wrap}
+
+.identity{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:var(--s5)}
+.preview{background:var(--ink);color:#fff;border-radius:var(--r);padding:var(--s4);align-self:start}
+.preview p{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#a9c0be;margin-bottom:var(--s3)}
+.preview .team{display:flex;gap:var(--s3);align-items:center}
+.preview b{display:block;line-height:1.2;overflow-wrap:anywhere}
+.preview small{color:#a9c0be;font-size:13px}
+.preview ul{list-style:none;padding:0;margin:var(--s4) 0 0;font-size:15px;color:#cfdedc}
+.preview li{padding:var(--s1) 0}
+.preview li.on{color:#fff;font-weight:600}
+.swatches{display:flex;gap:var(--s2);flex-wrap:wrap}
+.swatches input{position:absolute;opacity:0;pointer-events:none}
+.swatches label{width:44px;height:44px;margin:0;border-radius:12px;background:var(--c);cursor:pointer;display:grid;place-items:center;border:3px solid transparent;box-shadow:inset 0 0 0 2px var(--panel)}
+.swatches input:checked+label{border-color:var(--ink)}
+.swatches input:focus-visible+label{outline:3px solid var(--action);outline-offset:2px}
+
+.toolbar{display:flex;gap:var(--s3);align-items:center;margin-bottom:var(--s3);flex-wrap:wrap}
+.toolbar input{max-width:320px}
+.count{color:var(--ink-3);font-size:14px;margin-left:auto}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--panel)}
+table{width:100%;border-collapse:collapse;min-width:560px}
+th,td{padding:var(--s3) var(--s4);text-align:left;vertical-align:middle}
+th{font-size:13px;color:var(--ink-3);font-weight:600;border-bottom:1px solid var(--line);letter-spacing:.02em}
+td{border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:0}
+td.who{display:flex;gap:var(--s3);align-items:center;min-width:220px}
+.av{width:36px;height:36px;border-radius:50%;background:var(--tint);color:var(--action-d);display:grid;place-items:center;font-weight:700;font-size:14px;flex:none}
+td.who b{display:block;line-height:1.25;font-size:16px}
+td.who small{color:var(--ink-3);font-size:13px}
+td select{min-height:44px;width:auto;padding-right:var(--s2)}
+td.r,th.r{text-align:right}
+.you{font-size:12px;background:var(--ink);color:#fff;border-radius:3px;padding:0 6px;margin-left:var(--s2);font-weight:600;vertical-align:1px}
+.fixed{font-weight:600;padding:0 var(--s3)}
+.empty{padding:var(--s6) var(--s4);text-align:center;color:var(--ink-2)}
+.linkbtn{background:none;border:0;color:var(--action-d);text-decoration:underline;cursor:pointer;padding:var(--s2)}
+.rm{color:var(--danger);border-color:transparent}
+.rm:hover{background:var(--danger-bg)}
+
+.invite{display:flex;gap:var(--s2)}
+.invite input{font-family:var(--mono);font-size:14px;background:#fff}
+.divider{border:0;border-top:1px solid var(--line);margin:var(--s5) 0}
+
+.switch{display:grid;grid-template-columns:1fr auto;gap:var(--s4);align-items:center;padding:var(--s3) 0}
+.switch+.switch{border-top:1px solid var(--line)}
+.switch b{display:block;font-size:16px;line-height:1.3}
+.switch span.d{color:var(--ink-3);font-size:14px}
+.tg{appearance:none;width:52px;height:44px;margin:0;background:none;cursor:pointer;position:relative}
+.tg::before{content:"";position:absolute;inset:10px 0;border-radius:12px;background:#8ea0a1;transition:background .15s}
+.tg::after{content:"";position:absolute;top:13px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .15s}
+.tg:checked::before{background:var(--action)}
+.tg:checked::after{transform:translateX(28px)}
+.tg:hover::before{filter:brightness(.92)}
+.tg:disabled{cursor:not-allowed}
+.switch select{width:auto}
+
+fieldset{border:0;padding:0;margin:0}
+.opts{display:grid;gap:var(--s2)}
+.opts label{display:flex;gap:var(--s3);align-items:flex-start;font-weight:400;padding:var(--s3);border:1.5px solid var(--line);border-radius:6px;cursor:pointer;margin:0;background:#fff}
+.opts label:hover{border-color:var(--ink-2)}
+.opts label:has(input:checked){border-color:var(--action);background:var(--tint)}
+.opts input{margin-top:5px;width:18px;height:18px;accent-color:var(--action)}
+.opts b{display:block;line-height:1.3}
+.opts span{color:var(--ink-2);font-size:14px}
+.note{margin-top:var(--s4);padding:var(--s3) var(--s4);border-left:4px solid var(--ink);background:var(--panel);font-size:15px}
+
+.zone{border-color:var(--danger);background:var(--danger-bg)}
+.zone+.zone{margin-top:var(--s4)}
+.zone h3{font-size:18px;margin-bottom:var(--s1)}
+.zone p{color:var(--ink-2);font-size:15px;margin-bottom:var(--s4);max-width:56ch}
+
+dialog{border:0;border-radius:12px;padding:var(--s5);max-width:460px;width:calc(100% - 32px);background:var(--panel);color:var(--ink);box-shadow:0 12px 40px rgba(20,41,43,.35)}
+dialog::backdrop{background:rgba(20,41,43,.55)}
+dialog h2{font-size:22px;margin-bottom:var(--s2)}
+dialog p{color:var(--ink-2);margin-bottom:var(--s4)}
+dialog .actions{margin-top:var(--s4);justify-content:flex-end}
+
+#toast{position:fixed;left:50%;bottom:var(--s5);transform:translate(-50%,16px);background:var(--ink);color:#fff;padding:var(--s3) var(--s4);border-radius:8px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:calc(100% - 32px);z-index:10;font-size:15px}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+#toast.bad{background:var(--danger)}
+
+@media (max-width:920px){
+  .shell{grid-template-columns:1fr;gap:var(--s4);padding:var(--s4) var(--s4) var(--s8)}
+  nav.side{position:sticky;top:0;z-index:5;background:var(--canvas);margin:0 calc(var(--s4)*-1);padding:var(--s2) var(--s4);border-bottom:1px solid var(--line)}
+  nav.side .team{display:none}
+  nav.side ul{flex-direction:row;overflow-x:auto;gap:var(--s2)}
+  nav.side a{white-space:nowrap;gap:var(--s2)}
+  .block>header{grid-template-columns:1fr;gap:var(--s4);margin-bottom:var(--s4)}
+  .block .why{max-width:60ch}
+  .identity{grid-template-columns:1fr}
+  .preview{order:-1}
+}
+@media (max-width:480px){
+  .row2{grid-template-columns:1fr}
+  .invite{flex-direction:column}
+  .panel{padding:var(--s4)}
+  .switch{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="sample">Sample page: the members and settings below are sample data and changes stay in this tab only.</div>
+
+<div class="shell">
+  <nav class="side" aria-label="Settings sections">
+    <div class="team">
+      <div class="tile js-tile" aria-hidden="true">R</div>
+      <b><span class="js-name-side">Riverside Ops</span><small>Team settings</small></b>
+    </div>
+    <ul>
+      <li><a href="#general" aria-current="true">Name and icon</a></li>
+      <li><a href="#members">Members <span class="n" id="navCount">5</span></a></li>
+      <li><a href="#invites">Invite link</a></li>
+      <li><a href="#permissions">Permissions</a></li>
+      <li><a href="#retention">Message history</a></li>
+      <li><a href="#delete" class="danger">Delete team</a></li>
+    </ul>
+  </nav>
+
+  <main id="main">
+    <h1 class="page-title">Team settings</h1>
+    <p class="lede">Rename the team, decide who belongs to it and what they can do, and choose how long messages are kept. Only owners and admins see this page.</p>
+
+    <!-- GENERAL -->
+    <section class="block" id="general" aria-labelledby="h-general">
+      <header>
+        <div>
+          <h2 id="h-general">Name and icon</h2>
+          <p class="why">Shown in the sidebar, in invites and in email notifications.</p>
+          <span class="when">Applies when you save</span>
+        </div>
+        <div class="body">
+          <form class="panel identity" id="formGeneral" novalidate>
+            <div>
+              <div class="field">
+                <label for="name">Team name</label>
+                <input type="text" id="name" value="Riverside Ops" maxlength="40" autocomplete="off" aria-describedby="nameErr">
+                <p class="err" id="nameErr" role="alert"></p>
+              </div>
+              <div class="field">
+                <label for="handle">Team address</label>
+                <div class="handle"><span>chat.example/</span><input type="text" id="handle" value="riverside-ops" maxlength="30" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="handleHint handleErr"></div>
+                <p class="hint" id="handleHint">Lowercase letters, numbers and hyphens. Changing it breaks old invite links.</p>
+                <p class="err" id="handleErr" role="alert"></p>
+              </div>
+              <div class="field">
+                <label for="desc">Description <span class="opt">(optional)</span></label>
+                <textarea id="desc" maxlength="160">Dispatch, warehouse and driver coordination.</textarea>
+                <p class="hint"><span id="descCount">0</span> of 160 characters</p>
+              </div>
+              <fieldset class="field">
+                <legend class="lbl">Icon colour</legend>
+                <div class="swatches" id="swatches">
+                  <input type="radio" name="tile" id="c1" value="#0f6b63" checked><label for="c1" style="--c:#0f6b63"><span class="sr" hidden>Teal</span></label>
+                  <input type="radio" name="tile" id="c2" value="#9a3b1f"><label for="c2" style="--c:#9a3b1f" title="Brick"></label>
+                  <input type="radio" name="tile" id="c3" value="#3d4f8a"><label for="c3" style="--c:#3d4f8a" title="Slate blue"></label>
+                  <input type="radio" name="tile" id="c4" value="#7a5a10"><label for="c4" style="--c:#7a5a10" title="Ochre"></label>
+                  <input type="radio" name="tile" id="c5" value="#14292b"><label for="c5" style="--c:#14292b" title="Ink"></label>
+                </div>
+              </fieldset>
+              <div class="actions">
+                <button class="btn primary" type="submit" id="saveGeneral" disabled>Save name and icon</button>
+                <button class="btn" type="button" id="resetGeneral" disabled>Discard changes</button>
+              </div>
+            </div>
+            <aside class="preview" aria-label="Sidebar preview">
+              <p>Sidebar preview</p>
+              <div class="team"><div class="tile js-tile" aria-hidden="true">R</div><div><b class="js-name-side">Riverside Ops</b><small>5 members</small></div></div>
+              <ul><li class="on"># general</li><li># dispatch</li><li># warehouse</li><li># drivers</li></ul>
+            </aside>
+          </form>
+        </div>
+      </header>
+    </section>
+
+    <!-- MEMBERS -->
+    <section class="block" id="members" aria-labelledby="h-members">
+      <header>
+        <div>
+          <h2 id="h-members">Members</h2>
+          <p class="why">Admins can change roles and remove people. Guests only see channels they are added to.</p>
+          <span class="when">Role changes apply immediately</span>
+        </div>
+        <div class="body">
+          <div class="toolbar">
+            <div style="flex:1;min-width:200px;max-width:320px">
+              <label for="q" class="sr" style="position:absolute;left:-9999px">Search members</label>
+              <input type="search" id="q" placeholder="Search by name or email" autocomplete="off">
+            </div>
+            <span class="count" id="count" aria-live="polite"></span>
+          </div>
+          <div class="tablewrap">
+            <table>
+              <thead><tr><th scope="col">Member</th><th scope="col">Role</th><th scope="col">Joined</th><th scope="col" class="r">Action</th></tr></thead>
+              <tbody id="rows"></tbody>
+            </table>
+            <div class="empty" id="noRes" hidden></div>
+          </div>
+        </div>
+      </header>
+    </section>
+
+    <!-- INVITES -->
+    <section class="block" id="invites" aria-labelledby="h-invites">
+      <header>
+        <div>
+          <h2 id="h-invites">Invite link</h2>
+          <p class="why">Anyone with the link joins as a member. Regenerate it to cancel the old one.</p>
+          <span class="when">Applies immediately</span>
+        </div>
+        <div class="body">
+          <div class="panel">
+            <label for="link">Link</label>
+            <div class="invite">
+              <input type="text" id="link" readonly value="">
+              <button class="btn primary" type="button" id="copy">Copy link</button>
+            </div>
+            <p class="hint" id="exp">Expires in 7 days.</p>
+            <hr class="divider">
+            <div class="row2">
+              <div>
+                <label for="expiry">Link expires after</label>
+                <select id="expiry">
+                  <option value="1">1 day</option>
+                  <option value="7" selected>7 days</option>
+                  <option value="30">30 days</option>
+                  <option value="0">Never</option>
+                </select>
+              </div>
+              <div style="align-self:end"><button class="btn" type="button" id="regen">Regenerate link</button></div>
+            </div>
+            <div class="switch" style="margin-top:var(--s4)">
+              <div><b id="t-inv">Members can invite others</b><span class="d">When off, only owners and admins can share the link.</span></div>
+              <input type="checkbox" class="tg" role="switch" aria-labelledby="t-inv" checked>
+            </div>
+          </div>
+        </div>
+      </header>
+    </section>
+
+    <!-- PERMISSIONS -->
+    <section class="block" id="permissions" aria-labelledby="h-perm">
+      <header>
+        <div>
+          <h2 id="h-perm">Permissions</h2>
+          <p class="why">What regular members may do. Admins and owners are not affected.</p>
+          <span class="when">Applies immediately</span>
+        </div>
+        <div class="body">
+          <div class="panel">
+            <div class="switch"><div><b id="t1">Create channels</b><span class="d">Members can start public and private channels.</span></div><input type="checkbox" class="tg" role="switch" aria-labelledby="t1" checked></div>
+            <div class="switch"><div><b id="t2">Post in #general</b><span class="d">When off, only admins can post there. Members can still react and reply in threads.</span></div><input type="checkbox" class="tg" role="switch" aria-labelledby="t2" checked></div>
+            <div class="switch"><div><b id="t3">Use @everyone and @here</b><span class="d">Notifies every member of a channel, including those on mute schedules.</span></div><input type="checkbox" class="tg" role="switch" aria-labelledby="t3"></div>
+            <div class="switch"><div><b id="t4">Delete their own messages</b><span class="d">Deleted messages cannot be restored by admins.</span></div><input type="checkbox" class="tg" role="switch" aria-labelledby="t4" checked></div>
+            <div class="switch">
+              <div><b id="t5">Edit window</b><span class="d">How long after sending a member can still edit a message.</span></div>
+              <select aria-labelledby="t5" id="editWin"><option>15 minutes</option><option selected>1 hour</option><option>24 hours</option><option>No limit</option></select>
+            </div>
+          </div>
+        </div>
+      </header>
+    </section>
+
+    <!-- RETENTION -->
+    <section class="block" id="retention" aria-labelledby="h-ret">
+      <header>
+        <div>
+          <h2 id="h-ret">Message history</h2>
+          <p class="why">Messages and files older than the limit are deleted for everyone.</p>
+          <span class="when">Applies when you save</span>
+        </div>
+        <div class="body">
+          <form class="panel" id="formRet">
+            <fieldset>
+              <legend class="lbl">Keep messages for</legend>
+              <div class="opts">
+                <label><input type="radio" name="ret" value="forever" checked><div><b>Forever</b><span>Nothing is deleted automatically.</span></div></label>
+                <label><input type="radio" name="ret" value="365"><div><b>1 year</b><span>Older messages are removed each night.</span></div></label>
+                <label><input type="radio" name="ret" value="90"><div><b>90 days</b><span>Good for teams that handle sensitive details.</span></div></label>
+                <label><input type="radio" name="ret" value="30"><div><b>30 days</b><span>Search only finds the last month.</span></div></label>
+              </div>
+            </fieldset>
+            <p class="note" id="retNote" hidden></p>
+            <div class="actions"><button class="btn primary" type="submit" id="saveRet" disabled>Save history setting</button></div>
+          </form>
+        </div>
+      </header>
+    </section>
+
+    <!-- DELETE -->
+    <section class="block" id="delete" aria-labelledby="h-del">
+      <header>
+        <div>
+          <h2 id="h-del">Delete team</h2>
+          <p class="why">Only the owner can do this.</p>
+        </div>
+        <div class="body">
+          <div class="panel zone">
+            <h3>Delete this team and all its messages</h3>
+            <p>All channels, messages and files are removed for every member. This cannot be undone.</p>
+            <button class="btn danger" type="button" id="delOpen">Delete team…</button>
+          </div>
+        </div>
+      </header>
+    </section>
+  </main>
+</div>
+
+<dialog id="dlgRemove" aria-labelledby="rmT">
+  <form method="dialog" id="rmForm">
+    <h2 id="rmT">Remove member?</h2>
+    <p id="rmP"></p>
+    <div class="actions"><button class="btn" value="cancel">Keep member</button><button class="btn danger" value="ok" id="rmOk">Remove member</button></div>
+  </form>
+</dialog>
+
+<dialog id="dlgDelete" aria-labelledby="dT">
+  <form method="dialog" id="dForm">
+    <h2 id="dT">Delete this team?</h2>
+    <p>This removes all channels, messages and files for 5 members. Type <b id="dName"></b> to confirm.</p>
+    <label for="dConfirm">Team name</label>
+    <input type="text" id="dConfirm" autocomplete="off">
+    <div class="actions"><button class="btn" value="cancel">Cancel</button><button class="btn danger" value="ok" id="dOk" disabled>Delete team</button></div>
+  </form>
+</dialog>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  var $=function(s,r){return (r||document).querySelector(s)},$$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+  var toastT;
+  function toast(m,bad){var t=$('#toast');t.textContent=m;t.className='show'+(bad?' bad':'');clearTimeout(toastT);toastT=setTimeout(function(){t.className=''},3200)}
+
+  /* ---- General ---- */
+  var saved={name:'Riverside Ops',handle:'riverside-ops',desc:'Dispatch, warehouse and driver coordination.',tile:'#0f6b63'};
+  var name=$('#name'),handle=$('#handle'),desc=$('#desc');
+  function applyIdentity(v){
+    $$('.js-name-side').forEach(function(e){e.textContent=v.name||'Untitled team'});
+    $$('.js-tile').forEach(function(e){e.textContent=(v.name||'?').trim().charAt(0).toUpperCase()||'?';e.style.setProperty('--tile',v.tile)});
+  }
+  function current(){return {name:name.value.trim(),handle:handle.value,desc:desc.value,tile:($('input[name=tile]:checked')||{}).value}}
+  function dirty(){var c=current();return c.name!==saved.name||c.handle!==saved.handle||c.desc!==saved.desc||c.tile!==saved.tile}
+  function refreshGeneral(){var d=dirty();$('#saveGeneral').disabled=!d;$('#resetGeneral').disabled=!d;$('#descCount').textContent=desc.value.length;applyIdentity(current())}
+  function vName(){var e=$('#nameErr');if(!name.value.trim()){e.textContent='Enter a team name, for example “Riverside Ops”.';name.setAttribute('aria-invalid','true');return false}e.textContent='';name.removeAttribute('aria-invalid');return true}
+  function vHandle(){var e=$('#handleErr'),v=handle.value;if(!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(v)){e.textContent='Use lowercase letters, numbers and single hyphens, with no spaces. Example: riverside-ops.';handle.setAttribute('aria-invalid','true');return false}e.textContent='';handle.removeAttribute('aria-invalid');return true}
+  name.addEventListener('blur',vName);handle.addEventListener('blur',vHandle);
+  [name,handle,desc].forEach(function(e){e.addEventListener('input',refreshGeneral)});
+  $$('input[name=tile]').forEach(function(e){e.addEventListener('change',refreshGeneral)});
+  $('#formGeneral').addEventListener('submit',function(ev){ev.preventDefault();var a=vName(),b=vHandle();if(!a||!b){(a?handle:name).focus();return}saved=current();refreshGeneral();toast('Name and icon saved.')});
+  $('#resetGeneral').addEventListener('click',function(){name.value=saved.name;handle.value=saved.handle;desc.value=saved.desc;$$('input[name=tile]').forEach(function(e){e.checked=e.value===saved.tile});vName();vHandle();refreshGeneral()});
+
+  /* ---- Members ---- */
+  var members=[
+    {id:1,n:'Member A',e:'member.a@example.com',r:'Owner',j:'12 Mar 2025',you:true},
+    {id:2,n:'Member B',e:'member.b@example.com',r:'Admin',j:'2 Apr 2025'},
+    {id:3,n:'Member C',e:'member.c@example.com',r:'Member',j:'19 Jun 2025'},
+    {id:4,n:'Member D',e:'member.d@example.com',r:'Member',j:'3 Sep 2025'},
+    {id:5,n:'Guest E',e:'guest.e@example.com',r:'Guest',j:'28 Oct 2025'}
+  ];
+  var pending=null;
+  function esc(s){return s.replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function renderMembers(){
+    var q=$('#q').value.trim().toLowerCase();
+    var list=members.filter(function(m){return !q||(m.n+' '+m.e).toLowerCase().indexOf(q)>-1});
+    $('#rows').innerHTML=list.map(function(m){
+      var role=m.r==='Owner'?'<span class="fixed">Owner</span>':
+        '<select aria-label="Role for '+esc(m.n)+'" data-id="'+m.id+'">'+['Admin','Member','Guest'].map(function(r){return '<option'+(r===m.r?' selected':'')+'>'+r+'</option>'}).join('')+'</select>';
+      var act=m.r==='Owner'?'<span class="hint" style="margin:0">Cannot remove owner</span>':
+        '<button class="btn sm rm" type="button" data-rm="'+m.id+'">Remove<span style="position:absolute;left:-9999px"> '+esc(m.n)+'</span></button>';
+      return '<tr><td class="who"><span class="av" aria-hidden="true">'+esc(m.n.split(' ')[1]||m.n.charAt(0))+'</span><span><b>'+esc(m.n)+(m.you?'<span class="you">You</span>':'')+'</b><small>'+esc(m.e)+'</small></span></td><td>'+role+'</td><td>'+m.j+'</td><td class="r">'+act+'</td></tr>';
+    }).join('');
+    var nr=$('#noRes');
+    if(!list.length){nr.hidden=false;nr.innerHTML=members.length?'No members match “'+esc($('#q').value)+'”. <button class="linkbtn" type="button" id="clearQ">Clear search</button>':'No members yet. Share the invite link below to add the first one.'}else nr.hidden=true;
+    $('#count').textContent=(q?list.length+' of ':'')+members.length+' member'+(members.length===1?'':'s');
+    $('#navCount').textContent=members.length;
+    $$('.preview small').forEach(function(e){e.textContent=members.length+' members'});
+  }
+  $('#q').addEventListener('input',renderMembers);
+  $('#noRes').addEventListener('click',function(e){if(e.target.id==='clearQ'){$('#q').value='';renderMembers();$('#q').focus()}});
+  $('#rows').addEventListener('change',function(e){
+    if(e.target.tagName!=='SELECT')return;
+    var m=members.filter(function(x){return x.id==e.target.dataset.id})[0];m.r=e.target.value;toast(m.n+' is now '+m.r.toLowerCase()+'.');
+  });
+  $('#rows').addEventListener('click',function(e){
+    var b=e.target.closest('[data-rm]');if(!b)return;
+    pending=members.filter(function(x){return x.id==b.dataset.rm})[0];
+    $('#rmT').textContent='Remove '+pending.n+'?';
+    $('#rmP').textContent=pending.n+' loses access to every channel and can rejoin only with a new invite. Their past messages stay.';
+    $('#dlgRemove').showModal();
+  });
+  $('#dlgRemove').addEventListener('close',function(){
+    if(this.returnValue==='ok'&&pending){members=members.filter(function(x){return x!==pending});renderMembers();toast(pending.n+' removed.')}
+    this.returnValue='';pending=null;
+  });
+
+  /* ---- Invite ---- */
+  function token(){var a='abcdefghjkmnpqrstuvwxyz23456789',s='';for(var i=0;i<10;i++)s+=a.charAt(Math.floor(Math.random()*a.length));return s}
+  function setLink(){$('#link').value='https://chat.example/join/'+token()}
+  function setExp(){var v=$('#expiry').value;$('#exp').textContent=v==='0'?'This link never expires.':'Expires in '+v+(v==='1'?' day.':' days.')}
+  setLink();
+  $('#regen').addEventListener('click',function(){setLink();setExp();toast('New link created. The old link no longer works.')});
+  $('#expiry').addEventListener('change',function(){setExp();toast('Link expiry updated.')});
+  $('#copy').addEventListener('click',function(){
+    var v=$('#link').value;
+    function ok(){toast('Invite link copied.')}
+    function fail(){$('#link').select();toast('Could not copy automatically. The link is selected, press Ctrl+C or ⌘C.',true)}
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(v).then(ok,fail)}else{try{$('#link').select();document.execCommand('copy')?ok():fail()}catch(e){fail()}}
+  });
+
+  /* ---- Switches ---- */
+  $$('.tg').forEach(function(t){t.addEventListener('change',function(){
+    var l=document.getElementById(t.getAttribute('aria-labelledby')).textContent;toast(l+': '+(t.checked?'on':'off')+'.')})});
+  $('#editWin').addEventListener('change',function(){toast('Edit window set to '+this.value.toLowerCase()+'.')});
+
+  /* ---- Retention ---- */
+  var savedRet='forever';
+  var notes={'365':'Messages older than 1 year will be deleted tonight when you save.','90':'Messages older than 90 days will be deleted tonight when you save. This cannot be undone.','30':'Messages older than 30 days will be deleted tonight when you save. This cannot be undone.'};
+  $$('input[name=ret]').forEach(function(r){r.addEventListener('change',function(){
+    var v=$('input[name=ret]:checked').value,n=$('#retNote');
+    $('#saveRet').disabled=v===savedRet;
+    if(notes[v]&&v!==savedRet){n.hidden=false;n.textContent=notes[v]}else n.hidden=true;
+  })});
+  $('#formRet').addEventListener('submit',function(e){e.preventDefault();savedRet=$('input[name=ret]:checked').value;$('#saveRet').disabled=true;$('#retNote').hidden=true;toast('Message history setting saved.')});
+
+  /* ---- Delete ---- */
+  $('#delOpen').addEventListener('click',function(){$('#dName').textContent=saved.name;$('#dConfirm').value='';$('#dOk').disabled=true;$('#dlgDelete').showModal();$('#dConfirm').focus()});
+  $('#dConfirm').addEventListener('input',function(){$('#dOk').disabled=this.value.trim()!==saved.name});
+  $('#dlgDelete').addEventListener('close',function(){
+    if(this.returnValue==='ok'){
+      $('#main').innerHTML='<h1 class="page-title">Team deleted</h1><p class="lede">“'+esc(saved.name)+'” was deleted in this sample page. Reload to start over. In the real app, members would see a notice and be signed out.</p>';
+      $('nav.side').style.display='none';
+    }
+    this.returnValue='';
+  });
+
+  /* ---- Current section marker ---- */
+  var links=$$('nav.side a'),secs=$$('section.block');
+  function mark(){
+    var y=window.scrollY+160,cur=secs[0].id;
+    secs.forEach(function(s){if(s.offsetTop<=y)cur=s.id});
+    if(window.innerHeight+window.scrollY>=document.body.scrollHeight-4)cur=secs[secs.length-1].id;
+    links.forEach(function(a){a.setAttribute('aria-current',a.getAttribute('href')==='#'+cur?'true':'false')});
+  }
+  window.addEventListener('scroll',mark,{passive:true});
+
+  refreshGeneral();renderMembers();mark();
+})();
+</script>
+</body>
+</html>

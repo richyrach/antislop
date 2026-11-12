@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tern — Notes that keep up with you</title>
+<meta name="description" content="Tern is a fast, calm note-taking app. Capture ideas instantly, link them together, and find anything in a blink.">
+<style>
+  :root{
+    --bg:#f7f6f2;
+    --ink:#16181d;
+    --muted:#5d636e;
+    --line:#e4e2da;
+    --card:#ffffff;
+    --accent:#1f6f6b;
+    --accent-ink:#ffffff;
+    --accent-soft:#dff0ee;
+    --radius:14px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#111315;
+      --ink:#eceae4;
+      --muted:#9aa0aa;
+      --line:#262a2f;
+      --card:#1a1d21;
+      --accent:#5cc4bd;
+      --accent-ink:#0b1d1c;
+      --accent-soft:#17302f;
+    }
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+  h1,h2,h3{line-height:1.15;letter-spacing:-0.02em}
+
+  /* Nav */
+  header{padding:22px 0}
+  nav{display:flex;align-items:center;justify-content:space-between}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.25rem;letter-spacing:-0.02em}
+  .logo svg{width:28px;height:28px}
+  .nav-links{display:flex;align-items:center;gap:28px;font-size:.95rem;color:var(--muted)}
+  .nav-links a:hover{color:var(--ink)}
+  .btn{
+    display:inline-block;padding:12px 22px;border-radius:999px;font-weight:600;font-size:.98rem;
+    background:var(--accent);color:var(--accent-ink);border:1px solid var(--accent);
+    transition:transform .15s ease, opacity .15s ease;cursor:pointer;
+  }
+  .btn:hover{transform:translateY(-1px);opacity:.92}
+  .btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+  .btn.small{padding:8px 16px;font-size:.9rem}
+  @media(max-width:700px){.nav-links a.hide-m{display:none}.nav-links{gap:16px}}
+
+  /* Hero */
+  .hero{padding:72px 0 56px;text-align:center}
+  .eyebrow{
+    display:inline-block;padding:6px 14px;border-radius:999px;background:var(--accent-soft);
+    color:var(--accent);font-size:.85rem;font-weight:600;margin-bottom:22px;
+  }
+  .hero h1{font-size:clamp(2.4rem,6vw,4.4rem);max-width:14ch;margin:0 auto 20px}
+  .hero p.lead{font-size:clamp(1.05rem,2vw,1.25rem);color:var(--muted);max-width:56ch;margin:0 auto 32px}
+  .cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .fine{margin-top:16px;font-size:.85rem;color:var(--muted)}
+
+  /* App mock */
+  .mock{
+    margin:56px auto 0;max-width:900px;background:var(--card);border:1px solid var(--line);
+    border-radius:18px;box-shadow:0 30px 60px -30px rgba(0,0,0,.25);overflow:hidden;text-align:left;
+  }
+  .mock-bar{display:flex;gap:7px;padding:14px 16px;border-bottom:1px solid var(--line)}
+  .mock-bar i{width:11px;height:11px;border-radius:50%;background:var(--line);display:block}
+  .mock-body{display:grid;grid-template-columns:220px 1fr}
+  .side{border-right:1px solid var(--line);padding:18px 14px;font-size:.9rem;color:var(--muted)}
+  .side .item{padding:8px 10px;border-radius:8px;margin-bottom:2px}
+  .side .item.active{background:var(--accent-soft);color:var(--accent);font-weight:600}
+  .side .label{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;margin:16px 10px 8px}
+  .doc{padding:28px 32px}
+  .doc h3{font-size:1.5rem;margin-bottom:14px}
+  .doc p{color:var(--muted);margin-bottom:12px;font-size:.98rem}
+  .chip{display:inline-block;padding:2px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:.85rem;font-weight:500}
+  .check{display:flex;gap:10px;align-items:center;color:var(--ink);font-size:.98rem;margin-bottom:8px}
+  .check b{width:16px;height:16px;border-radius:5px;border:1.5px solid var(--accent);display:inline-block;flex:none}
+  .check b.on{background:var(--accent)}
+  @media(max-width:700px){.mock-body{grid-template-columns:1fr}.side{display:none}.doc{padding:22px}}
+
+  /* Sections */
+  section{padding:80px 0}
+  .section-head{text-align:center;max-width:620px;margin:0 auto 48px}
+  .section-head h2{font-size:clamp(1.8rem,4vw,2.6rem);margin-bottom:14px}
+  .section-head p{color:var(--muted);font-size:1.08rem}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:28px}
+  .card .ic{
+    width:42px;height:42px;border-radius:11px;background:var(--accent-soft);color:var(--accent);
+    display:grid;place-items:center;margin-bottom:18px;
+  }
+  .card .ic svg{width:22px;height:22px}
+  .card h3{font-size:1.15rem;margin-bottom:8px;letter-spacing:-0.01em}
+  .card p{color:var(--muted);font-size:.97rem}
+
+  /* Steps */
+  .steps{counter-reset:s;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:32px}
+  .step{counter-increment:s}
+  .step::before{
+    content:counter(s);display:grid;place-items:center;width:36px;height:36px;border-radius:50%;
+    background:var(--ink);color:var(--bg);font-weight:700;margin-bottom:14px;
+  }
+  .step h3{font-size:1.15rem;margin-bottom:6px}
+  .step p{color:var(--muted)}
+
+  /* Quote */
+  .quote{background:var(--accent);color:var(--accent-ink);border-radius:22px;padding:56px 32px;text-align:center}
+  .quote blockquote{font-size:clamp(1.3rem,3vw,1.9rem);max-width:30ch;margin:0 auto 16px;line-height:1.3;letter-spacing:-0.01em;font-weight:600}
+  .quote cite{font-style:normal;opacity:.85;font-size:.95rem}
+
+  /* Pricing */
+  .plans{max-width:760px;margin:0 auto}
+  .plan h3{font-size:1.3rem}
+  .price{font-size:2.6rem;font-weight:700;letter-spacing:-0.03em;margin:10px 0 4px}
+  .price span{font-size:1rem;font-weight:500;color:var(--muted)}
+  .plan ul{list-style:none;margin:18px 0 24px}
+  .plan li{padding:6px 0 6px 26px;position:relative;color:var(--muted);font-size:.96rem}
+  .plan li::before{content:"✓";position:absolute;left:0;color:var(--accent);font-weight:700}
+  .plan.pro{border:2px solid var(--accent)}
+  .plan .btn{width:100%;text-align:center}
+
+  /* FAQ */
+  .faq{max-width:700px;margin:0 auto}
+  details{border-bottom:1px solid var(--line);padding:18px 0}
+  summary{cursor:pointer;font-weight:600;font-size:1.05rem;list-style:none;display:flex;justify-content:space-between;gap:16px}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+";color:var(--accent);font-size:1.4rem;line-height:1}
+  details[open] summary::after{content:"–"}
+  details p{color:var(--muted);margin-top:10px}
+
+  /* Final CTA + footer */
+  .final{text-align:center;padding:90px 0}
+  .final h2{font-size:clamp(2rem,5vw,3.2rem);margin-bottom:16px}
+  .final p{color:var(--muted);margin-bottom:28px;font-size:1.1rem}
+  footer{border-top:1px solid var(--line);padding:32px 0;color:var(--muted);font-size:.9rem}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px}
+  .foot nav{gap:22px;display:flex}
+  a:focus-visible,summary:focus-visible,.btn:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <nav aria-label="Main">
+      <a href="#" class="logo" aria-label="Tern home">
+        <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <rect width="32" height="32" rx="9" fill="var(--accent)"/>
+          <path d="M6 20c5 1 9-1 12-6l2-3 1 4 5-1-4 4c-3 4-8 6-14 5z" fill="var(--accent-ink)"/>
+        </svg>
+        Tern
+      </a>
+      <div class="nav-links">
+        <a href="#features" class="hide-m">Features</a>
+        <a href="#how" class="hide-m">How it works</a>
+        <a href="#pricing" class="hide-m">Pricing</a>
+        <a href="#download" class="btn small">Get Tern</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="hero">
+      <span class="eyebrow">Now available on Mac, Windows, iOS &amp; Android</span>
+      <h1>Notes that keep up with you.</h1>
+      <p class="lead">Tern is a fast, calm place to capture ideas, connect them, and find them again in a blink. No clutter, no lag, no lost thoughts.</p>
+      <div class="cta">
+        <a href="#download" class="btn">Download Tern — it's free</a>
+        <a href="#features" class="btn ghost">See how it works</a>
+      </div>
+      <p class="fine">Free forever for personal use. No credit card needed.</p>
+
+      <div class="mock" role="img" aria-label="Preview of the Tern app showing a note with linked ideas and a checklist">
+        <div class="mock-bar"><i></i><i></i><i></i></div>
+        <div class="mock-body">
+          <div class="side">
+            <div class="item active">Today</div>
+            <div class="item">All notes</div>
+            <div class="item">Favorites</div>
+            <div class="label">Notebooks</div>
+            <div class="item">Work</div>
+            <div class="item">Reading list</div>
+            <div class="item">Trip to Lisbon</div>
+          </div>
+          <div class="doc">
+            <h3>Product sync — Thursday</h3>
+            <p>Agreed to ship the new onboarding next sprint. Follow up with design on <span class="chip">[[Empty states]]</span> and revisit <span class="chip">[[Pricing experiments]]</span>.</p>
+            <div class="check"><b class="on"></b> Send recap to the team</div>
+            <div class="check"><b class="on"></b> Book user interviews</div>
+            <div class="check"><b></b> Draft launch announcement</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section id="features">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Everything you need. Nothing you don't.</h2>
+        <p>Tern stays out of your way so your ideas can take the lead.</p>
+      </div>
+      <div class="grid">
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h8l-1 8 10-12h-8z"/></svg></div>
+          <h3>Instant capture</h3>
+          <p>Open, type, done. Tern launches in milliseconds and saves as you write, even offline.</p>
+        </div>
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007 0l3-3a5 5 0 00-7-7l-1 1"/><path d="M14 11a5 5 0 00-7 0l-3 3a5 5 0 007 7l1-1"/></svg></div>
+          <h3>Linked thinking</h3>
+          <p>Type [[ to connect notes. Backlinks and a visual map reveal how your ideas fit together.</p>
+        </div>
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
+          <h3>Search that gets you</h3>
+          <p>Find anything by keyword, tag, or date. Results appear as you type, across every notebook.</p>
+        </div>
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 000-9 6 6 0 00-11.7 1.5A4 4 0 006.5 19z"/></svg></div>
+          <h3>Sync everywhere</h3>
+          <p>Your notes follow you across phone, tablet, and desktop, quietly and reliably.</p>
+        </div>
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></div>
+          <h3>Private by design</h3>
+          <p>End-to-end encryption means only you can read your notes. Not us, not anyone else.</p>
+        </div>
+        <div class="card">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M4 19h16"/></svg></div>
+          <h3>Your data, portable</h3>
+          <p>Export to Markdown anytime. Your notes are plain files you truly own.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>From scattered to sorted in three steps</h2>
+      </div>
+      <div class="steps">
+        <div class="step"><h3>Capture</h3><p>Jot down thoughts, tasks, and links the moment they arrive.</p></div>
+        <div class="step"><h3>Connect</h3><p>Link related notes and let Tern surface what belongs together.</p></div>
+        <div class="step"><h3>Retrieve</h3><p>Search or browse your map and pick up exactly where you left off.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="quote">
+        <blockquote>“Tern is the first notes app I haven't wanted to switch away from after a month.”</blockquote>
+        <cite>Maya R., product designer</cite>
+      </div>
+    </div>
+  </section>
+
+  <section id="pricing">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Simple pricing</h2>
+        <p>Start free. Upgrade when you need more.</p>
+      </div>
+      <div class="grid plans">
+        <div class="card plan">
+          <h3>Free</h3>
+          <div class="price">$0<span> / forever</span></div>
+          <ul>
+            <li>Unlimited notes</li>
+            <li>Sync on up to 2 devices</li>
+            <li>Linking &amp; backlinks</li>
+            <li>Markdown export</li>
+          </ul>
+          <a href="#download" class="btn ghost">Get started</a>
+        </div>
+        <div class="card plan pro">
+          <h3>Tern Plus</h3>
+          <div class="price">$5<span> / month</span></div>
+          <ul>
+            <li>Everything in Free</li>
+            <li>Unlimited devices</li>
+            <li>Visual map &amp; advanced search</li>
+            <li>File attachments up to 5 GB</li>
+            <li>Priority support</li>
+          </ul>
+          <a href="#download" class="btn">Try Plus free for 14 days</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="section-head"><h2>Questions, answered</h2></div>
+      <div class="faq">
+        <details>
+          <summary>Does Tern work offline?</summary>
+          <p>Yes. Everything works without a connection and syncs automatically when you're back online.</p>
+        </details>
+        <details>
+          <summary>Can I import notes from another app?</summary>
+          <p>You can import Markdown and plain text files, and bring in notes from other popular apps using our importer.</p>
+        </details>
+        <details>
+          <summary>Is my data really private?</summary>
+          <p>Notes are end-to-end encrypted. Only your devices hold the keys needed to read them.</p>
+        </details>
+        <details>
+          <summary>What happens if I cancel Plus?</summary>
+          <p>You keep all your notes and can continue using the free plan. Nothing is deleted.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap final" id="download">
+    <h2>Give your ideas a home.</h2>
+    <p>Join thousands of people thinking more clearly with Tern.</p>
+    <div class="cta">
+      <a href="#" class="btn">Download for Mac</a>
+      <a href="#" class="btn ghost">Windows</a>
+      <a href="#" class="btn ghost">iOS</a>
+      <a href="#" class="btn ghost">Android</a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>© 2026 Tern. All rights reserved.</div>
+    <nav aria-label="Footer">
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Contact</a>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lingua – Create your account</title>
+<style>
+  :root{
+    --bg:#f4f7f2;
+    --card:#ffffff;
+    --ink:#1f2a24;
+    --muted:#6a776f;
+    --brand:#2e9e6b;
+    --brand-dark:#237a52;
+    --accent:#ffb84d;
+    --border:#d9e2dc;
+    --error:#d6453d;
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+  }
+  .wrap{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    max-width:920px;
+    width:100%;
+    background:var(--card);
+    border-radius:24px;
+    overflow:hidden;
+    box-shadow:0 20px 50px rgba(30,60,45,.12);
+  }
+  .hero{
+    background:linear-gradient(160deg,#2e9e6b,#1d7a5a);
+    color:#fff;
+    padding:48px 40px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::after{
+    content:"";
+    position:absolute;
+    width:260px;height:260px;
+    border-radius:50%;
+    background:rgba(255,255,255,.08);
+    right:-80px;bottom:-80px;
+  }
+  .logo{font-weight:800;font-size:1.4rem;letter-spacing:.5px;display:flex;align-items:center;gap:10px}
+  .logo span{
+    background:var(--accent);color:#3b2a00;
+    width:34px;height:34px;border-radius:10px;
+    display:grid;place-items:center;font-size:1.1rem;
+  }
+  .hero h2{font-size:1.9rem;line-height:1.25;margin:40px 0 12px}
+  .hero p{opacity:.9;line-height:1.5;margin:0}
+  .bubbles{display:flex;flex-wrap:wrap;gap:8px;margin-top:28px;position:relative;z-index:1}
+  .bubbles b{
+    background:rgba(255,255,255,.18);
+    padding:7px 14px;border-radius:999px;font-weight:600;font-size:.9rem;
+  }
+  .form-side{padding:44px 40px}
+  h1{margin:0 0 6px;font-size:1.6rem}
+  .sub{color:var(--muted);margin:0 0 24px}
+  .field{margin-bottom:16px}
+  label{display:block;font-size:.85rem;font-weight:600;margin-bottom:6px}
+  input,select{
+    width:100%;
+    padding:12px 14px;
+    border:1.5px solid var(--border);
+    border-radius:var(--radius);
+    font-size:1rem;
+    background:#fff;
+    color:var(--ink);
+    font-family:inherit;
+    transition:border-color .15s, box-shadow .15s;
+  }
+  input:focus,select:focus{
+    outline:none;
+    border-color:var(--brand);
+    box-shadow:0 0 0 3px rgba(46,158,107,.18);
+  }
+  .field.invalid input{border-color:var(--error)}
+  .msg{color:var(--error);font-size:.8rem;margin-top:5px;min-height:1em;display:none}
+  .field.invalid .msg{display:block}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .pw{position:relative}
+  .pw button{
+    position:absolute;right:8px;top:50%;transform:translateY(-50%);
+    background:none;border:none;color:var(--brand-dark);
+    font-weight:600;cursor:pointer;font-size:.8rem;padding:6px;
+  }
+  .meter{display:flex;gap:4px;margin-top:8px}
+  .meter i{flex:1;height:4px;border-radius:2px;background:var(--border);transition:background .2s}
+  .strength{font-size:.75rem;color:var(--muted);margin-top:4px}
+  .check{display:flex;gap:10px;align-items:flex-start;font-size:.85rem;color:var(--muted);margin:6px 0 18px}
+  .check input{width:auto;margin-top:3px;accent-color:var(--brand)}
+  .check a{color:var(--brand-dark)}
+  .btn{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:var(--radius);
+    background:var(--brand);
+    color:#fff;
+    font-size:1rem;
+    font-weight:700;
+    cursor:pointer;
+    transition:background .15s, transform .1s;
+  }
+  .btn:hover{background:var(--brand-dark)}
+  .btn:active{transform:scale(.99)}
+  .divider{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:.8rem;margin:20px 0}
+  .divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--border)}
+  .social{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .social button{
+    padding:11px;border:1.5px solid var(--border);background:#fff;
+    border-radius:var(--radius);font-weight:600;cursor:pointer;font-size:.9rem;
+    font-family:inherit;color:var(--ink);
+  }
+  .social button:hover{background:#f4f7f2}
+  .login{text-align:center;margin-top:22px;font-size:.9rem;color:var(--muted)}
+  .login a{color:var(--brand-dark);font-weight:600;text-decoration:none}
+  .success{
+    display:none;text-align:center;padding:60px 10px;
+  }
+  .success .tick{
+    width:70px;height:70px;border-radius:50%;background:var(--brand);color:#fff;
+    font-size:2rem;display:grid;place-items:center;margin:0 auto 18px;
+  }
+  @media(max-width:760px){
+    .wrap{grid-template-columns:1fr}
+    .hero{padding:28px 24px}
+    .hero h2{margin-top:20px;font-size:1.4rem}
+    .form-side{padding:28px 24px}
+  }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <section class="hero">
+    <div>
+      <div class="logo"><span>L</span> Lingua</div>
+      <h2>Speak a new language in just 10 minutes a day.</h2>
+      <p>Bite-sized lessons, real conversations, and a streak that keeps you coming back.</p>
+    </div>
+    <div class="bubbles" aria-hidden="true">
+      <b>Hola 👋</b><b>Bonjour</b><b>こんにちは</b><b>Ciao</b><b>Hallo</b><b>안녕하세요</b>
+    </div>
+  </section>
+
+  <section class="form-side">
+    <div id="formView">
+      <h1>Create your account</h1>
+      <p class="sub">Start learning for free. No credit card needed.</p>
+
+      <form id="signup" novalidate>
+        <div class="field">
+          <label for="name">Name</label>
+          <input id="name" type="text" autocomplete="name" placeholder="Alex Johnson">
+          <div class="msg">Please enter your name.</div>
+        </div>
+
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" type="email" autocomplete="email" placeholder="you@example.com">
+          <div class="msg">Enter a valid email address.</div>
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="pw">
+            <input id="password" type="password" autocomplete="new-password" placeholder="At least 8 characters">
+            <button type="button" id="toggle">Show</button>
+          </div>
+          <div class="meter" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+          <div class="strength" id="strength">Use 8+ characters with a mix of letters and numbers.</div>
+          <div class="msg">Password must be at least 8 characters.</div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="learn">I want to learn</label>
+            <select id="learn">
+              <option>Spanish</option>
+              <option>French</option>
+              <option>German</option>
+              <option>Italian</option>
+              <option>Japanese</option>
+              <option>Korean</option>
+              <option>Portuguese</option>
+              <option>Mandarin</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="level">My level</label>
+            <select id="level">
+              <option>Beginner</option>
+              <option>Intermediate</option>
+              <option>Advanced</option>
+            </select>
+          </div>
+        </div>
+
+        <label class="check">
+          <input type="checkbox" id="terms">
+          <span>I agree to the <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</span>
+        </label>
+        <div class="field" id="termsField" style="margin-top:-12px">
+          <div class="msg">Please accept the terms to continue.</div>
+        </div>
+
+        <button class="btn" type="submit">Create account</button>
+      </form>
+
+      <div class="divider">or sign up with</div>
+      <div class="social">
+        <button type="button">Google</button>
+        <button type="button">Apple</button>
+      </div>
+
+      <p class="login">Already have an account? <a href="#">Log in</a></p>
+    </div>
+
+    <div class="success" id="successView" role="status">
+      <div class="tick">✓</div>
+      <h1>Welcome, <span id="who"></span>!</h1>
+      <p class="sub">Your <strong id="lang"></strong> journey starts now. Let's pick your daily goal.</p>
+    </div>
+  </section>
+</main>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const form = $('signup');
+  const pw = $('password');
+
+  $('toggle').addEventListener('click', () => {
+    const show = pw.type === 'password';
+    pw.type = show ? 'text' : 'password';
+    $('toggle').textContent = show ? 'Hide' : 'Show';
+  });
+
+  pw.addEventListener('input', () => {
+    const v = pw.value;
+    let score = 0;
+    if (v.length >= 8) score++;
+    if (/[a-z]/.test(v) && /[A-Z]/.test(v)) score++;
+    if (/\d/.test(v)) score++;
+    if (/[^A-Za-z0-9]/.test(v)) score++;
+    const colors = ['#d9e2dc', '#d6453d', '#ffb84d', '#8fcf6b', '#2e9e6b'];
+    const labels = ['Use 8+ characters with a mix of letters and numbers.', 'Weak', 'Fair', 'Good', 'Strong'];
+    if (!v) score = 0;
+    document.querySelectorAll('.meter i').forEach((bar, i) => {
+      bar.style.background = i < score ? colors[score] : colors[0];
+    });
+    $('strength').textContent = labels[score];
+  });
+
+  function setInvalid(fieldEl, bad) {
+    fieldEl.classList.toggle('invalid', bad);
+    return !bad;
+  }
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const results = [
+      setInvalid($('name').closest('.field'), $('name').value.trim().length < 1),
+      setInvalid($('email').closest('.field'), !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test($('email').value.trim())),
+      setInvalid(pw.closest('.field'), pw.value.length < 8),
+      setInvalid($('termsField'), !$('terms').checked)
+    ];
+    if (results.every(Boolean)) {
+      $('who').textContent = $('name').value.trim().split(' ')[0];
+      $('lang').textContent = $('learn').value;
+      $('formView').style.display = 'none';
+      $('successView').style.display = 'block';
+    } else {
+      const firstBad = form.querySelector('.invalid input');
+      if (firstBad) firstBad.focus();
+    }
+  });
+
+  form.querySelectorAll('input').forEach(i =>
+    i.addEventListener('input', () => i.closest('.field')?.classList.remove('invalid'))
+  );
+  $('terms').addEventListener('change', () => $('termsField').classList.remove('invalid'));
+</script>
+</body>
+</html>

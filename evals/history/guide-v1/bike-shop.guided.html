@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Neighbourhood bike repair</title>
+<meta name="description" content="Bike repair for the neighbourhood. Find your bike's symptom, then write up a repair ticket to hand in at the counter.">
+<!--
+  Direction: the page is a workshop repair ticket (manila tag, red string, ballpoint blue-black ink).
+  The generic version would have been a hero, three icon cards and a "Get started" button.
+  Left out because the real material was not supplied: shop name, address, hours, phone, prices, photos, reviews.
+  Add the address and hours inside the <address> element in the footer when you have them.
+-->
+<style>
+  :root{
+    --paper:#f3eee1;
+    --manila:#e8d6a0;
+    --manila-dark:#cdb877;
+    --ink:#1b2433;
+    --ink-soft:#455066;
+    --string:#a8231b;
+    --steel:#d9d6cd;
+    --focus:#0b5cad;
+    --s1:.25rem;--s2:.5rem;--s3:.75rem;--s4:1rem;--s5:1.5rem;--s6:2.5rem;--s7:4rem;
+    --head:"Franklin Gothic Medium","Arial Narrow","Roboto Condensed","Helvetica Neue",Arial,sans-serif;
+    --body:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--paper);color:var(--ink);font:1.0625rem/1.55 var(--body)}
+  .wrap{max-width:68rem;margin-inline:auto;padding-inline:var(--s4)}
+  a{color:var(--ink);text-underline-offset:.2em}
+  a:hover{color:var(--string)}
+  :focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:2px}
+
+  header.top{border-bottom:3px solid var(--ink)}
+  header.top .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--s3);padding-block:var(--s4)}
+  .mark{font:700 1.35rem/1 var(--head);text-decoration:none;letter-spacing:.01em}
+  nav ul{display:flex;gap:var(--s2);list-style:none;margin:0;padding:0}
+  nav a{display:inline-flex;align-items:center;min-height:44px;padding-inline:var(--s3);font-weight:600;text-decoration:none;border-bottom:3px solid transparent}
+  nav a:hover{border-bottom-color:var(--string);color:var(--ink)}
+  nav a:active{background:var(--steel)}
+
+  .intro{padding-block:var(--s7) var(--s6);display:grid;gap:var(--s5);max-width:46rem}
+  h1{font:700 clamp(2.4rem,7vw,4.5rem)/1.02 var(--head);margin:0;letter-spacing:-.01em}
+  .intro p{margin:0;font-size:1.25rem;max-width:36rem}
+  .btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 var(--s5);font:700 1rem var(--body);background:var(--ink);color:var(--paper);border:2px solid var(--ink);border-radius:2px;text-decoration:none;cursor:pointer;transition:transform .12s,background-color .12s}
+  .btn:hover{background:var(--string);border-color:var(--string);color:#fff;transform:translateY(-2px)}
+  .btn:active{transform:translateY(1px)}
+  .btn.alt{background:transparent;color:var(--ink)}
+  .btn.alt:hover{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+  .btn:disabled{background:var(--steel);border-color:var(--steel);color:#5b6372;cursor:not-allowed;transform:none}
+  .intro .btn{justify-self:start}
+
+  section{padding-block:var(--s6)}
+  h2{font:700 clamp(1.7rem,4vw,2.4rem)/1.1 var(--head);margin:0 0 var(--s3)}
+  .lede{margin:0 0 var(--s5);max-width:40rem;color:var(--ink-soft)}
+
+  table{width:100%;border-collapse:collapse;background:#fbf8ef;border:2px solid var(--ink)}
+  caption{text-align:start;padding-bottom:var(--s2);font-weight:600;position:absolute;left:-9999px}
+  th,td{text-align:start;vertical-align:top;padding:var(--s3) var(--s4);border-bottom:1px solid var(--steel)}
+  thead th{background:var(--ink);color:var(--paper);font-weight:600}
+  tbody th{font-weight:700;width:34%}
+  tbody tr:hover{background:#f1e9cf}
+  tbody tr:last-child th,tbody tr:last-child td{border-bottom:0}
+
+  .ticket-area{display:grid;gap:var(--s6);grid-template-columns:1fr;align-items:start}
+  form{display:grid;gap:var(--s4)}
+  label{display:grid;gap:var(--s1);font-weight:600}
+  input,select,textarea{font:inherit;color:var(--ink);background:#fff;border:2px solid var(--ink);border-radius:2px;padding:var(--s3);min-height:48px;width:100%}
+  textarea{min-height:8rem;resize:vertical}
+  input:hover,select:hover,textarea:hover{border-color:var(--string)}
+  .hint{font-weight:400;color:var(--ink-soft);font-size:.9rem}
+  .actions{display:flex;flex-wrap:wrap;gap:var(--s3)}
+  #status{min-height:1.5em;margin:0;font-weight:600}
+  #status.err{color:var(--string)}
+
+  .tag-wrap{position:relative;padding-top:2.5rem}
+  .string{position:absolute;top:0;left:50%;width:3px;height:3.2rem;background:var(--string);transform:translateX(-50%)}
+  .tag{position:relative;background:var(--manila);border:2px solid var(--manila-dark);padding:3.25rem var(--s5) var(--s5);clip-path:polygon(12% 0,88% 0,100% 7%,100% 100%,0 100%,0 7%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}
+  .tag::before{content:"";position:absolute;top:1rem;left:50%;width:18px;height:18px;margin-left:-9px;border-radius:50%;background:var(--paper);border:2px solid var(--manila-dark)}
+  .tag h3{font:700 1.3rem/1.1 var(--head);margin:0 0 var(--s4);text-align:center}
+  .tag dl{margin:0;display:grid;gap:0}
+  .tag dl div{display:grid;grid-template-columns:7.5rem 1fr;gap:var(--s3);padding:var(--s2) 0;border-bottom:1px solid var(--manila-dark)}
+  .tag dt{font-weight:600;color:#4a3f1c}
+  .tag dd{margin:0;color:#14308a;font-weight:600;white-space:pre-wrap;overflow-wrap:anywhere;min-height:1.55em}
+  .tag dd.empty{color:#6d6340;font-weight:400;font-style:normal}
+
+  footer{border-top:3px solid var(--ink);margin-top:var(--s6);padding-block:var(--s5)}
+  footer p{margin:0;color:var(--ink-soft)}
+
+  @media (min-width:56rem){
+    .ticket-area{grid-template-columns:1fr 24rem;gap:var(--s7)}
+  }
+  @media (max-width:40rem){
+    thead{position:absolute;left:-9999px}
+    table,tbody,tr,th,td{display:block;width:100%}
+    tbody tr{padding:var(--s2) 0;border-bottom:2px solid var(--ink)}
+    tbody tr:last-child{border-bottom:0}
+    tbody th{width:100%;border:0;padding-bottom:0}
+    td{border:0;padding-top:var(--s1)}
+    .tag dl div{grid-template-columns:1fr;gap:0}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none!important}
+  }
+  @media print{
+    body{background:#fff}
+    header.top,.intro,#symptoms,form,footer,.lede,#ticket-heading{display:none}
+    .ticket-area{display:block}
+    section{padding:0}
+    .tag{clip-path:none;border:2px solid #000;background:#fff}
+    .string{display:none}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="mark" href="#top">Neighbourhood bike repair</a>
+    <nav aria-label="Page sections">
+      <ul>
+        <li><a href="#symptoms">What we fix</a></li>
+        <li><a href="#ticket">Write your ticket</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="wrap">
+    <div class="intro">
+      <h1>Bike repair for the neighbourhood.</h1>
+      <p>Bring in a bike that won't stop, won't shift or won't hold air. Write down what's wrong before you arrive and hand us the ticket.</p>
+      <a class="btn" href="#ticket">Write your repair ticket</a>
+    </div>
+
+    <section id="symptoms" aria-labelledby="symptoms-h">
+      <h2 id="symptoms-h">What you notice, and what we do about it</h2>
+      <p class="lede">Most repairs start with a symptom, not a part name. Find yours.</p>
+      <table>
+        <caption>Common bike symptoms and the repair for each</caption>
+        <thead>
+          <tr><th scope="col">Symptom</th><th scope="col">Repair</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Tyre goes soft overnight</th><td>Find the puncture, patch or replace the tube, check the tyre and rim tape for what caused it.</td></tr>
+          <tr><th scope="row">Brakes squeal, or the lever pulls to the bar</th><td>Replace worn pads, adjust or replace cables, bleed hydraulic brakes.</td></tr>
+          <tr><th scope="row">Chain skips or the gears jump</th><td>Index the gears, replace a stretched chain, replace a worn cassette if needed.</td></tr>
+          <tr><th scope="row">Wheel wobbles as it spins</th><td>True the wheel, tighten or replace spokes.</td></tr>
+          <tr><th scope="row">Creak with every pedal stroke</th><td>Check pedals, crank, bottom bracket and headset, then clean and regrease what's dry.</td></tr>
+          <tr><th scope="row">Bike has been in a shed all winter</th><td>Full service: clean, lube, check every bolt, brake, gear and tyre.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="ticket" aria-labelledby="ticket-h">
+      <h2 id="ticket-h">Write your repair ticket</h2>
+      <p class="lede">Fill this in at home. Print it or copy the text, then hand it over with the bike. Nothing is sent anywhere.</p>
+      <div class="ticket-area">
+        <form id="f" novalidate>
+          <label for="name">Your name
+            <input id="name" name="name" type="text" autocomplete="name">
+          </label>
+          <label for="bike">Type of bike
+            <select id="bike" name="bike">
+              <option value="">Choose one</option>
+              <option>Road bike</option>
+              <option>Mountain bike</option>
+              <option>Hybrid or commuter</option>
+              <option>City or Dutch bike</option>
+              <option>Folding bike</option>
+              <option>Electric bike</option>
+              <option>Kid's bike</option>
+              <option>Cargo bike</option>
+              <option>Other</option>
+            </select>
+          </label>
+          <label for="issue">What's wrong
+            <span class="hint">When it happens and what it sounds or feels like helps most.</span>
+            <textarea id="issue" name="issue" required aria-describedby="status"></textarea>
+          </label>
+          <div class="actions">
+            <button class="btn" type="button" id="copy" disabled>Copy ticket text</button>
+            <button class="btn alt" type="button" id="print" disabled>Print ticket</button>
+          </div>
+          <p id="status" role="status" aria-live="polite">Describe the problem to enable copy and print.</p>
+        </form>
+
+        <div class="tag-wrap">
+          <div class="string" aria-hidden="true"></div>
+          <article class="tag" aria-label="Repair ticket preview">
+            <h3 id="ticket-heading">Repair ticket</h3>
+            <dl>
+              <div><dt>Date in</dt><dd id="o-date"></dd></div>
+              <div><dt>Name</dt><dd id="o-name" class="empty">Not filled in</dd></div>
+              <div><dt>Bike</dt><dd id="o-bike" class="empty">Not filled in</dd></div>
+              <div><dt>Problem</dt><dd id="o-issue" class="empty">Nothing written yet</dd></div>
+            </dl>
+          </article>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <address style="font-style:normal">
+      <p>Address and opening hours go here once they're confirmed.</p>
+    </address>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  var name=$("name"),bike=$("bike"),issue=$("issue"),copy=$("copy"),print=$("print"),status=$("status");
+  var oName=$("o-name"),oBike=$("o-bike"),oIssue=$("o-issue"),oDate=$("o-date");
+  var dateText=new Date().toLocaleDateString(undefined,{year:"numeric",month:"long",day:"numeric"});
+  oDate.textContent=dateText;
+
+  function show(el,val,empty){
+    el.textContent=val||empty;
+    el.classList.toggle("empty",!val);
+  }
+  function ticketText(){
+    return ["Repair ticket","Date in: "+dateText,"Name: "+(name.value.trim()||"-"),"Bike: "+(bike.value||"-"),"Problem: "+issue.value.trim()].join("\n");
+  }
+  function update(){
+    show(oName,name.value.trim(),"Not filled in");
+    show(oBike,bike.value,"Not filled in");
+    show(oIssue,issue.value.trim(),"Nothing written yet");
+    var ok=issue.value.trim().length>0;
+    copy.disabled=print.disabled=!ok;
+    status.className="";
+    status.textContent=ok?"":"Describe the problem to enable copy and print.";
+  }
+  [name,bike,issue].forEach(function(el){el.addEventListener("input",update);el.addEventListener("change",update)});
+
+  copy.addEventListener("click",function(){
+    var t=ticketText();
+    function fail(){
+      status.className="err";
+      status.textContent="Copy was blocked by the browser. Select the text on the tag and copy it by hand, or use Print ticket.";
+    }
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(t).then(function(){
+        status.className="";status.textContent="Copied. Paste it into a message or note.";
+      },fail);
+    }else{fail()}
+  });
+  print.addEventListener("click",function(){window.print()});
+  update();
+})();
+</script>
+</body>
+</html>

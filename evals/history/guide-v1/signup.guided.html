@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Create your account</title>
+<style>
+  :root {
+    --board: #20392f;
+    --chalk: #f1efe6;
+    --chalk-dim: #c3cec3;
+    --yellow-chalk: #f2d36b;
+    --paper: #f3f5f2;
+    --ink: #1b2420;
+    --ink-dim: #4a574f;
+    --line: #b9c4bc;
+    --focus: #8a5a00;
+    --error: #a32020;
+    --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 40px; --s7: 64px;
+    --radius: 6px;
+    --font: system-ui, -apple-system, "Segoe UI", "Noto Sans", "Noto Sans CJK JP", "Noto Sans Arabic", "Noto Sans Devanagari", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    font-family: var(--font);
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--ink);
+    background: var(--paper);
+    min-height: 100vh;
+  }
+  .page {
+    display: grid;
+    grid-template-columns: 1fr;
+    min-height: 100vh;
+  }
+
+  /* Chalkboard: shows the greeting in the chosen language */
+  .board {
+    background: var(--board);
+    color: var(--chalk);
+    padding: var(--s5) var(--s4);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: var(--s3);
+  }
+  .board-note { margin: 0; color: var(--chalk-dim); font-size: .9375rem; }
+  .greeting {
+    margin: 0;
+    font-size: clamp(2.5rem, 12vw, 4.5rem);
+    line-height: 1.15;
+    font-weight: 600;
+    color: var(--yellow-chalk);
+    overflow-wrap: anywhere;
+  }
+  .greeting.swap { animation: write .3s ease-out; }
+  @keyframes write { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .roman { margin: 0; font-size: 1.125rem; min-height: 1.7em; }
+  .gloss { margin: 0; padding-top: var(--s3); border-top: 1px solid rgba(241,239,230,.35); color: var(--chalk-dim); font-size: .9375rem; }
+
+  /* Form side */
+  main { padding: var(--s5) var(--s4) var(--s6); display: flex; justify-content: center; align-items: flex-start; }
+  .wrap { width: 100%; max-width: 30rem; }
+  h1 { font-size: 1.75rem; line-height: 1.2; margin: 0 0 var(--s2); }
+  .lede { margin: 0 0 var(--s5); color: var(--ink-dim); max-width: 45ch; }
+  fieldset { border: 0; padding: 0; margin: 0 0 var(--s5); min-width: 0; }
+  legend, label.field-label { display: block; font-weight: 600; margin-bottom: var(--s2); padding: 0; }
+
+  .langs { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--s2); }
+  .lang {
+    position: relative;
+    display: flex; flex-direction: column; justify-content: center;
+    min-height: 56px;
+    padding: var(--s2) var(--s3);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: #fff;
+    cursor: pointer;
+    transition: border-color .15s, background-color .15s;
+  }
+  .lang:hover { border-color: var(--board); background: #eaf0eb; }
+  .lang input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+  .lang .native { font-size: 1.125rem; font-weight: 600; line-height: 1.3; }
+  .lang .english { font-size: .8125rem; color: var(--ink-dim); line-height: 1.3; }
+  .lang:has(input:checked) { background: var(--board); border-color: var(--board); color: var(--chalk); }
+  .lang:has(input:checked) .english { color: var(--chalk-dim); }
+  .lang:has(input:focus-visible) { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .lang:active { transform: translateY(1px); }
+
+  .field { margin-bottom: var(--s4); }
+  .input-row { display: flex; gap: var(--s2); }
+  input[type="email"], input[type="password"], input[type="text"] {
+    width: 100%; min-height: 48px;
+    padding: var(--s2) var(--s3);
+    font: inherit; color: var(--ink);
+    background: #fff;
+    border: 1px solid var(--ink-dim);
+    border-radius: var(--radius);
+  }
+  input[type="email"]:hover, input[type="password"]:hover, input[type="text"]:hover { border-color: var(--board); }
+  input:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; }
+  input[aria-invalid="true"] { border-color: var(--error); border-width: 2px; }
+  .hint { margin: var(--s1) 0 0; font-size: .875rem; color: var(--ink-dim); }
+  .error { margin: var(--s1) 0 0; font-size: .875rem; color: var(--error); font-weight: 600; }
+  .error:empty { display: none; }
+
+  button {
+    font: inherit; cursor: pointer; min-height: 48px; border-radius: var(--radius);
+  }
+  .toggle {
+    min-width: 76px; padding: 0 var(--s3);
+    background: transparent; color: var(--ink); border: 1px solid var(--ink-dim);
+  }
+  .toggle:hover { background: #e3eae5; }
+  .toggle:active { background: #d3ddd6; }
+  .toggle:focus-visible, .submit:focus-visible, .cta:focus-visible, a:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+  .submit, .cta {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 100%; padding: var(--s2) var(--s4);
+    background: var(--board); color: #fff; border: 1px solid var(--board);
+    font-weight: 600; text-decoration: none; text-align: center;
+    transition: background-color .15s;
+  }
+  .submit:hover, .cta:hover { background: #162a22; }
+  .submit:active, .cta:active { transform: translateY(1px); }
+  .submit:disabled { background: #8a968f; border-color: #8a968f; cursor: not-allowed; }
+
+  .alt { margin: var(--s4) 0 0; color: var(--ink-dim); }
+  .alt a { color: var(--ink); font-weight: 600; }
+  .alt a:hover { text-decoration-thickness: 3px; }
+
+  .done[hidden], form[hidden] { display: none; }
+  .done p { margin: 0 0 var(--s5); }
+
+  @media (min-width: 860px) {
+    .page { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); }
+    .board { padding: var(--s7) var(--s6); position: sticky; top: 0; height: 100vh; }
+    main { padding: var(--s7) var(--s6); align-items: center; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .greeting.swap { animation: none; }
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <aside class="board" aria-label="Greeting preview">
+    <p class="board-note" id="boardNote">Pick a language to see how you will start.</p>
+    <p class="greeting" id="greeting" lang="en">Hello</p>
+    <p class="roman" id="roman"></p>
+    <p class="gloss" id="gloss">“Hello” in English</p>
+  </aside>
+
+  <main>
+    <div class="wrap">
+      <h1>Create your account</h1>
+      <p class="lede">Choose the language you want to learn, then add an email and password.</p>
+
+      <form id="form" action="/signup" method="post">
+        <fieldset aria-describedby="langError">
+          <legend>I want to learn</legend>
+          <div class="langs" role="radiogroup">
+            <label class="lang"><input type="radio" name="language" value="Spanish" required><span class="native" lang="es">Español</span><span class="english">Spanish</span></label>
+            <label class="lang"><input type="radio" name="language" value="French"><span class="native" lang="fr">Français</span><span class="english">French</span></label>
+            <label class="lang"><input type="radio" name="language" value="German"><span class="native" lang="de">Deutsch</span><span class="english">German</span></label>
+            <label class="lang"><input type="radio" name="language" value="Italian"><span class="native" lang="it">Italiano</span><span class="english">Italian</span></label>
+            <label class="lang"><input type="radio" name="language" value="Portuguese"><span class="native" lang="pt">Português</span><span class="english">Portuguese</span></label>
+            <label class="lang"><input type="radio" name="language" value="Japanese"><span class="native" lang="ja">日本語</span><span class="english">Japanese</span></label>
+            <label class="lang"><input type="radio" name="language" value="Korean"><span class="native" lang="ko">한국어</span><span class="english">Korean</span></label>
+            <label class="lang"><input type="radio" name="language" value="Hindi"><span class="native" lang="hi">हिन्दी</span><span class="english">Hindi</span></label>
+            <label class="lang"><input type="radio" name="language" value="Arabic"><span class="native" lang="ar" dir="rtl">العربية</span><span class="english">Arabic</span></label>
+          </div>
+          <p class="error" id="langError" role="alert"></p>
+        </fieldset>
+
+        <div class="field">
+          <label class="field-label" for="email">Email</label>
+          <input type="email" id="email" name="email" autocomplete="email" required aria-describedby="emailError">
+          <p class="error" id="emailError" role="alert"></p>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="password">Password</label>
+          <div class="input-row">
+            <input type="password" id="password" name="password" autocomplete="new-password" minlength="8" required aria-describedby="pwHint pwError">
+            <button type="button" class="toggle" id="toggle" aria-pressed="false" aria-controls="password">Show</button>
+          </div>
+          <p class="hint" id="pwHint">At least 8 characters.</p>
+          <p class="error" id="pwError" role="alert"></p>
+        </div>
+
+        <button type="submit" class="submit" id="submit">Create account</button>
+        <p class="alt">Already have an account? <a href="/login">Log in</a></p>
+      </form>
+
+      <section class="done" id="done" hidden aria-live="polite">
+        <h2 style="margin:0 0 8px;font-size:1.5rem;line-height:1.2">Account created</h2>
+        <p id="doneText"></p>
+        <a class="cta" id="doneCta" href="/learn">Start the first lesson</a>
+      </section>
+    </div>
+  </main>
+</div>
+
+<script>
+  // Greetings are real words in each language, shown in the language's own script.
+  var DATA = {
+    Spanish:    { text: "Hola",       lang: "es", dir: "ltr", roman: "" },
+    French:     { text: "Bonjour",    lang: "fr", dir: "ltr", roman: "" },
+    German:     { text: "Hallo",      lang: "de", dir: "ltr", roman: "" },
+    Italian:    { text: "Ciao",       lang: "it", dir: "ltr", roman: "" },
+    Portuguese: { text: "Olá",        lang: "pt", dir: "ltr", roman: "" },
+    Japanese:   { text: "こんにちは",   lang: "ja", dir: "ltr", roman: "konnichiwa" },
+    Korean:     { text: "안녕하세요",   lang: "ko", dir: "ltr", roman: "annyeonghaseyo" },
+    Hindi:      { text: "नमस्ते",      lang: "hi", dir: "ltr", roman: "namaste" },
+    Arabic:     { text: "مرحبا",      lang: "ar", dir: "rtl", roman: "marhaban" }
+  };
+
+  var form = document.getElementById("form");
+  var greeting = document.getElementById("greeting");
+  var roman = document.getElementById("roman");
+  var gloss = document.getElementById("gloss");
+  var note = document.getElementById("boardNote");
+  var submit = document.getElementById("submit");
+  var email = document.getElementById("email");
+  var pw = document.getElementById("password");
+  var langError = document.getElementById("langError");
+  var emailError = document.getElementById("emailError");
+  var pwError = document.getElementById("pwError");
+  var chosen = null;
+
+  form.setAttribute("novalidate", "");
+
+  form.addEventListener("change", function (e) {
+    if (e.target.name !== "language") return;
+    chosen = e.target.value;
+    var d = DATA[chosen];
+    greeting.textContent = d.text;
+    greeting.lang = d.lang;
+    greeting.dir = d.dir;
+    roman.textContent = d.roman;
+    gloss.textContent = "“Hello” in " + chosen;
+    note.textContent = "Your first word.";
+    submit.textContent = "Create account and start " + chosen;
+    langError.textContent = "";
+    greeting.classList.remove("swap");
+    void greeting.offsetWidth;
+    greeting.classList.add("swap");
+  });
+
+  document.getElementById("toggle").addEventListener("click", function () {
+    var show = pw.type === "password";
+    pw.type = show ? "text" : "password";
+    this.textContent = show ? "Hide" : "Show";
+    this.setAttribute("aria-pressed", String(show));
+  });
+
+  function setError(input, el, msg) {
+    el.textContent = msg;
+    if (input) input.setAttribute("aria-invalid", msg ? "true" : "false");
+  }
+
+  email.addEventListener("input", function () { setError(email, emailError, ""); });
+  pw.addEventListener("input", function () { setError(pw, pwError, ""); });
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var first = null;
+
+    if (!chosen) {
+      langError.textContent = "Choose a language to learn.";
+      first = first || form.querySelector('input[name="language"]');
+    }
+    var v = email.value.trim();
+    if (!v) {
+      setError(email, emailError, "Enter your email address.");
+      first = first || email;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) {
+      setError(email, emailError, "This email is missing something. It should look like name@example.com.");
+      first = first || email;
+    }
+    if (pw.value.length < 8) {
+      setError(pw, pwError, "Use at least 8 characters. You have " + pw.value.length + ".");
+      first = first || pw;
+    }
+    if (first) { first.focus(); return; }
+
+    // Wire this to the real sign-up endpoint (form action) before shipping.
+    // Until then the screen only confirms locally; nothing is sent or stored.
+    form.hidden = true;
+    document.getElementById("doneText").textContent = "Signed up as " + v + ". Your first " + chosen + " lesson is next.";
+    document.getElementById("doneCta").textContent = "Start the first " + chosen + " lesson";
+    var done = document.getElementById("done");
+    done.hidden = false;
+    done.querySelector("h2").setAttribute("tabindex", "-1");
+    done.querySelector("h2").focus();
+  });
+</script>
+</body>
+</html>

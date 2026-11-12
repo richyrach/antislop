@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Team Settings – Chatterbox</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --panel:#fff; --border:#e4e7ec; --text:#101828; --muted:#667085;
+    --primary:#5b4bdb; --primary-dark:#4a3cc0; --primary-soft:#efedfd;
+    --danger:#d92d20; --danger-soft:#fef3f2; --ok:#12b76a; --radius:10px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0e1116; --panel:#161b22; --border:#2a313c; --text:#e6e9ef; --muted:#98a2b3;
+      --primary:#8b7dff; --primary-dark:#a094ff; --primary-soft:#241f4d;
+      --danger:#f97066; --danger-soft:#3a1a18;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text)}
+  .layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+  aside{background:var(--panel);border-right:1px solid var(--border);padding:20px 12px;position:sticky;top:0;height:100vh}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;padding:0 8px 20px;font-size:16px}
+  .logo{width:28px;height:28px;border-radius:8px;background:var(--primary);color:#fff;display:grid;place-items:center;font-size:15px}
+  nav a{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;color:var(--muted);text-decoration:none;font-weight:500}
+  nav a:hover{background:var(--bg);color:var(--text)}
+  nav a.active{background:var(--primary-soft);color:var(--primary)}
+  nav a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+  .nav-label{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:16px 10px 6px}
+  main{padding:32px 40px 80px;max-width:900px;width:100%}
+  h1{font-size:24px;margin:0 0 4px}
+  .sub{color:var(--muted);margin:0 0 24px}
+  .tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:24px;overflow-x:auto}
+  .tabs button{background:none;border:0;padding:10px 14px;font:inherit;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+  .tabs button[aria-selected=true]{color:var(--primary);border-color:var(--primary)}
+  section.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px}
+  .card h2{font-size:16px;margin:0 0 4px}
+  .card>p.desc{margin:0 0 20px;color:var(--muted)}
+  .row{display:grid;grid-template-columns:200px 1fr;gap:16px;padding:16px 0;border-top:1px solid var(--border);align-items:start}
+  .row:first-of-type{border-top:0}
+  .row label.l{font-weight:600}
+  .row small{display:block;color:var(--muted);font-weight:400;margin-top:2px}
+  input[type=text],input[type=email],select,textarea{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:var(--panel);color:var(--text);font:inherit}
+  textarea{resize:vertical;min-height:80px}
+  .avatar-row{display:flex;align-items:center;gap:16px}
+  .team-avatar{width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#7a5cff,#3ec6e0);color:#fff;display:grid;place-items:center;font-size:26px;font-weight:700}
+  .btn{padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:var(--panel);color:var(--text);font:inherit;font-weight:600;cursor:pointer}
+  .btn:hover{background:var(--bg)}
+  .btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+  .btn.primary:hover{background:var(--primary-dark)}
+  .btn.danger{color:var(--danger);border-color:var(--danger)}
+  .btn.danger:hover{background:var(--danger-soft)}
+  .btn.sm{padding:5px 10px;font-size:13px}
+  .switch{display:flex;justify-content:space-between;gap:20px;align-items:center;padding:14px 0;border-top:1px solid var(--border)}
+  .switch:first-of-type{border-top:0}
+  .switch b{display:block}
+  .switch span.d{color:var(--muted)}
+  .toggle{position:relative;width:42px;height:24px;flex:none}
+  .toggle input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer;z-index:1}
+  .toggle i{position:absolute;inset:0;background:#c5cad3;border-radius:99px;transition:.2s}
+  .toggle i::after{content:"";position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 2px rgba(0,0,0,.3)}
+  .toggle input:checked+i{background:var(--primary)}
+  .toggle input:checked+i::after{transform:translateX(18px)}
+  .toggle input:focus-visible+i{outline:2px solid var(--primary);outline-offset:2px}
+  .toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+  .toolbar input{flex:1;min-width:180px}
+  .toolbar select{width:auto}
+  table{width:100%;border-collapse:collapse}
+  th{text-align:left;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;padding:8px 10px;border-bottom:1px solid var(--border)}
+  td{padding:12px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
+  tr:last-child td{border-bottom:0}
+  .person{display:flex;align-items:center;gap:12px}
+  .av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:600;font-size:13px;flex:none;position:relative}
+  .av::after{content:"";position:absolute;right:-1px;bottom:-1px;width:10px;height:10px;border-radius:50%;background:var(--ok);border:2px solid var(--panel)}
+  .av.off::after{background:#98a2b3}
+  .person small{color:var(--muted);display:block}
+  .badge{font-size:12px;padding:2px 8px;border-radius:99px;background:var(--primary-soft);color:var(--primary);font-weight:600}
+  .badge.pending{background:#fffaeb;color:#b54708}
+  .role-select{width:auto;padding:5px 8px}
+  .danger-zone{border-color:var(--danger)}
+  .danger-zone h2{color:var(--danger)}
+  .danger-zone .row{align-items:center}
+  .invite-link{display:flex;gap:8px}
+  .savebar{position:sticky;bottom:0;display:flex;justify-content:flex-end;gap:10px;align-items:center;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;box-shadow:0 -4px 16px rgba(0,0,0,.06)}
+  .savebar .msg{margin-right:auto;color:var(--muted)}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,80px);background:#101828;color:#fff;padding:10px 16px;border-radius:8px;transition:.3s;opacity:0;pointer-events:none}
+  .toast.show{transform:translate(-50%,0);opacity:1}
+  dialog{border:1px solid var(--border);border-radius:12px;background:var(--panel);color:var(--text);padding:24px;max-width:440px;width:calc(100% - 32px)}
+  dialog::backdrop{background:rgba(0,0,0,.45)}
+  dialog h3{margin:0 0 8px}
+  .dlg-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+  [hidden]{display:none!important}
+  @media (max-width:800px){
+    .layout{grid-template-columns:1fr}
+    aside{display:none}
+    main{padding:20px 16px 80px}
+    .row{grid-template-columns:1fr;gap:8px}
+    .hide-sm{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside aria-label="Workspace navigation">
+    <div class="brand"><div class="logo">💬</div>Chatterbox</div>
+    <nav>
+      <a href="#">🏠 Home</a>
+      <a href="#">💬 Messages</a>
+      <a href="#">📌 Saved items</a>
+      <div class="nav-label">Workspace</div>
+      <a href="#" class="active" aria-current="page">⚙️ Team settings</a>
+      <a href="#">🔌 Integrations</a>
+      <a href="#">💳 Billing</a>
+    </nav>
+  </aside>
+
+  <main>
+    <h1>Team settings</h1>
+    <p class="sub">Manage your team's profile, members, and chat preferences.</p>
+
+    <div class="tabs" role="tablist" aria-label="Settings sections">
+      <button role="tab" aria-selected="true" aria-controls="tab-general" id="t-general">General</button>
+      <button role="tab" aria-selected="false" aria-controls="tab-members" id="t-members" tabindex="-1">Members</button>
+      <button role="tab" aria-selected="false" aria-controls="tab-chat" id="t-chat" tabindex="-1">Chat &amp; permissions</button>
+      <button role="tab" aria-selected="false" aria-controls="tab-notify" id="t-notify" tabindex="-1">Notifications</button>
+      <button role="tab" aria-selected="false" aria-controls="tab-danger" id="t-danger" tabindex="-1">Advanced</button>
+    </div>
+
+    <form id="settingsForm" onsubmit="return false">
+
+    <!-- GENERAL -->
+    <div role="tabpanel" id="tab-general" aria-labelledby="t-general">
+      <section class="card">
+        <h2>Team profile</h2>
+        <p class="desc">This information is visible to everyone in the team.</p>
+        <div class="row">
+          <label class="l">Team icon<small>PNG or JPG, at least 256px.</small></label>
+          <div class="avatar-row">
+            <div class="team-avatar" id="teamAvatar">D</div>
+            <button type="button" class="btn" id="uploadBtn">Upload</button>
+            <button type="button" class="btn" id="removeBtn">Remove</button>
+          </div>
+        </div>
+        <div class="row">
+          <label class="l" for="name">Team name</label>
+          <input type="text" id="name" value="Design Squad" maxlength="40">
+        </div>
+        <div class="row">
+          <label class="l" for="url">Team URL<small>Used in invite links.</small></label>
+          <input type="text" id="url" value="design-squad">
+        </div>
+        <div class="row">
+          <label class="l" for="desc">Description</label>
+          <textarea id="desc">Product designers, researchers, and illustrators sharing work and feedback.</textarea>
+        </div>
+        <div class="row">
+          <label class="l" for="tz">Default time zone</label>
+          <select id="tz">
+            <option>(UTC−08:00) Pacific Time</option>
+            <option>(UTC−05:00) Eastern Time</option>
+            <option selected>(UTC+00:00) London</option>
+            <option>(UTC+01:00) Berlin</option>
+            <option>(UTC+05:30) Mumbai</option>
+            <option>(UTC+09:00) Tokyo</option>
+          </select>
+        </div>
+      </section>
+    </div>
+
+    <!-- MEMBERS -->
+    <div role="tabpanel" id="tab-members" aria-labelledby="t-members" hidden>
+      <section class="card">
+        <h2>Invite people</h2>
+        <p class="desc">Share a link or invite by email.</p>
+        <div class="row">
+          <label class="l" for="inviteEmail">Email invite</label>
+          <div class="invite-link">
+            <input type="email" id="inviteEmail" placeholder="name@company.com">
+            <button type="button" class="btn primary" id="inviteBtn">Send invite</button>
+          </div>
+        </div>
+        <div class="row">
+          <label class="l" for="link">Invite link<small>Anyone with the link can join.</small></label>
+          <div class="invite-link">
+            <input type="text" id="link" readonly value="https://chatterbox.app/join/design-squad-x7Kq2">
+            <button type="button" class="btn" id="copyBtn">Copy</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Members <span class="badge" id="count">6</span></h2>
+        <p class="desc">Change roles or remove people from the team.</p>
+        <div class="toolbar">
+          <input type="text" id="search" placeholder="Search by name or email" aria-label="Search members">
+          <select id="filter" aria-label="Filter by role">
+            <option value="">All roles</option>
+            <option>Owner</option><option>Admin</option><option>Member</option><option>Guest</option>
+          </select>
+        </div>
+        <div style="overflow-x:auto">
+        <table>
+          <thead><tr><th>Member</th><th>Role</th><th class="hide-sm">Last active</th><th><span class="sr" style="position:absolute;left:-9999px">Actions</span></th></tr></thead>
+          <tbody id="members"></tbody>
+        </table>
+        </div>
+        <p id="empty" class="desc" hidden style="margin:16px 0 0">No members match your search.</p>
+      </section>
+    </div>
+
+    <!-- CHAT -->
+    <div role="tabpanel" id="tab-chat" aria-labelledby="t-chat" hidden>
+      <section class="card">
+        <h2>Channels &amp; messaging</h2>
+        <p class="desc">Control who can do what in your team's conversations.</p>
+        <div class="row">
+          <label class="l" for="createCh">Who can create channels</label>
+          <select id="createCh"><option>Everyone</option><option selected>Members and admins</option><option>Admins only</option></select>
+        </div>
+        <div class="row">
+          <label class="l" for="post">Who can post in #general</label>
+          <select id="post"><option selected>Everyone</option><option>Admins only</option></select>
+        </div>
+        <div class="row">
+          <label class="l" for="retain">Message retention<small>Older messages are deleted.</small></label>
+          <select id="retain"><option selected>Keep forever</option><option>1 year</option><option>90 days</option><option>30 days</option></select>
+        </div>
+        <div class="switch"><div><b>Allow message editing</b><span class="d">Members can edit their messages after sending.</span></div>
+          <label class="toggle"><input type="checkbox" checked aria-label="Allow message editing"><i></i></label></div>
+        <div class="switch"><div><b>Allow message deletion</b><span class="d">Members can delete their own messages.</span></div>
+          <label class="toggle"><input type="checkbox" checked aria-label="Allow message deletion"><i></i></label></div>
+        <div class="switch"><div><b>Allow guests</b><span class="d">Guests can only access channels they're added to.</span></div>
+          <label class="toggle"><input type="checkbox" checked aria-label="Allow guests"><i></i></label></div>
+        <div class="switch"><div><b>Require admin approval to join</b><span class="d">New joiners via link wait for approval.</span></div>
+          <label class="toggle"><input type="checkbox" aria-label="Require admin approval"><i></i></label></div>
+      </section>
+    </div>
+
+    <!-- NOTIFY -->
+    <div role="tabpanel" id="tab-notify" aria-labelledby="t-notify" hidden>
+      <section class="card">
+        <h2>Default notifications</h2>
+        <p class="desc">Defaults for new members. Everyone can override these personally.</p>
+        <div class="row">
+          <label class="l" for="notifyDef">Notify me about</label>
+          <select id="notifyDef"><option>All messages</option><option selected>Mentions and direct messages</option><option>Nothing</option></select>
+        </div>
+        <div class="switch"><div><b>Email digest</b><span class="d">Daily summary of missed activity.</span></div>
+          <label class="toggle"><input type="checkbox" checked aria-label="Email digest"><i></i></label></div>
+        <div class="switch"><div><b>Mobile push notifications</b><span class="d">Send push alerts to mobile devices.</span></div>
+          <label class="toggle"><input type="checkbox" checked aria-label="Mobile push"><i></i></label></div>
+        <div class="switch"><div><b>Quiet hours</b><span class="d">Pause notifications 22:00 – 07:00 local time.</span></div>
+          <label class="toggle"><input type="checkbox" aria-label="Quiet hours"><i></i></label></div>
+      </section>
+    </div>
+
+    <!-- DANGER -->
+    <div role="tabpanel" id="tab-danger" aria-labelledby="t-danger" hidden>
+      <section class="card">
+        <h2>Data</h2>
+        <p class="desc">Export your team's data at any time.</p>
+        <div class="row">
+          <label class="l">Export history<small>JSON archive of all public channels.</small></label>
+          <div><button type="button" class="btn" data-toast="Export started. We'll email you a download link.">Request export</button></div>
+        </div>
+      </section>
+      <section class="card danger-zone">
+        <h2>Danger zone</h2>
+        <p class="desc">These actions are permanent and cannot be undone.</p>
+        <div class="row">
+          <label class="l">Transfer ownership<small>Hand the team to another admin.</small></label>
+          <div><button type="button" class="btn danger" data-confirm="transfer">Transfer…</button></div>
+        </div>
+        <div class="row">
+          <label class="l">Delete team<small>Removes all channels, messages and files.</small></label>
+          <div><button type="button" class="btn danger" data-confirm="delete">Delete team…</button></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="savebar" id="savebar">
+      <span class="msg" id="saveMsg">No unsaved changes</span>
+      <button type="button" class="btn" id="discard" disabled>Discard</button>
+      <button type="submit" class="btn primary" id="save" disabled>Save changes</button>
+    </div>
+    </form>
+  </main>
+</div>
+
+<dialog id="dlg">
+  <h3 id="dlgTitle"></h3>
+  <p id="dlgBody" style="color:var(--muted);margin:0"></p>
+  <div id="dlgInputWrap" style="margin-top:14px" hidden>
+    <label for="dlgInput" style="font-weight:600">Type the team name to confirm</label>
+    <input type="text" id="dlgInput" style="margin-top:6px" autocomplete="off">
+  </div>
+  <div class="dlg-actions">
+    <button type="button" class="btn" id="dlgCancel">Cancel</button>
+    <button type="button" class="btn danger" id="dlgOk">Confirm</button>
+  </div>
+</dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2600)};
+
+/* Tabs */
+const tabs=$$('[role=tab]');
+function selectTab(t){
+  tabs.forEach(x=>{const on=x===t;x.setAttribute('aria-selected',on);x.tabIndex=on?0:-1;$('#'+x.getAttribute('aria-controls')).hidden=!on});
+  t.focus();
+}
+tabs.forEach((t,i)=>{
+  t.addEventListener('click',()=>selectTab(t));
+  t.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight')selectTab(tabs[(i+1)%tabs.length]);
+    if(e.key==='ArrowLeft')selectTab(tabs[(i-1+tabs.length)%tabs.length]);
+  });
+});
+
+/* Dirty state */
+const form=$('#settingsForm'), save=$('#save'), discard=$('#discard'), msg=$('#saveMsg');
+const fields=()=>$$('input:not(#search):not(#inviteEmail):not(#link):not(#dlgInput), select:not(#filter):not(.role-select), textarea',form);
+const snap=()=>fields().map(f=>f.type==='checkbox'?f.checked:f.value);
+let base=snap();
+function checkDirty(){
+  const d=JSON.stringify(snap())!==JSON.stringify(base);
+  save.disabled=discard.disabled=!d;
+  msg.textContent=d?'You have unsaved changes':'No unsaved changes';
+}
+form.addEventListener('input',checkDirty);
+form.addEventListener('change',checkDirty);
+save.addEventListener('click',()=>{base=snap();checkDirty();toast('Settings saved')});
+discard.addEventListener('click',()=>{fields().forEach((f,i)=>{f.type==='checkbox'?f.checked=base[i]:f.value=base[i]});updateAvatar();checkDirty()});
+
+/* Team avatar */
+function updateAvatar(){const a=$('#teamAvatar');if(!a.dataset.removed)a.textContent=($('#name').value.trim()[0]||'?').toUpperCase()}
+$('#name').addEventListener('input',updateAvatar);
+$('#uploadBtn').onclick=()=>toast('File picker would open here');
+$('#removeBtn').onclick=()=>{toast('Icon removed – using initial')};
+$('#url').addEventListener('input',e=>{e.target.value=e.target.value.toLowerCase().replace(/[^a-z0-9-]/g,'-')});
+
+/* Members */
+const colors=['#7a5cff','#e5484d','#12a594','#f59e0b','#3b82f6','#ec4899'];
+let members=[
+  {n:'Rich Rach',e:'richyrachfansgmial@gmail.com',r:'Owner',a:'Online',on:1},
+  {n:'Amara Okafor',e:'amara@designsquad.co',r:'Admin',a:'Online',on:1},
+  {n:'Liam Chen',e:'liam@designsquad.co',r:'Member',a:'2 hours ago'},
+  {n:'Sofia Marquez',e:'sofia@designsquad.co',r:'Member',a:'Yesterday'},
+  {n:'Noah Patel',e:'noah@freelance.io',r:'Guest',a:'3 days ago'},
+  {n:'Hana Sato',e:'hana@designsquad.co',r:'Member',a:'Invite pending',pending:1},
+];
+const initials=n=>n.split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();
+function render(){
+  const q=$('#search').value.toLowerCase(), f=$('#filter').value;
+  const list=members.map((m,i)=>({...m,i})).filter(m=>(!f||m.r===f)&&(m.n+m.e).toLowerCase().includes(q));
+  $('#members').innerHTML=list.map(m=>`
+    <tr>
+      <td><div class="person"><div class="av ${m.on?'':'off'}" style="background:${colors[m.i%6]}">${initials(m.n)}</div>
+        <div><b>${m.n}</b>${m.i===0?' <small style="display:inline">(you)</small>':''}<small>${m.e}</small></div></div></td>
+      <td>${m.r==='Owner'?'<span class="badge">Owner</span>':
+        `<select class="role-select" data-i="${m.i}" aria-label="Role for ${m.n}">${['Admin','Member','Guest'].map(r=>`<option ${r===m.r?'selected':''}>${r}</option>`).join('')}</select>`}</td>
+      <td class="hide-sm">${m.pending?'<span class="badge pending">Pending</span>':m.a}</td>
+      <td style="text-align:right">${m.r==='Owner'?'':`<button type="button" class="btn sm danger" data-rm="${m.i}">${m.pending?'Revoke':'Remove'}</button>`}</td>
+    </tr>`).join('');
+  $('#empty').hidden=list.length>0;
+  $('#count').textContent=members.length;
+}
+$('#search').addEventListener('input',render);
+$('#filter').addEventListener('change',render);
+$('#members').addEventListener('change',e=>{
+  if(e.target.matches('.role-select')){const m=members[e.target.dataset.i];m.r=e.target.value;toast(`${m.n} is now ${m.r}`)}
+});
+$('#members').addEventListener('click',e=>{
+  const b=e.target.closest('[data-rm]');if(!b)return;
+  const m=members[b.dataset.rm];
+  openDialog({title:`${b.textContent} ${m.n}?`,body:`${m.n} will lose access to all channels in this team.`,ok:b.textContent,fn:()=>{members.splice(b.dataset.rm,1);render();toast(`${m.n} ${b.textContent==='Revoke'?'invite revoked':'removed'}`)}});
+});
+$('#inviteBtn').onclick=()=>{
+  const i=$('#inviteEmail');
+  if(!i.checkValidity()||!i.value){i.focus();toast('Enter a valid email address');return}
+  members.push({n:i.value.split('@')[0],e:i.value,r:'Member',a:'Invite pending',pending:1});
+  toast(`Invite sent to ${i.value}`);i.value='';render();
+};
+$('#copyBtn').onclick=()=>{
+  navigator.clipboard?.writeText($('#link').value).catch(()=>{});
+  toast('Invite link copied');
+};
+render();
+
+/* Dialog */
+const dlg=$('#dlg');let onOk=null,needName=false;
+function openDialog({title,body,ok='Confirm',fn,type=false}){
+  $('#dlgTitle').textContent=title;$('#dlgBody').textContent=body;$('#dlgOk').textContent=ok;
+  needName=type;$('#dlgInputWrap').hidden=!type;$('#dlgInput').value='';
+  $('#dlgOk').disabled=type;onOk=fn;dlg.showModal();
+}
+$('#dlgInput').addEventListener('input',e=>{$('#dlgOk').disabled=e.target.value!==$('#name').value});
+$('#dlgCancel').onclick=()=>dlg.close();
+$('#dlgOk').onclick=()=>{dlg.close();onOk&&onOk()};
+$$('[data-confirm]').forEach(b=>b.onclick=()=>{
+  if(b.dataset.confirm==='delete')
+    openDialog({title:'Delete this team?',body:'All channels, messages and files will be permanently erased.',ok:'Delete team',type:true,fn:()=>toast('Team deletion scheduled (demo)')});
+  else
+    openDialog({title:'Transfer ownership?',body:'You will become an admin. The new owner can remove you.',ok:'Transfer',fn:()=>toast('Transfer request sent to Amara Okafor')});
+});
+$$('[data-toast]').forEach(b=>b.onclick=()=>toast(b.dataset.toast));
+</script>
+</body>
+</html>

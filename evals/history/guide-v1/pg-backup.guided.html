@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pgferry: back up Postgres to S3</title>
+<meta name="description" content="pgferry is an open-source command line tool that backs up a Postgres database to an S3 bucket and restores it from there.">
+<!--
+  Before publishing:
+  1. Replace REPO_URL in the three links with your real repository address.
+  2. Check the command names against the real CLI. Only `backup` and `restore` are shown, and options are left to `--help` on purpose.
+-->
+<style>
+  :root{
+    --sea:#eef1f0;      /* terminal wall */
+    --ink:#14212b;      /* hull black */
+    --funnel:#b3261a;   /* funnel red: the one action */
+    --signal:#f2c230;   /* harbour sign yellow: header band */
+    --water:#5d6e78;    /* secondary text, 4.7:1 on --sea */
+    --rule:#c5cdcb;
+    --s1:.5rem; --s2:1rem; --s3:1.5rem; --s4:2.5rem; --s5:4rem;
+    --sans:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--sea);color:var(--ink);font:1.0625rem/1.55 var(--sans)}
+  a{color:var(--ink);text-underline-offset:.2em;text-decoration-thickness:2px}
+  a:hover{color:var(--funnel)}
+  :focus-visible{outline:3px solid var(--ink);outline-offset:3px;box-shadow:0 0 0 6px var(--signal)}
+  .wrap{max-width:62rem;margin-inline:auto;padding-inline:var(--s3)}
+
+  /* sign band */
+  .band{background:var(--signal);border-bottom:4px solid var(--ink)}
+  .band .wrap{display:flex;justify-content:space-between;align-items:center;gap:var(--s2);min-height:3.5rem}
+  .name{font-weight:800;font-size:1.375rem;letter-spacing:-.01em;text-decoration:none}
+  .name:hover{color:var(--ink)}
+  .band a.src{font-weight:700;display:inline-flex;align-items:center;min-height:44px}
+
+  /* hero */
+  .hero{padding-block:var(--s5) var(--s4)}
+  h1{font-size:clamp(2.25rem,6.5vw,4.25rem);line-height:1.03;letter-spacing:-.025em;margin:0 0 var(--s3);max-width:16ch;font-weight:800}
+  .lede{font-size:1.25rem;max-width:34rem;margin:0 0 var(--s4)}
+
+  /* the crossing: a route line as on a ferry map */
+  .route{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:var(--s2);margin:0 0 var(--s4);padding:var(--s3) 0;border-block:2px solid var(--ink)}
+  .stop{font-weight:800;font-size:1.125rem;line-height:1.2}
+  .stop small{display:block;font-weight:400;color:var(--water);font-size:.9375rem}
+  .stop:last-child{text-align:end}
+  .line{position:relative;height:2.75rem}
+  .line::before{content:"";position:absolute;inset-inline:0;top:50%;border-top:4px dashed var(--ink)}
+  .line i{position:absolute;top:50%;width:14px;height:14px;margin-top:-7px;background:var(--sea);border:4px solid var(--ink);border-radius:50%}
+  .line i:first-child{inset-inline-start:-4px}
+  .line i:last-child{inset-inline-end:-4px}
+  .line span{position:absolute;inset-inline:0;text-align:center;font-size:.9375rem;font-weight:700;background:none}
+  .line .out{top:-.4rem}
+  .line .back{bottom:-.4rem;color:var(--water)}
+
+  .cta{display:flex;flex-wrap:wrap;gap:var(--s2);align-items:center}
+  .btn{display:inline-flex;align-items:center;min-height:48px;padding:0 var(--s3);background:var(--funnel);color:#fff;font-weight:700;text-decoration:none;border:2px solid var(--funnel);border-radius:2px;transition:transform .12s ease}
+  .btn:hover{background:var(--ink);border-color:var(--ink);color:#fff;transform:translateY(-2px)}
+  .btn:active{transform:translateY(0)}
+
+  /* timetable */
+  section{padding-block:var(--s4)}
+  h2{font-size:1.75rem;letter-spacing:-.015em;margin:0 0 var(--s2);line-height:1.15}
+  .board{width:100%;border-collapse:collapse;background:var(--ink);color:#fff}
+  .board caption{text-align:start;padding:0 0 var(--s1);color:var(--water);font-size:.9375rem}
+  .board th,.board td{padding:var(--s2) var(--s3);text-align:start;vertical-align:top}
+  .board thead th{background:var(--signal);color:var(--ink);font-size:.9375rem;font-weight:800}
+  .board tbody tr+tr{border-top:1px solid #3a4a55}
+  .board td:first-child{font-family:var(--mono);font-weight:700;white-space:nowrap}
+  .board .dir{white-space:nowrap}
+
+  pre{margin:0;padding:var(--s3);background:var(--ink);color:#fff;font:.9375rem/1.7 var(--mono);overflow-x:auto;border-radius:2px}
+  pre .c{color:#a9bac4}
+  .snip{position:relative}
+  .copy{display:none;position:absolute;top:var(--s1);inset-inline-end:var(--s1);min-height:44px;min-width:44px;padding:0 var(--s2);background:var(--signal);color:var(--ink);border:0;font:700 .875rem var(--sans);cursor:pointer;border-radius:2px}
+  .copy:hover{background:#fff}
+  .copy:active{transform:translateY(1px)}
+  .js .copy{display:inline-block}
+  p.note{max-width:40rem;margin:0 0 var(--s2)}
+
+  footer{border-top:4px solid var(--ink);margin-top:var(--s4);padding-block:var(--s3) var(--s4)}
+  footer p{margin:0 0 var(--s1);max-width:36rem}
+
+  @media (max-width:640px){
+    .hero{padding-block:var(--s4) var(--s3)}
+    .route{grid-template-columns:1fr;gap:var(--s1)}
+    .stop:last-child{text-align:start}
+    .line{height:3.5rem;width:6px;margin-inline-start:7px}
+    .line::before{inset:0;top:0;border-top:0;border-inline-start:4px dashed var(--ink)}
+    .line i{inset-inline-start:-6px!important;inset-inline-end:auto!important;margin-top:0}
+    .line i:first-child{top:-4px}
+    .line i:last-child{top:auto;bottom:-4px}
+    .line span{inset-inline:auto;inset-inline-start:var(--s3);text-align:start;white-space:nowrap}
+    .line .out{top:.2rem}
+    .line .back{top:auto;bottom:.2rem}
+    .board thead{position:absolute;inline-size:1px;block-size:1px;overflow:hidden;clip-path:inset(50%)}
+    .board,.board tbody,.board tr,.board td{display:block}
+    .board td{padding:var(--s1) var(--s2)}
+    .board tr{padding:var(--s1) 0}
+    .board td::before{content:attr(data-label);display:block;font-size:.8125rem;color:#a9bac4;font-family:var(--sans)}
+    .board td:first-child{white-space:normal}
+  }
+  @media (prefers-reduced-motion:reduce){.btn{transition:none}.btn:hover{transform:none}}
+</style>
+</head>
+<body>
+<script>document.documentElement.className='js'</script>
+
+<header class="band">
+  <div class="wrap">
+    <a class="name" href="#top">pgferry</a>
+    <a class="src" href="REPO_URL">Source on GitHub</a>
+  </div>
+</header>
+
+<main id="top">
+  <div class="wrap hero">
+    <h1>Carries a Postgres database across to S3.</h1>
+    <p class="lede">pgferry is an open-source command line tool. One command takes a backup of your database and puts it in your bucket. Another brings it back.</p>
+
+    <div class="route" role="img" aria-label="Backup goes from Postgres to an S3 bucket. Restore goes from the S3 bucket back to Postgres.">
+      <div class="stop">Postgres<small>your database</small></div>
+      <div class="line" aria-hidden="true"><i></i><span class="out">backup →</span><span class="back">← restore</span><i></i></div>
+      <div class="stop">S3 bucket<small>your storage</small></div>
+    </div>
+
+    <div class="cta">
+      <a class="btn" href="REPO_URL">Get pgferry from the repository</a>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <section aria-labelledby="commands">
+      <h2 id="commands">Two commands, one in each direction</h2>
+      <table class="board">
+        <caption>Run <code>--help</code> on either command to see its options.</caption>
+        <thead>
+          <tr><th scope="col">Command</th><th scope="col">Carries</th><th scope="col">Direction</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-label="Command">pgferry backup</td>
+            <td data-label="Carries">A copy of the database</td>
+            <td class="dir" data-label="Direction">Postgres → S3</td>
+          </tr>
+          <tr>
+            <td data-label="Command">pgferry restore</td>
+            <td data-label="Carries">A copy from the bucket</td>
+            <td class="dir" data-label="Direction">S3 → Postgres</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section aria-labelledby="cron">
+      <h2 id="cron">Run it from cron</h2>
+      <p class="note">A backup is a single command, so any scheduler can run it. This line would run it at 03:00 every night.</p>
+      <div class="snip">
+        <pre><code><span class="c"># add the options shown by: pgferry backup --help</span>
+0 3 * * * pgferry backup</code></pre>
+        <button class="copy" type="button" data-copy="0 3 * * * pgferry backup">Copy</button>
+      </div>
+    </section>
+
+    <section aria-labelledby="open">
+      <h2 id="open">Read the code</h2>
+      <p class="note">The source is public. Check what it does with your database before you point it at one, and open an issue if something is wrong.</p>
+      <p class="note"><a href="REPO_URL">Browse the repository</a></p>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p><strong>pgferry</strong>, an open-source tool for backing up Postgres to S3.</p>
+    <p><a href="REPO_URL">Source and issues</a></p>
+  </div>
+</footer>
+
+<script>
+document.querySelectorAll('.copy').forEach(function(b){
+  b.addEventListener('click',function(){
+    var t=b.getAttribute('data-copy');
+    var done=function(m){b.textContent=m;setTimeout(function(){b.textContent='Copy'},1800)};
+    if(navigator.clipboard){navigator.clipboard.writeText(t).then(function(){done('Copied')},function(){done('Select and copy')})}
+    else{done('Select and copy')}
+  });
+});
+</script>
+</body>
+</html>

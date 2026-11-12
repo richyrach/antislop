@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tern, a note-taking app</title>
+<meta name="description" content="Tern is a note-taking app. Write a note on this page to try the writing surface.">
+<!--
+Direction: a field notebook page, because a tern is a bird and a bird log is a dated, ruled record.
+Palette from the bird: pale sea-grey paper, dark slate ink (the cap), one red (the bill) used only for the margin rule and the one action.
+Generic version would have been: gradient hero, three feature cards, "Get started".
+Left out because no real material was supplied: features, screenshots, pricing, download links, testimonials.
+To add a download link, put an <a class="btn"> inside the .cta paragraph.
+-->
+<style>
+:root{
+  --paper:#eef2f4;
+  --sheet:#f8fafb;
+  --ink:#1b2830;
+  --muted:#46565f;
+  --rule:#c3d0d6;
+  --bill:#b42a12;
+  --bill-dark:#8f1f0c;
+  --step:8px;
+  --line:32px;
+  --serif:Georgia,"Times New Roman",serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:1rem;line-height:1.5}
+.wrap{max-width:46rem;margin-inline:auto;padding:calc(var(--step)*3) calc(var(--step)*2) calc(var(--step)*8)}
+header.top{display:flex;align-items:center;gap:var(--step);padding-block:var(--step) calc(var(--step)*5)}
+.mark{font-family:var(--serif);font-weight:700;font-size:1.5rem;letter-spacing:.01em}
+h1{font-family:var(--serif);font-weight:700;font-size:clamp(2rem,7vw,3.25rem);line-height:1.1;margin:0 0 calc(var(--step)*2);max-width:16ch}
+.lede{font-size:1.125rem;max-width:34rem;margin:0 0 calc(var(--step)*5);color:var(--muted)}
+h2{font-family:var(--serif);font-size:1.375rem;margin:calc(var(--step)*6) 0 calc(var(--step)*2)}
+
+.page{background:var(--sheet);border:1px solid var(--rule);border-radius:2px;position:relative}
+.page::before{content:"";position:absolute;inset-block:0;inset-inline-start:3.5rem;width:2px;background:var(--bill);opacity:.8}
+.page-head{display:flex;justify-content:space-between;gap:var(--step);padding:var(--step) calc(var(--step)*2) var(--step) 4.25rem;border-bottom:2px solid var(--ink);font-size:.9375rem}
+.page-head label{font-weight:600}
+.page-head time{color:var(--muted)}
+textarea{
+  display:block;width:100%;min-height:calc(var(--line)*7);resize:vertical;border:0;margin:0;
+  padding:0 calc(var(--step)*2) 0 4.25rem;
+  font:1.0625rem/var(--line) var(--serif);color:var(--ink);background:
+    repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--line) - 1px),var(--rule) calc(var(--line) - 1px),var(--rule) var(--line));
+  background-attachment:local;caret-color:var(--bill)
+}
+textarea:focus-visible{outline:3px solid var(--ink);outline-offset:-3px}
+textarea::placeholder{color:#5b6b74}
+.page-foot{display:flex;flex-wrap:wrap;align-items:center;gap:var(--step) calc(var(--step)*2);padding:calc(var(--step)*1.5) calc(var(--step)*2) calc(var(--step)*1.5) 4.25rem;border-top:1px solid var(--rule)}
+.btn{min-height:44px;padding:0 calc(var(--step)*3);border:2px solid var(--bill);background:var(--bill);color:#fff;font:600 1rem var(--sans);border-radius:2px;cursor:pointer;transition:transform .12s,background-color .12s}
+.btn:hover{background:var(--bill-dark);border-color:var(--bill-dark)}
+.btn:active{transform:translateY(1px)}
+.btn:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.btn:disabled{background:transparent;color:#5b6b74;border-color:var(--rule);cursor:not-allowed;transform:none}
+.hint{margin:0;font-size:.9375rem;color:var(--muted)}
+.error{margin:0;padding:var(--step) calc(var(--step)*2) var(--step) 4.25rem;color:#8f1f0c;font-weight:600;font-size:.9375rem}
+
+table{width:100%;border-collapse:collapse;background:var(--sheet);border:1px solid var(--rule)}
+caption{text-align:start;padding-bottom:var(--step);color:var(--muted);font-size:.9375rem}
+th,td{text-align:start;vertical-align:top;padding:var(--step) calc(var(--step)*1.5);border-bottom:1px solid var(--rule)}
+thead th{border-bottom:2px solid var(--ink);font-size:.875rem}
+td.when{white-space:nowrap;color:var(--muted);font-variant-numeric:tabular-nums;font-size:.9375rem}
+td.note{font-family:var(--serif);white-space:pre-wrap;overflow-wrap:anywhere}
+td.act{text-align:end;width:1%}
+.del{min-height:44px;min-width:44px;background:none;border:0;color:var(--muted);font:inherit;font-size:.9375rem;text-decoration:underline;cursor:pointer;border-radius:2px}
+.del:hover{color:var(--bill-dark);background:#e3eaee}
+.del:focus-visible{outline:3px solid var(--ink)}
+.del:active{transform:translateY(1px)}
+.empty{padding:calc(var(--step)*3) calc(var(--step)*2);background:var(--sheet);border:1px dashed var(--rule);color:var(--muted);margin:0}
+footer{margin-top:calc(var(--step)*8);padding-top:calc(var(--step)*2);border-top:2px solid var(--ink);font-size:.9375rem;color:var(--muted)}
+.cta{margin:0}
+@media (max-width:420px){
+  .page::before,.page-head,textarea,.page-foot,.error{--x:0}
+  .page::before{inset-inline-start:2rem}
+  .page-head,.page-foot,.error{padding-inline-start:2.75rem}
+  textarea{padding-inline-start:2.75rem}
+  th,td{padding-inline:var(--step)}
+}
+@media (prefers-reduced-motion:reduce){.btn{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <span class="mark">Tern</span>
+  </header>
+
+  <main>
+    <h1>Tern is a note-taking app.</h1>
+    <p class="lede">The page below is a working note. Write something, add it to the log, and it stays in this browser.</p>
+
+    <section aria-labelledby="write">
+      <h2 id="write" class="visually-hidden" style="position:absolute;left:-9999px">Write a note</h2>
+      <form class="page" id="form" novalidate>
+        <div class="page-head">
+          <label for="text">New note</label>
+          <time id="today" datetime=""></time>
+        </div>
+        <textarea id="text" name="text" placeholder="Start writing here" aria-describedby="hint"></textarea>
+        <p class="error" id="err" role="alert" hidden></p>
+        <div class="page-foot">
+          <button class="btn" id="add" type="submit" disabled>Add to log</button>
+          <p class="hint" id="hint">Nothing leaves this page. Notes are stored in your browser only.</p>
+        </div>
+      </form>
+    </section>
+
+    <section aria-labelledby="log-h">
+      <h2 id="log-h">Log</h2>
+      <p class="empty" id="empty">No notes yet. The first one you add will appear here.</p>
+      <table id="log" hidden>
+        <caption>Notes saved in this browser, newest first</caption>
+        <thead><tr><th scope="col">Written</th><th scope="col">Note</th><th scope="col"><span style="position:absolute;left:-9999px">Remove</span></th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer>
+    <p class="cta">Tern is in development. Download links will appear here.</p>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var KEY="tern-demo-notes";
+  var form=document.getElementById("form"),text=document.getElementById("text"),add=document.getElementById("add");
+  var rows=document.getElementById("rows"),log=document.getElementById("log"),empty=document.getElementById("empty");
+  var err=document.getElementById("err"),today=document.getElementById("today");
+  var notes=[];
+  var fmt=new Intl.DateTimeFormat(undefined,{dateStyle:"medium",timeStyle:"short"});
+
+  var d=new Date();
+  today.textContent=new Intl.DateTimeFormat(undefined,{dateStyle:"full"}).format(d);
+  today.setAttribute("datetime",d.toISOString().slice(0,10));
+
+  function showError(m){err.textContent=m;err.hidden=!m}
+  function load(){
+    try{var raw=localStorage.getItem(KEY);notes=raw?JSON.parse(raw):[];if(!Array.isArray(notes))notes=[]}
+    catch(e){notes=[];showError("This browser is blocking storage, so notes will be lost when you close the page. Allow site data for this page to keep them.")}
+  }
+  function save(){
+    try{localStorage.setItem(KEY,JSON.stringify(notes));if(err.textContent.indexOf("could not")===0)showError("")}
+    catch(e){showError("Your note could not be saved because browser storage is unavailable or full. Free some space or allow site data, then try again.")}
+  }
+  function render(){
+    rows.textContent="";
+    notes.forEach(function(n,i){
+      var tr=document.createElement("tr");
+      var a=document.createElement("td");a.className="when";a.textContent=fmt.format(new Date(n.t));
+      var b=document.createElement("td");b.className="note";b.textContent=n.s;
+      var c=document.createElement("td");c.className="act";
+      var x=document.createElement("button");x.type="button";x.className="del";x.textContent="Remove";
+      x.setAttribute("aria-label","Remove note from "+a.textContent);
+      x.addEventListener("click",function(){notes.splice(i,1);save();render();});
+      c.appendChild(x);tr.appendChild(a);tr.appendChild(b);tr.appendChild(c);rows.appendChild(tr);
+    });
+    log.hidden=!notes.length;empty.hidden=!!notes.length;
+  }
+  text.addEventListener("input",function(){add.disabled=!text.value.trim()});
+  form.addEventListener("submit",function(e){
+    e.preventDefault();
+    var s=text.value.trim();if(!s)return;
+    notes.unshift({t:Date.now(),s:s});
+    save();render();text.value="";add.disabled=true;text.focus();
+  });
+  load();render();
+})();
+</script>
+</body>
+</html>

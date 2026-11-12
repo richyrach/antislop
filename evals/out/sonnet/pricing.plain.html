@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Taskflow Pricing</title>
+<style>
+  :root {
+    --bg: #f7f8fc;
+    --text: #1b1f3b;
+    --muted: #666b8a;
+    --primary: #5b5bf0;
+    --primary-dark: #4646d6;
+    --card: #ffffff;
+    --border: #e3e5f1;
+    --accent: #22c08a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+  header {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .logo { font-weight: 800; font-size: 1.3rem; color: var(--primary); }
+  .logo span { color: var(--text); }
+  nav a { color: var(--muted); text-decoration: none; margin-left: 24px; font-size: .95rem; }
+  nav a:hover { color: var(--primary); }
+  .hero { text-align: center; padding: 48px 24px 24px; max-width: 700px; margin: 0 auto; }
+  .hero h1 { font-size: clamp(2rem, 5vw, 3rem); letter-spacing: -0.02em; margin-bottom: 12px; }
+  .hero p { color: var(--muted); font-size: 1.1rem; }
+
+  .toggle-wrap { display: flex; justify-content: center; align-items: center; gap: 14px; margin: 32px 0 8px; font-weight: 600; }
+  .toggle-wrap .label { color: var(--muted); transition: color .2s; }
+  .toggle-wrap .label.active { color: var(--text); }
+  .switch { position: relative; width: 52px; height: 28px; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute; inset: 0; background: #cfd2e8; border-radius: 28px;
+    cursor: pointer; transition: background .2s;
+  }
+  .slider::before {
+    content: ""; position: absolute; height: 22px; width: 22px; left: 3px; top: 3px;
+    background: #fff; border-radius: 50%; transition: transform .2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,.2);
+  }
+  .switch input:checked + .slider { background: var(--primary); }
+  .switch input:checked + .slider::before { transform: translateX(24px); }
+  .switch input:focus-visible + .slider { outline: 3px solid rgba(91,91,240,.4); outline-offset: 2px; }
+  .save {
+    background: #dcf7ec; color: #0d8a60; font-size: .75rem; padding: 3px 10px;
+    border-radius: 20px; font-weight: 700;
+  }
+
+  .plans {
+    max-width: 1100px; margin: 32px auto 0; padding: 0 24px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; align-items: stretch;
+  }
+  .plan {
+    background: var(--card); border: 1px solid var(--border); border-radius: 18px;
+    padding: 32px 28px; display: flex; flex-direction: column; position: relative;
+  }
+  .plan.featured {
+    border: 2px solid var(--primary);
+    box-shadow: 0 20px 50px rgba(91,91,240,.18);
+    transform: translateY(-8px);
+  }
+  .badge {
+    position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+    background: var(--primary); color: #fff; font-size: .75rem; font-weight: 700;
+    padding: 5px 14px; border-radius: 20px; letter-spacing: .04em; text-transform: uppercase;
+  }
+  .plan h2 { font-size: 1.3rem; margin-bottom: 4px; }
+  .plan .desc { color: var(--muted); font-size: .95rem; min-height: 46px; }
+  .price { margin: 20px 0 4px; display: flex; align-items: baseline; gap: 6px; }
+  .price .amount { font-size: 3rem; font-weight: 800; letter-spacing: -0.03em; }
+  .price .per { color: var(--muted); font-size: .9rem; }
+  .billed { color: var(--muted); font-size: .85rem; min-height: 22px; margin-bottom: 20px; }
+  .btn {
+    display: block; text-align: center; text-decoration: none; padding: 13px;
+    border-radius: 10px; font-weight: 700; border: 2px solid var(--primary);
+    color: var(--primary); transition: all .15s;
+  }
+  .btn:hover { background: rgba(91,91,240,.08); }
+  .featured .btn { background: var(--primary); color: #fff; }
+  .featured .btn:hover { background: var(--primary-dark); border-color: var(--primary-dark); }
+  .plan ul { list-style: none; margin-top: 26px; display: grid; gap: 12px; }
+  .plan li { padding-left: 28px; position: relative; font-size: .95rem; }
+  .plan li::before {
+    content: ""; position: absolute; left: 0; top: 4px; width: 18px; height: 18px;
+    border-radius: 50%; background: #dcf7ec;
+  }
+  .plan li::after {
+    content: ""; position: absolute; left: 6px; top: 8px; width: 5px; height: 9px;
+    border: solid var(--accent); border-width: 0 2px 2px 0; transform: rotate(45deg) scale(.8);
+    transform-origin: center; top: 6px;
+  }
+  .plan li.head { font-weight: 700; padding-left: 0; }
+  .plan li.head::before, .plan li.head::after { display: none; }
+
+  .faq { max-width: 760px; margin: 80px auto 0; padding: 0 24px; }
+  .faq h2 { text-align: center; margin-bottom: 24px; font-size: 1.8rem; }
+  details { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px 22px; margin-bottom: 12px; }
+  summary { cursor: pointer; font-weight: 600; }
+  details p { margin-top: 10px; color: var(--muted); }
+
+  footer { text-align: center; color: var(--muted); font-size: .85rem; padding: 60px 24px 40px; }
+
+  @media (max-width: 900px) {
+    .plans { grid-template-columns: 1fr; max-width: 460px; }
+    .plan.featured { transform: none; }
+    nav { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Task<span>flow</span></div>
+  <nav>
+    <a href="#">Features</a>
+    <a href="#">Pricing</a>
+    <a href="#">Customers</a>
+    <a href="#">Sign in</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <h1>Simple pricing for teams that ship</h1>
+  <p>Plan projects, track work, and hit deadlines. Start free, upgrade when you're ready.</p>
+</section>
+
+<div class="toggle-wrap">
+  <span class="label active" id="lblMonthly">Monthly</span>
+  <label class="switch" aria-label="Toggle annual billing">
+    <input type="checkbox" id="billingToggle">
+    <span class="slider"></span>
+  </label>
+  <span class="label" id="lblYearly">Yearly</span>
+  <span class="save">Save 20%</span>
+</div>
+
+<main class="plans">
+  <article class="plan">
+    <h2>Starter</h2>
+    <p class="desc">For individuals and small teams getting organized.</p>
+    <div class="price"><span class="amount" data-monthly="0" data-yearly="0">$0</span><span class="per">/ user / mo</span></div>
+    <div class="billed">Free forever</div>
+    <a href="#" class="btn">Get started free</a>
+    <ul>
+      <li class="head">Includes:</li>
+      <li>Up to 5 users</li>
+      <li>3 active projects</li>
+      <li>Kanban &amp; list views</li>
+      <li>1 GB file storage</li>
+      <li>Community support</li>
+    </ul>
+  </article>
+
+  <article class="plan featured">
+    <span class="badge">Most popular</span>
+    <h2>Pro</h2>
+    <p class="desc">For growing teams that need more power and visibility.</p>
+    <div class="price"><span class="amount" data-monthly="12" data-yearly="10">$12</span><span class="per">/ user / mo</span></div>
+    <div class="billed" data-monthly="Billed monthly" data-yearly="Billed annually ($120 / user)">Billed monthly</div>
+    <a href="#" class="btn">Start 14-day trial</a>
+    <ul>
+      <li class="head">Everything in Starter, plus:</li>
+      <li>Unlimited users &amp; projects</li>
+      <li>Gantt charts &amp; timelines</li>
+      <li>Time tracking &amp; reports</li>
+      <li>100 GB file storage</li>
+      <li>Integrations (Slack, GitHub, Google)</li>
+      <li>Priority email support</li>
+    </ul>
+  </article>
+
+  <article class="plan">
+    <h2>Enterprise</h2>
+    <p class="desc">For organizations needing security, control, and scale.</p>
+    <div class="price"><span class="amount" data-monthly="24" data-yearly="20">$24</span><span class="per">/ user / mo</span></div>
+    <div class="billed" data-monthly="Billed monthly" data-yearly="Billed annually ($240 / user)">Billed monthly</div>
+    <a href="#" class="btn">Contact sales</a>
+    <ul>
+      <li class="head">Everything in Pro, plus:</li>
+      <li>SSO &amp; SAML authentication</li>
+      <li>Advanced permissions &amp; audit logs</li>
+      <li>Portfolio &amp; resource management</li>
+      <li>Unlimited storage</li>
+      <li>99.99% uptime SLA</li>
+      <li>Dedicated success manager</li>
+    </ul>
+  </article>
+</main>
+
+<section class="faq">
+  <h2>Frequently asked questions</h2>
+  <details>
+    <summary>Can I change plans later?</summary>
+    <p>Yes. You can upgrade or downgrade at any time, and billing is prorated automatically.</p>
+  </details>
+  <details>
+    <summary>Is there a free trial for paid plans?</summary>
+    <p>Pro includes a 14-day free trial with no credit card required.</p>
+  </details>
+  <details>
+    <summary>What payment methods do you accept?</summary>
+    <p>We accept all major credit cards. Enterprise customers can also pay by invoice.</p>
+  </details>
+  <details>
+    <summary>Do you offer discounts for nonprofits or students?</summary>
+    <p>Yes, eligible nonprofits and educational teams get 50% off. Reach out to our sales team.</p>
+  </details>
+</section>
+
+<footer>&copy; 2026 Taskflow, Inc. All rights reserved.</footer>
+
+<script>
+  const toggle = document.getElementById('billingToggle');
+  const lblM = document.getElementById('lblMonthly');
+  const lblY = document.getElementById('lblYearly');
+
+  function update() {
+    const yearly = toggle.checked;
+    lblM.classList.toggle('active', !yearly);
+    lblY.classList.toggle('active', yearly);
+    document.querySelectorAll('.amount').forEach(el => {
+      el.textContent = '$' + (yearly ? el.dataset.yearly : el.dataset.monthly);
+    });
+    document.querySelectorAll('.billed[data-monthly]').forEach(el => {
+      el.textContent = yearly ? el.dataset.yearly : el.dataset.monthly;
+    });
+  }
+  toggle.addEventListener('change', update);
+</script>
+</body>
+</html>

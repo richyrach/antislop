@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plotline pricing: free for five people, then per seat</title>
+<meta name="description" content="Plotline project management. Free for up to five members. Team is $8 per seat a month billed yearly, Business is $14.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2314202B'/%3E%3Crect x='6' y='8' width='20' height='4' fill='%23fff'/%3E%3Crect x='11' y='14' width='15' height='4' fill='%23fff'/%3E%3Crect x='17' y='20' width='9' height='4' fill='%23F26B21'/%3E%3C/svg%3E">
+<!--
+DIRECTION
+Pricing is shown the way a project schedule is shown: the comparison table is a Gantt chart whose columns are the plans, and each feature is a bar that starts at the plan where it appears and runs to the right edge. The generic version would be three identical cards over a checkmark grid.
+Colours come from a planning wall: cool paper, ink, schedule-bar teal, and highlighter orange used only for the recommended plan's button.
+
+PLACEHOLDERS TO REPLACE BEFORE LAUNCH
+- Product name "Plotline", all prices, limits, support terms and the FAQ policies are sample values, not real offers.
+- Signup links point to /signup?plan=... and need a real destination.
+-->
+<style>
+:root{
+  --paper:#EEF1F3;
+  --card:#F9FAFB;
+  --ink:#14202B;
+  --muted:#4A5967;
+  --line:#CBD3DA;
+  --bar:#0B6E6E;
+  --bar-deep:#14202B;
+  --mark:#F26B21;
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:72px;--s9:112px;
+  --display:"Bahnschrift","DIN Alternate","Avenir Next Condensed","Franklin Gothic Medium","Arial Narrow",sans-serif;
+  --text:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.55 var(--text);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus-visible{outline:3px solid var(--ink);outline-offset:3px;border-radius:3px}
+.team :focus-visible{outline-color:#fff}
+.wrap{max-width:1180px;margin-inline:auto;padding-inline:var(--s5)}
+
+/* header */
+header.top{display:flex;align-items:center;justify-content:space-between;gap:var(--s4);padding-block:var(--s4);flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:var(--s2);font:700 22px/1 var(--display);letter-spacing:.01em;text-decoration:none}
+.brand svg{display:block}
+nav{display:flex;gap:var(--s5)}
+nav a{display:inline-flex;align-items:center;min-height:44px;color:var(--muted);text-decoration:none;font-size:15px}
+nav a:hover{color:var(--ink);text-decoration:underline;text-underline-offset:4px}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1.25fr 1fr;gap:var(--s7);align-items:end;padding-block:var(--s7) var(--s8)}
+h1{font:700 clamp(48px,8.4vw,108px)/.92 var(--display);letter-spacing:-.015em;margin:0 0 var(--s5);text-wrap:balance}
+.lede{font-size:19px;max-width:34ch;margin:0;color:var(--muted);text-wrap:pretty}
+.mini{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:var(--s4) var(--s4) var(--s3)}
+.mini .cols,.sched .cols{display:grid;grid-template-columns:repeat(3,1fr);text-align:center;font:700 13px/1 var(--display);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.mini .row{padding:var(--s2) 0;background:
+  linear-gradient(var(--line),var(--line)) 33.333% 0/1px 100% no-repeat,
+  linear-gradient(var(--line),var(--line)) 66.667% 0/1px 100% no-repeat}
+.mini .cols{padding-bottom:var(--s3)}
+
+/* bars */
+.bar{display:block;height:28px;line-height:28px;border-radius:3px;background:var(--bar);color:#fff;font-size:13px;font-weight:600;padding-inline:var(--s3);white-space:nowrap;overflow:hidden;position:relative}
+.bar::before{content:"";position:absolute;inset-block:0;inset-inline-start:0;width:4px;background:var(--mark)}
+.b0{margin-left:3px;width:calc(100% - 6px)}
+.b1{margin-left:calc(33.333% + 3px);width:calc(66.667% - 6px)}
+.b2{margin-left:calc(66.667% + 3px);width:calc(33.333% - 6px);background:var(--bar-deep)}
+
+/* toggle */
+.billing{display:none;align-items:center;gap:var(--s3);margin-bottom:var(--s5);flex-wrap:wrap}
+.js .billing{display:flex}
+.seg{display:inline-flex;border:1.5px solid var(--ink);border-radius:6px;overflow:hidden}
+.seg button{font:600 15px var(--text);min-height:44px;padding:0 var(--s4);border:0;background:transparent;color:var(--ink);cursor:pointer;transition:background-color .15s,color .15s}
+.seg button:hover{background:#dfe5e9}
+.seg button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.seg button:active{transform:translateY(1px)}
+.billing small{color:var(--muted);font-size:15px}
+
+/* plans */
+.plans{display:grid;grid-template-columns:1fr 1.12fr 1fr;gap:var(--s4);align-items:stretch}
+.plan{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:var(--s6) var(--s5);display:flex;flex-direction:column}
+.plan h2{font:700 26px/1 var(--display);margin:0 0 var(--s2);letter-spacing:.01em}
+.plan .who{margin:0 0 var(--s5);color:var(--muted);font-size:15px;min-height:3em}
+.price{display:flex;align-items:baseline;gap:var(--s2);margin:0;flex-wrap:wrap}
+.amt{font:700 64px/1 var(--display);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.unit{color:var(--muted);font-size:15px}
+.note{margin:var(--s2) 0 var(--s5);font-size:14px;color:var(--muted);min-height:1.5em}
+.plan ul{list-style:none;margin:0 0 var(--s6);padding:var(--s5) 0 0;border-top:1px solid var(--line);display:grid;gap:var(--s3);font-size:16px}
+.plan li{padding-inline-start:var(--s5);position:relative}
+.plan li::before{content:"";position:absolute;inset-inline-start:0;top:.55em;width:12px;height:4px;background:var(--bar)}
+.btn{margin-top:auto;display:flex;align-items:center;justify-content:center;min-height:48px;padding:0 var(--s5);border-radius:5px;font:700 16px var(--text);text-decoration:none;border:1.5px solid var(--ink);color:var(--ink);background:transparent;transition:background-color .15s,transform .15s}
+.btn:hover{background:var(--ink);color:#fff}
+.btn:active{transform:translateY(1px)}
+.btn[aria-disabled="true"]{opacity:.5;pointer-events:none}
+.team{background:var(--ink);color:#fff;border-color:var(--ink);padding-block:var(--s7) var(--s6);position:relative}
+.team .who,.team .unit,.team .note{color:#C3CDD5}
+.team ul{border-top-color:#3A4856}
+.team li::before{background:var(--mark)}
+.team .btn{background:var(--mark);border-color:var(--mark);color:var(--ink)}
+.team .btn:hover{background:#fff;border-color:#fff;color:var(--ink)}
+.flag{position:absolute;top:var(--s4);inset-inline-start:var(--s5);font:700 13px/1 var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--mark)}
+
+/* schedule */
+section{padding-block:var(--s8) 0}
+h3.sec{font:700 clamp(32px,4.6vw,52px)/1 var(--display);letter-spacing:-.01em;margin:0 0 var(--s3);text-wrap:balance}
+.sec-lede{margin:0 0 var(--s6);color:var(--muted);max-width:52ch}
+.sched{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.sched th,.sched td{padding:var(--s3) var(--s4);text-align:start;border-top:1px solid var(--line)}
+.sched thead th{border-top:0;background:var(--paper);padding-block:var(--s4)}
+.sched thead th:first-child{width:36%;font:700 13px/1 var(--display);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.sched tbody th{font-weight:500;font-size:16px}
+.sched tbody td{padding-block:var(--s3);background:
+  linear-gradient(var(--line),var(--line)) 33.333% 0/1px 100% no-repeat,
+  linear-gradient(var(--line),var(--line)) 66.667% 0/1px 100% no-repeat}
+.sched thead .cols{padding:0}
+
+/* faq */
+.faq{max-width:760px}
+details{border-top:1px solid var(--line)}
+details:last-child{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;min-height:56px;display:flex;align-items:center;justify-content:space-between;gap:var(--s4);font:600 18px var(--text);list-style:none;padding-block:var(--s2)}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font:400 28px/1 var(--display);color:var(--bar)}
+details[open] summary::after{content:"\2212"}
+summary:hover{color:var(--bar)}
+details p{margin:0 0 var(--s5);color:var(--muted);max-width:62ch}
+
+footer{margin-top:var(--s9);border-top:1px solid var(--line);padding-block:var(--s6);color:var(--muted);font-size:15px;display:flex;justify-content:space-between;gap:var(--s4);flex-wrap:wrap}
+
+@media (max-width:980px){
+  .hero{grid-template-columns:1fr;gap:var(--s6);padding-block:var(--s6) var(--s7)}
+  .plans{grid-template-columns:1fr}
+  .team{order:-1;padding-block:var(--s7) var(--s6)}
+  .plan .who{min-height:0}
+}
+@media (max-width:720px){
+  .wrap{padding-inline:var(--s4)}
+  .sched,.sched tbody,.sched tr,.sched th,.sched td{display:block}
+  .sched thead tr{display:block}
+  .sched thead th:first-child{display:none}
+  .sched thead th{padding-block:var(--s3)}
+  .sched tbody th{padding-bottom:0;border-top:1px solid var(--line)}
+  .sched tbody td{border-top:0;padding-top:var(--s2)}
+  .sched tbody th,.sched tbody td{padding-inline:var(--s4)}
+  .bar{font-size:12px;padding-inline:var(--s2) var(--s1)}
+  .amt{font-size:56px}
+  footer{margin-top:var(--s8)}
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.classList.add('js')</script>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="#top" id="top">
+      <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="6" fill="#14202B"/><rect x="6" y="8" width="20" height="4" fill="#fff"/><rect x="11" y="14" width="15" height="4" fill="#fff"/><rect x="17" y="20" width="9" height="4" fill="#F26B21"/></svg>
+      Plotline
+    </a>
+    <nav aria-label="Page sections">
+      <a href="#plans">Plans</a>
+      <a href="#compare">What each plan adds</a>
+      <a href="#faq">Questions</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="hero">
+      <div>
+        <h1>Free for five people. Then pay per seat.</h1>
+        <p class="lede">Plotline plans projects as boards, lists and timelines. Every plan includes all three basic views. Paid plans add scheduling, time tracking and company-wide controls.</p>
+      </div>
+      <div class="mini" aria-hidden="true">
+        <div class="cols"><span>Free</span><span>Team</span><span>Business</span></div>
+        <div class="row"><span class="bar b0">Boards and lists</span></div>
+        <div class="row"><span class="bar b1">Timeline with dependencies</span></div>
+        <div class="row"><span class="bar b2">SSO</span></div>
+      </div>
+    </div>
+
+    <div id="plans">
+      <div class="billing" role="group" aria-label="Billing period">
+        <div class="seg">
+          <button type="button" data-period="m" aria-pressed="true">Monthly</button>
+          <button type="button" data-period="y" aria-pressed="false">Yearly</button>
+        </div>
+        <small>Yearly billing is about 20% cheaper per seat.</small>
+      </div>
+
+      <div class="plans">
+        <article class="plan">
+          <h2>Free</h2>
+          <p class="who">For a small team trying Plotline on real work.</p>
+          <p class="price"><span class="amt">$0</span><span class="unit">for up to 5 members</span></p>
+          <p class="note">No card needed</p>
+          <ul>
+            <li>3 active projects</li>
+            <li>Board, list and calendar views</li>
+            <li>Comments and file attachments</li>
+            <li>1 GB storage</li>
+          </ul>
+          <a class="btn" href="/signup?plan=free">Create free workspace</a>
+        </article>
+
+        <article class="plan team">
+          <span class="flag">Most teams start here</span>
+          <h2>Team</h2>
+          <p class="who">For teams that plan against dates and need to bill time.</p>
+          <p class="price"><span class="amt" data-m="10" data-y="8">$10</span><span class="unit">per seat a month</span></p>
+          <p class="note" data-m="Billed monthly" data-y="Billed yearly, $96 per seat">Billed monthly</p>
+          <ul>
+            <li>Everything in Free, with unlimited members</li>
+            <li>Unlimited projects</li>
+            <li>Timeline view with task dependencies</li>
+            <li>Time tracking and CSV timesheets</li>
+            <li>100 GB storage per workspace</li>
+          </ul>
+          <a class="btn" href="/signup?plan=team">Choose Team</a>
+        </article>
+
+        <article class="plan">
+          <h2>Business</h2>
+          <p class="who">For companies running many projects across departments.</p>
+          <p class="price"><span class="amt" data-m="18" data-y="14">$18</span><span class="unit">per seat a month</span></p>
+          <p class="note" data-m="Billed monthly" data-y="Billed yearly, $168 per seat">Billed monthly</p>
+          <ul>
+            <li>Everything in Team</li>
+            <li>Workload view across people</li>
+            <li>Portfolio dashboard</li>
+            <li>SAML single sign-on and audit log</li>
+            <li>1 TB storage, support reply within 1 business day</li>
+          </ul>
+          <a class="btn" href="/signup?plan=business">Choose Business</a>
+        </article>
+      </div>
+    </div>
+
+    <section id="compare">
+      <h3 class="sec">What each plan adds</h3>
+      <p class="sec-lede">Each bar starts on the plan where the feature first appears and continues on every plan to its right.</p>
+      <table class="sched">
+        <caption class="sr">Features by plan. Each feature lists the plan it starts on.</caption>
+        <thead>
+          <tr>
+            <th scope="col">Feature</th>
+            <th scope="col"><div class="cols"><span>Free</span><span>Team</span><span>Business</span></div></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Board, list and calendar views</th><td><span class="bar b0"><span class="sr">Starts on Free: </span>All plans</span></td></tr>
+          <tr><th scope="row">Comments, @mentions and attachments</th><td><span class="bar b0"><span class="sr">Starts on Free: </span>All plans</span></td></tr>
+          <tr><th scope="row">Timeline view with task dependencies</th><td><span class="bar b1"><span class="sr">Starts on Team: </span>Team and Business</span></td></tr>
+          <tr><th scope="row">Recurring tasks and templates</th><td><span class="bar b1"><span class="sr">Starts on Team: </span>Team and Business</span></td></tr>
+          <tr><th scope="row">Time tracking and CSV timesheets</th><td><span class="bar b1"><span class="sr">Starts on Team: </span>Team and Business</span></td></tr>
+          <tr><th scope="row">Guests with per-project permissions</th><td><span class="bar b1"><span class="sr">Starts on Team: </span>Team and Business</span></td></tr>
+          <tr><th scope="row">Workload view across people</th><td><span class="bar b2"><span class="sr">Starts on Business: </span>Business</span></td></tr>
+          <tr><th scope="row">Portfolio dashboard</th><td><span class="bar b2"><span class="sr">Starts on Business: </span>Business</span></td></tr>
+          <tr><th scope="row">SAML single sign-on and audit log</th><td><span class="bar b2"><span class="sr">Starts on Business: </span>Business</span></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="faq" class="faq">
+      <h3 class="sec">Questions about seats and billing</h3>
+      <details>
+        <summary>What happens when a sixth person joins the Free plan?</summary>
+        <p>You are asked to move to Team before the invitation is sent. Nothing in your workspace is changed or deleted.</p>
+      </details>
+      <details>
+        <summary>What counts as a seat?</summary>
+        <p>Each member who can create or edit tasks. Guests with comment-only access are not counted.</p>
+      </details>
+      <details>
+        <summary>Can I switch between monthly and yearly billing?</summary>
+        <p>Yes, at any renewal date. Yearly plans are charged once, for twelve months of seats.</p>
+      </details>
+      <details>
+        <summary>What happens to my projects if I move down to Free?</summary>
+        <p>Projects beyond the three-project limit become read-only. Nothing is deleted, and you can unlock them by upgrading again.</p>
+      </details>
+    </section>
+  </main>
+
+  <footer>
+    <span>Prices are in US dollars and exclude tax.</span>
+    <a href="#top">Back to top</a>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var btns=document.querySelectorAll('[data-period]');
+  var amts=document.querySelectorAll('.amt[data-m]');
+  var notes=document.querySelectorAll('.note[data-m]');
+  function set(p){
+    btns.forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.period===p))});
+    amts.forEach(function(a){a.textContent='$'+a.dataset[p]});
+    notes.forEach(function(n){n.textContent=n.dataset[p]});
+  }
+  btns.forEach(function(b){b.addEventListener('click',function(){set(b.dataset.period)})});
+})();
+</script>
+</body>
+</html>

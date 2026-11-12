@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Forno da Graça — Padaria Familiar em Lisboa</title>
+<meta name="description" content="Forno da Graça: padaria familiar no coração de Lisboa. Pão de forno a lenha, pastéis de nata e doçaria tradicional, todos os dias. / Family bakery in Lisbon: wood-fired bread and traditional pastries.">
+<style>
+:root{
+  --cream:#fbf5e9;
+  --flour:#fffdf8;
+  --crust:#b5651d;
+  --crust-dark:#7a3e0e;
+  --azulejo:#1f4e79;
+  --ink:#2b2118;
+  --muted:#6b5b4b;
+  --line:#e8dcc4;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:Georgia,'Times New Roman',serif;background:var(--cream);color:var(--ink);line-height:1.65}
+h1,h2,h3{font-weight:normal;line-height:1.2}
+a{color:inherit}
+.wrap{max-width:1080px;margin:0 auto;padding:0 1.25rem}
+.sans{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+
+/* Header */
+header{position:sticky;top:0;z-index:10;background:rgba(251,245,233,.95);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:.9rem 0;gap:1rem;flex-wrap:wrap}
+.logo{font-size:1.4rem;color:var(--crust-dark);text-decoration:none;letter-spacing:.02em}
+.logo span{color:var(--azulejo)}
+nav ul{display:flex;gap:1.4rem;list-style:none;font-family:system-ui,sans-serif;font-size:.95rem}
+nav a{text-decoration:none;color:var(--muted)}
+nav a:hover,nav a:focus{color:var(--crust)}
+.lang{font-family:system-ui,sans-serif;font-size:.85rem;border:1px solid var(--line);background:var(--flour);color:var(--ink);padding:.35rem .8rem;border-radius:999px;cursor:pointer}
+
+/* Hero */
+.hero{background:
+  radial-gradient(circle at 80% 20%,rgba(181,101,29,.18),transparent 55%),
+  linear-gradient(180deg,var(--cream),#f3e6cb);
+  padding:5rem 0 4.5rem;text-align:center;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:system-ui,sans-serif;text-transform:uppercase;letter-spacing:.2em;font-size:.78rem;color:var(--azulejo)}
+.hero h1{font-size:clamp(2.4rem,7vw,4.4rem);color:var(--crust-dark);margin:.6rem 0 1rem}
+.hero p{max-width:34rem;margin:0 auto 2rem;font-size:1.15rem;color:var(--muted)}
+.btn{display:inline-block;font-family:system-ui,sans-serif;background:var(--crust);color:#fff;text-decoration:none;padding:.85rem 1.7rem;border-radius:999px;font-size:1rem;transition:background .2s}
+.btn:hover{background:var(--crust-dark)}
+.btn.alt{background:transparent;color:var(--crust-dark);border:1.5px solid var(--crust);margin-left:.5rem}
+.btn.alt:hover{background:var(--crust);color:#fff}
+
+/* Sections */
+section{padding:4.5rem 0}
+.title{text-align:center;margin-bottom:2.5rem}
+.title h2{font-size:clamp(1.8rem,4vw,2.5rem);color:var(--crust-dark)}
+.title p{color:var(--muted);margin-top:.4rem}
+.rule{width:60px;height:3px;background:var(--azulejo);margin:.9rem auto 0;border-radius:2px}
+
+/* About */
+.about{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
+.about p+p{margin-top:1rem}
+.badge{background:var(--azulejo);color:#fff;border-radius:14px;padding:2.2rem;text-align:center;
+  background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.05) 0 12px,transparent 12px 24px)}
+.badge strong{display:block;font-size:3rem;font-weight:normal}
+.badge span{font-family:system-ui,sans-serif;font-size:.95rem;opacity:.9}
+
+/* Menu */
+.menu-bg{background:var(--flour);border-block:1px solid var(--line)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.4rem}
+.card{background:var(--cream);border:1px solid var(--line);border-radius:12px;padding:1.5rem}
+.card .emoji{font-size:2rem}
+.card h3{font-size:1.25rem;margin:.5rem 0 .3rem;color:var(--crust-dark)}
+.card p{color:var(--muted);font-size:.97rem}
+.price{display:block;margin-top:.8rem;font-family:system-ui,sans-serif;font-weight:600;color:var(--azulejo)}
+.note{text-align:center;font-family:system-ui,sans-serif;font-size:.88rem;color:var(--muted);margin-top:1.8rem}
+
+/* Visit */
+.visit{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem}
+.panel{background:var(--flour);border:1px solid var(--line);border-radius:12px;padding:2rem}
+.panel h3{color:var(--crust-dark);margin-bottom:1rem;font-size:1.4rem}
+table{width:100%;border-collapse:collapse;font-family:system-ui,sans-serif;font-size:.95rem}
+td{padding:.45rem 0;border-bottom:1px dashed var(--line)}
+td:last-child{text-align:right;color:var(--muted)}
+.panel p{margin-bottom:.6rem}
+.panel .sans{font-size:.95rem}
+
+/* Form */
+form{display:grid;gap:.8rem;font-family:system-ui,sans-serif}
+label{font-size:.85rem;color:var(--muted)}
+input,textarea,select{width:100%;padding:.7rem .8rem;border:1px solid var(--line);border-radius:8px;background:#fff;font:inherit;color:var(--ink)}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--azulejo);outline-offset:1px}
+.thanks{display:none;background:#e7f1e4;color:#2d5a27;padding:.8rem 1rem;border-radius:8px;font-family:system-ui,sans-serif;font-size:.95rem}
+
+footer{background:var(--crust-dark);color:#f3e6cb;text-align:center;padding:2.2rem 0;font-family:system-ui,sans-serif;font-size:.9rem}
+
+@media(max-width:760px){
+  .about,.visit{grid-template-columns:1fr}
+  nav ul{gap:.9rem;font-size:.88rem}
+  .btn.alt{margin:.6rem 0 0}
+  section{padding:3.2rem 0}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="#top">Forno da <span>Graça</span></a>
+    <nav aria-label="Principal">
+      <ul>
+        <li><a href="#sobre" data-pt="Sobre" data-en="About">Sobre</a></li>
+        <li><a href="#produtos" data-pt="Produtos" data-en="Products">Produtos</a></li>
+        <li><a href="#visitar" data-pt="Visitar" data-en="Visit">Visitar</a></li>
+        <li><a href="#encomendas" data-pt="Encomendas" data-en="Orders">Encomendas</a></li>
+      </ul>
+    </nav>
+    <button class="lang" id="langBtn" aria-label="Mudar idioma / Change language">EN</button>
+  </div>
+</header>
+
+<main id="top">
+<div class="hero">
+  <div class="wrap">
+    <div class="eyebrow" data-pt="Padaria familiar · Lisboa" data-en="Family bakery · Lisbon">Padaria familiar · Lisboa</div>
+    <h1>Forno da Graça</h1>
+    <p data-pt="Pão de forno a lenha, doçaria tradicional e café fresco, feitos todos os dias pela nossa família para a vizinhança da Graça."
+       data-en="Wood-fired bread, traditional pastries and fresh coffee, made daily by our family for the Graça neighbourhood.">Pão de forno a lenha, doçaria tradicional e café fresco, feitos todos os dias pela nossa família para a vizinhança da Graça.</p>
+    <a class="btn" href="#produtos" data-pt="Ver produtos" data-en="See our products">Ver produtos</a>
+    <a class="btn alt" href="#encomendas" data-pt="Fazer encomenda" data-en="Place an order">Fazer encomenda</a>
+  </div>
+</div>
+
+<section id="sobre">
+  <div class="wrap about">
+    <div>
+      <div class="title" style="text-align:left;margin-bottom:1.2rem">
+        <h2 data-pt="A nossa história" data-en="Our story">A nossa história</h2>
+        <div class="rule" style="margin-left:0"></div>
+      </div>
+      <p data-pt="O Forno da Graça é uma padaria de família, no alto de uma das colinas mais bonitas de Lisboa. Acordamos de madrugada para amassar, levedar devagar e cozer ao calor do forno, como se faz há gerações."
+         data-en="Forno da Graça is a family bakery on top of one of Lisbon's loveliest hills. We rise before dawn to knead, slowly ferment and bake in the heat of the oven, the way it has been done for generations.">O Forno da Graça é uma padaria de família, no alto de uma das colinas mais bonitas de Lisboa. Acordamos de madrugada para amassar, levedar devagar e cozer ao calor do forno, como se faz há gerações.</p>
+      <p data-pt="Usamos farinhas portuguesas, fermentação natural e ingredientes simples. Sem pressas, sem atalhos. Venha conhecer-nos: há sempre pão quente ao balcão."
+         data-en="We use Portuguese flours, natural fermentation and simple ingredients. No rush, no shortcuts. Come and meet us: there is always warm bread at the counter.">Usamos farinhas portuguesas, fermentação natural e ingredientes simples. Sem pressas, sem atalhos. Venha conhecer-nos: há sempre pão quente ao balcão.</p>
+    </div>
+    <div class="badge">
+      <strong>05:30</strong>
+      <span data-pt="A primeira fornada sai do forno todas as manhãs" data-en="The first batch leaves the oven every morning">A primeira fornada sai do forno todas as manhãs</span>
+    </div>
+  </div>
+</section>
+
+<section id="produtos" class="menu-bg">
+  <div class="wrap">
+    <div class="title">
+      <h2 data-pt="O que fazemos" data-en="What we bake">O que fazemos</h2>
+      <div class="rule"></div>
+      <p data-pt="Uma seleção do nosso balcão" data-en="A selection from our counter">Uma seleção do nosso balcão</p>
+    </div>
+    <div class="grid">
+      <article class="card"><div class="emoji" aria-hidden="true">🥖</div>
+        <h3 data-pt="Pão de forno a lenha" data-en="Wood-fired bread">Pão de forno a lenha</h3>
+        <p data-pt="Côdea estaladiça e miolo macio. Trigo, centeio e mistura." data-en="Crackling crust and soft crumb. Wheat, rye and mixed loaves.">Côdea estaladiça e miolo macio. Trigo, centeio e mistura.</p>
+        <span class="price" data-pt="desde 1,50 €" data-en="from €1.50">desde 1,50 €</span></article>
+      <article class="card"><div class="emoji" aria-hidden="true">🥧</div>
+        <h3 data-pt="Pastel de nata" data-en="Pastel de nata">Pastel de nata</h3>
+        <p data-pt="Massa folhada, creme sedoso e canela. Saem quentes, várias vezes ao dia." data-en="Flaky pastry, silky custard and cinnamon. Out of the oven warm, several times a day.">Massa folhada, creme sedoso e canela. Saem quentes, várias vezes ao dia.</p>
+        <span class="price">1,30 €</span></article>
+      <article class="card"><div class="emoji" aria-hidden="true">🥐</div>
+        <h3 data-pt="Folhados e bolos" data-en="Pastries and cakes">Folhados e bolos</h3>
+        <p data-pt="Queijadas, pão de ló, bolo de arroz e folhados de maçã." data-en="Queijadas, pão de ló, bolo de arroz and apple turnovers.">Queijadas, pão de ló, bolo de arroz e folhados de maçã.</p>
+        <span class="price" data-pt="desde 1,60 €" data-en="from €1.60">desde 1,60 €</span></article>
+      <article class="card"><div class="emoji" aria-hidden="true">🥪</div>
+        <h3 data-pt="Sandes e pequeno-almoço" data-en="Sandwiches and breakfast">Sandes e pequeno-almoço</h3>
+        <p data-pt="Pão com chouriço, queijo fresco ou presunto. Com bica ou galão." data-en="Bread with chouriço, fresh cheese or ham. Served with a bica or galão.">Pão com chouriço, queijo fresco ou presunto. Com bica ou galão.</p>
+        <span class="price" data-pt="desde 2,80 €" data-en="from €2.80">desde 2,80 €</span></article>
+      <article class="card"><div class="emoji" aria-hidden="true">🎂</div>
+        <h3 data-pt="Bolos por encomenda" data-en="Custom cakes">Bolos por encomenda</h3>
+        <p data-pt="Aniversários, batizados e festas. Encomende com 3 dias de antecedência." data-en="Birthdays, christenings and parties. Please order 3 days ahead.">Aniversários, batizados e festas. Encomende com 3 dias de antecedência.</p>
+        <span class="price" data-pt="sob consulta" data-en="on request">sob consulta</span></article>
+      <article class="card"><div class="emoji" aria-hidden="true">☕</div>
+        <h3 data-pt="Café e bebidas" data-en="Coffee and drinks">Café e bebidas</h3>
+        <p data-pt="Bica, galão, meia de leite e sumo de laranja natural." data-en="Bica, galão, meia de leite and fresh orange juice.">Bica, galão, meia de leite e sumo de laranja natural.</p>
+        <span class="price" data-pt="desde 0,90 €" data-en="from €0.90">desde 0,90 €</span></article>
+    </div>
+    <p class="note" data-pt="Produtos e preços indicativos; a oferta varia ao longo do dia." data-en="Products and prices are indicative; availability varies through the day.">Produtos e preços indicativos; a oferta varia ao longo do dia.</p>
+  </div>
+</section>
+
+<section id="visitar">
+  <div class="wrap">
+    <div class="title">
+      <h2 data-pt="Visite-nos" data-en="Visit us">Visite-nos</h2>
+      <div class="rule"></div>
+    </div>
+    <div class="visit">
+      <div class="panel">
+        <h3 data-pt="Horário" data-en="Opening hours">Horário</h3>
+        <table>
+          <tr><td data-pt="Segunda a sexta" data-en="Monday to Friday">Segunda a sexta</td><td>06:30 – 19:30</td></tr>
+          <tr><td data-pt="Sábado" data-en="Saturday">Sábado</td><td>07:00 – 19:00</td></tr>
+          <tr><td data-pt="Domingo" data-en="Sunday">Domingo</td><td>07:30 – 14:00</td></tr>
+        </table>
+      </div>
+      <div class="panel">
+        <h3 data-pt="Onde estamos" data-en="Find us">Onde estamos</h3>
+        <p class="sans">Largo da Graça, Lisboa<br>1170-165 Lisboa, Portugal</p>
+        <p class="sans"><span data-pt="Elétrico 28 · paragem Graça" data-en="Tram 28 · Graça stop">Elétrico 28 · paragem Graça</span></p>
+        <p class="sans">📞 +351 21 000 0000<br>✉️ ola@fornodagraca.pt</p>
+        <p class="sans"><a href="https://www.google.com/maps/search/?api=1&query=Largo+da+Gra%C3%A7a+Lisboa" target="_blank" rel="noopener" style="color:var(--azulejo)" data-pt="Abrir no mapa →" data-en="Open in maps →">Abrir no mapa →</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="encomendas" class="menu-bg">
+  <div class="wrap" style="max-width:620px">
+    <div class="title">
+      <h2 data-pt="Encomendas" data-en="Orders">Encomendas</h2>
+      <div class="rule"></div>
+      <p data-pt="Pão para o fim de semana ou um bolo para a festa? Diga-nos o que precisa." data-en="Bread for the weekend or a cake for the party? Tell us what you need.">Pão para o fim de semana ou um bolo para a festa? Diga-nos o que precisa.</p>
+    </div>
+    <form id="orderForm">
+      <div><label for="name" data-pt="Nome" data-en="Name">Nome</label><input id="name" required></div>
+      <div><label for="contact" data-pt="Telemóvel ou email" data-en="Phone or email">Telemóvel ou email</label><input id="contact" required></div>
+      <div><label for="date" data-pt="Data de levantamento" data-en="Pickup date">Data de levantamento</label><input id="date" type="date" required></div>
+      <div><label for="msg" data-pt="O que gostaria de encomendar?" data-en="What would you like to order?">O que gostaria de encomendar?</label><textarea id="msg" rows="4" required></textarea></div>
+      <button class="btn" type="submit" style="border:0;cursor:pointer" data-pt="Enviar pedido" data-en="Send request">Enviar pedido</button>
+      <div class="thanks" id="thanks" role="status" data-pt="Obrigado! Entraremos em contacto para confirmar a sua encomenda." data-en="Thank you! We will get in touch to confirm your order.">Obrigado! Entraremos em contacto para confirmar a sua encomenda.</div>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">© <span id="yr">2026</span> Forno da Graça · Lisboa ·
+    <span data-pt="Feito com amor em família" data-en="Made with love, by family">Feito com amor em família</span></div>
+</footer>
+
+<script>
+(function(){
+  var lang='pt', btn=document.getElementById('langBtn');
+  function apply(){
+    document.documentElement.lang=lang;
+    document.querySelectorAll('[data-pt]').forEach(function(el){el.textContent=el.getAttribute('data-'+lang);});
+    btn.textContent = lang==='pt' ? 'EN' : 'PT';
+  }
+  btn.addEventListener('click',function(){lang = lang==='pt'?'en':'pt';apply();});
+  var d=document.getElementById('date');
+  d.min=new Date().toISOString().split('T')[0];
+  document.getElementById('yr').textContent=new Date().getFullYear();
+  document.getElementById('orderForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    document.getElementById('thanks').style.display='block';
+    this.reset();
+  });
+})();
+</script>
+</body>
+</html>

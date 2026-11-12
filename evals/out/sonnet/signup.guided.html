@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Create your account · Glossa</title>
+<meta name="description" content="Create a Glossa account. Pick the language you want to learn, then add your name, email and a password.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231d2433'/%3E%3Ctext x='32' y='46' font-family='Georgia,serif' font-size='40' text-anchor='middle' fill='%23f1efe9'%3Eg%3C/text%3E%3C/svg%3E">
+<!--
+Direction: the screen is a page from a bilingual dictionary. The left panel is an entry for "hello" whose big headword
+changes to the language you pick; the form is the margin where you write in ballpoint blue (the only action colour).
+The generic version would have been a gradient hero, a logo row and social-login buttons.
+"Glossa" is a placeholder product name. Replace it. The form posts JSON to SIGNUP_URL (set below); there is no backend here.
+-->
+<style>
+:root{
+  --ground:#f1efe9; --paper:#fbfaf7; --ink:#1d2433; --muted:#4d566a; --line:#cfcbc0;
+  --pen:#2740d8; --pen-dark:#1b2fa8; --err:#b3261e; --on-ink:#f1efe9; --on-ink-muted:#aab3c5; --pen-light:#9fb0ff;
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px; --s8:72px;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Charter,Georgia,"Noto Serif",serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--ground);color:var(--ink);font:17px/1.5 var(--sans);min-height:100vh}
+::selection{background:var(--pen);color:#fff}
+.page{display:grid;grid-template-columns:5fr 6fr;min-height:100vh}
+
+/* dictionary panel */
+.entry{background:var(--ink);color:var(--on-ink);padding:var(--s6) var(--s8);display:flex;flex-direction:column;justify-content:space-between;gap:var(--s7)}
+.brand{font:700 22px/1 var(--serif);letter-spacing:-.01em;color:var(--on-ink);text-decoration:none;align-self:flex-start;padding:var(--s2) 0}
+.brand:focus-visible{outline:3px solid var(--pen-light);outline-offset:4px}
+.head{font:400 15px/1.4 var(--serif);color:var(--on-ink-muted)}
+.head b{font-weight:700;color:var(--on-ink);font-size:20px}
+.head i{font-style:italic}
+.word{font:400 clamp(48px,6.4vw,88px)/1.05 var(--serif);letter-spacing:-.02em;margin:var(--s3) 0 var(--s2);overflow-wrap:anywhere;transition:opacity .2s ease-out}
+.word.swap{opacity:0}
+.say{font:400 20px/1.3 var(--serif);font-style:italic;color:var(--on-ink-muted);min-height:1.3em;transition:opacity .2s ease-out}
+.say.swap{opacity:0}
+.list{list-style:none;margin:0;padding:0;border-top:1px solid #3a4358}
+.list li{display:grid;grid-template-columns:44px 1fr auto;align-items:baseline;gap:var(--s3);padding:var(--s3) 0;border-bottom:1px solid #3a4358;color:var(--on-ink-muted);font-size:16px}
+.list .code{font:700 12px/1 var(--sans);letter-spacing:.08em}
+.list .w{font-family:var(--serif);font-size:20px}
+.list .r{font-size:13px}
+.list li[aria-current="true"]{color:var(--on-ink)}
+.list li[aria-current="true"] .code{color:var(--pen-light)}
+.list li[aria-current="true"] .w{font-weight:700}
+
+/* form side */
+.side{padding:var(--s7) var(--s8);display:flex;align-items:center;justify-content:center}
+.card{width:100%;max-width:460px}
+h1{font:700 clamp(32px,3.4vw,44px)/1.1 var(--serif);letter-spacing:-.015em;margin:0 0 var(--s2);text-wrap:balance}
+.lede{color:var(--muted);margin:0 0 var(--s6)}
+fieldset{border:0;margin:0 0 var(--s5);padding:0;min-width:0}
+legend,label.l{display:block;font-weight:600;font-size:15px;margin-bottom:var(--s2);padding:0}
+.opt{font-weight:400;color:var(--muted)}
+.langs{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2)}
+.langs input{position:absolute;opacity:0;width:1px;height:1px}
+.langs label{display:flex;flex-direction:column;justify-content:center;min-height:56px;padding:var(--s2) var(--s4);background:var(--paper);border:1px solid var(--line);border-radius:6px;cursor:pointer;transition:border-color .15s,background-color .15s}
+.langs .n{font:400 20px/1.2 var(--serif)}
+.langs .e{font-size:13px;color:var(--muted)}
+.langs label:hover{border-color:var(--ink)}
+.langs input:checked+label{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);background:#fff}
+.langs input:focus-visible+label{outline:3px solid var(--pen);outline-offset:2px}
+.field{margin-bottom:var(--s5)}
+.control{display:flex;position:relative}
+input.t{width:100%;min-height:48px;padding:var(--s3) var(--s4);font:inherit;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:6px;transition:border-color .15s}
+input.t::placeholder{color:#6b7385}
+input.t:hover{border-color:var(--ink)}
+input.t:focus-visible{outline:3px solid var(--pen);outline-offset:1px;border-color:var(--pen)}
+input.t:disabled{background:#e6e3da;color:#6b7385;cursor:not-allowed}
+.field.bad input.t,.field.bad{--bd:var(--err)}
+.field.bad input.t{border-color:var(--err)}
+.show{position:absolute;inset-block:4px;inset-inline-end:4px;min-width:64px;padding:0 var(--s3);border:0;background:transparent;color:var(--pen);font:600 14px var(--sans);border-radius:4px;cursor:pointer}
+.show:hover{background:#e8eafb}
+.show:focus-visible{outline:3px solid var(--pen);outline-offset:0}
+.show:disabled{color:#6b7385;cursor:not-allowed}
+.hint{font-size:14px;color:var(--muted);margin:var(--s2) 0 0}
+.msg{font-size:14px;color:var(--err);margin:var(--s2) 0 0;font-weight:600}
+.msg[hidden]{display:none}
+.fail{border-left:4px solid var(--err);background:#f7e4e1;padding:var(--s3) var(--s4);margin:0 0 var(--s5);font-size:15px;border-radius:0 6px 6px 0}
+.fail[hidden]{display:none}
+.go{display:block;width:100%;min-height:52px;border:0;border-radius:6px;background:var(--pen);color:#fff;font:700 17px var(--sans);cursor:pointer;transition:background-color .15s,transform .1s}
+.go:hover{background:var(--pen-dark)}
+.go:active{transform:translateY(1px)}
+.go:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.go:disabled{background:#9aa1b3;cursor:not-allowed;transform:none}
+.fine{font-size:14px;color:var(--muted);margin:var(--s4) 0 0}
+.fine a,.login a{color:var(--ink);text-underline-offset:3px}
+.fine a:hover,.login a:hover{color:var(--pen)}
+.fine a:focus-visible,.login a:focus-visible{outline:3px solid var(--pen);outline-offset:2px;border-radius:2px}
+.login{margin:var(--s6) 0 0;padding-top:var(--s5);border-top:1px solid var(--line)}
+.done[hidden]{display:none}
+.done p{margin:0 0 var(--s5)}
+.done a.go{text-decoration:none;display:flex;align-items:center;justify-content:center}
+
+@media (max-width:860px){
+  .page{grid-template-columns:1fr}
+  .entry{padding:var(--s5) var(--s5) var(--s6);gap:var(--s5)}
+  .list{display:none}
+  .side{padding:var(--s6) var(--s5) var(--s7)}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important}
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <aside class="entry" aria-hidden="true">
+    <a class="brand" href="/" tabindex="-1">Glossa</a>
+    <div>
+      <div class="head"><b>hello</b> &nbsp;/həˈləʊ/ &nbsp;<i>interjection</i></div>
+      <div class="word" id="word" lang="en">hello</div>
+      <div class="say" id="say">English</div>
+    </div>
+    <ul class="list" id="list"></ul>
+  </aside>
+
+  <main class="side">
+    <div class="card">
+      <div id="formView">
+        <h1>Create your account</h1>
+        <p class="lede">Four fields, then your first lesson.</p>
+
+        <form id="form" novalidate>
+          <div class="fail" id="fail" role="alert" hidden></div>
+
+          <fieldset id="langField" aria-describedby="langMsg">
+            <legend>Language you want to learn</legend>
+            <div class="langs" id="langs"></div>
+            <p class="msg" id="langMsg" hidden>Choose a language to continue.</p>
+          </fieldset>
+
+          <div class="field" data-f="name">
+            <label class="l" for="name">First name</label>
+            <div class="control"><input class="t" id="name" name="name" type="text" autocomplete="given-name" aria-describedby="nameMsg" required></div>
+            <p class="msg" id="nameMsg" hidden></p>
+          </div>
+
+          <div class="field" data-f="email">
+            <label class="l" for="email">Email</label>
+            <div class="control"><input class="t" id="email" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="none" spellcheck="false" aria-describedby="emailMsg" required></div>
+            <p class="msg" id="emailMsg" hidden></p>
+          </div>
+
+          <div class="field" data-f="password">
+            <label class="l" for="password">Password</label>
+            <div class="control">
+              <input class="t" id="password" name="password" type="password" autocomplete="new-password" minlength="8" aria-describedby="passHint passMsg" required style="padding-inline-end:76px">
+              <button class="show" id="show" type="button" aria-controls="password" aria-pressed="false">Show</button>
+            </div>
+            <p class="hint" id="passHint">At least 8 characters.</p>
+            <p class="msg" id="passMsg" hidden></p>
+          </div>
+
+          <button class="go" id="go" type="submit">Create account</button>
+          <p class="fine">By creating an account you accept the <a href="/terms">terms</a> and the <a href="/privacy">privacy policy</a>.</p>
+        </form>
+
+        <p class="login">Already have an account? <a href="/login">Log in</a></p>
+      </div>
+
+      <div class="done" id="done" hidden tabindex="-1">
+        <h1 id="doneTitle">Account created</h1>
+        <p id="doneText"></p>
+        <a class="go" href="/learn">Start your first lesson</a>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+// Set this to your account-creation endpoint. It receives JSON: {language, name, email, password}.
+const SIGNUP_URL = "/api/signup";
+
+const LANGS = [
+  {id:"es", code:"ES", native:"Español",   en:"Spanish",    lang:"es",    word:"hola",        say:"/ˈo.la/"},
+  {id:"fr", code:"FR", native:"Français",  en:"French",     lang:"fr",    word:"bonjour",     say:"/bɔ̃.ʒuʁ/"},
+  {id:"it", code:"IT", native:"Italiano",  en:"Italian",    lang:"it",    word:"ciao",        say:"/ˈtʃa.o/"},
+  {id:"de", code:"DE", native:"Deutsch",   en:"German",     lang:"de",    word:"hallo",       say:"/ˈha.lo/"},
+  {id:"pt", code:"PT", native:"Português", en:"Portuguese", lang:"pt",    word:"olá",         say:"/oˈla/"},
+  {id:"tr", code:"TR", native:"Türkçe",    en:"Turkish",    lang:"tr",    word:"merhaba",     say:"/meɾˈha.ba/"},
+  {id:"ja", code:"JA", native:"日本語",     en:"Japanese",   lang:"ja",    word:"こんにちは",    say:"konnichiwa"},
+  {id:"ko", code:"KO", native:"한국어",     en:"Korean",     lang:"ko",    word:"안녕하세요",    say:"annyeonghaseyo"}
+];
+
+const $ = id => document.getElementById(id);
+const langsEl = $("langs"), listEl = $("list"), wordEl = $("word"), sayEl = $("say");
+
+LANGS.forEach(l => {
+  langsEl.insertAdjacentHTML("beforeend",
+    `<input type="radio" name="language" id="l-${l.id}" value="${l.id}" required>
+     <label for="l-${l.id}"><span class="n" lang="${l.lang}">${l.native}</span><span class="e">${l.en}</span></label>`);
+  listEl.insertAdjacentHTML("beforeend",
+    `<li data-id="${l.id}"><span class="code">${l.code}</span><span class="w" lang="${l.lang}">${l.word}</span><span class="r">${l.say}</span></li>`);
+});
+
+function showWord(l){
+  wordEl.classList.add("swap"); sayEl.classList.add("swap");
+  setTimeout(() => {
+    wordEl.textContent = l.word; wordEl.lang = l.lang;
+    sayEl.textContent = l.say;
+    wordEl.classList.remove("swap"); sayEl.classList.remove("swap");
+  }, 160);
+  listEl.querySelectorAll("li").forEach(li => {
+    li.toggleAttribute("aria-current", li.dataset.id === l.id);
+    if (li.dataset.id === l.id) li.setAttribute("aria-current","true");
+  });
+}
+langsEl.addEventListener("change", e => {
+  const l = LANGS.find(x => x.id === e.target.value);
+  if (l){ showWord(l); $("langMsg").hidden = true; }
+});
+
+/* validation */
+const rules = {
+  name:  v => v.trim() ? "" : "Enter your first name.",
+  email: v => !v.trim() ? "Enter your email address."
+           : /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()) ? "" : "That email doesn't look complete. It should look like name@example.com.",
+  password: v => v.length >= 8 ? "" : "Use at least 8 characters. A few random words work well."
+};
+const msgIds = {name:"nameMsg", email:"emailMsg", password:"passMsg"};
+
+function check(key){
+  const input = $(key), err = rules[key](input.value), msg = $(msgIds[key]), field = input.closest(".field");
+  msg.textContent = err; msg.hidden = !err;
+  field.classList.toggle("bad", !!err);
+  input.setAttribute("aria-invalid", err ? "true" : "false");
+  return !err;
+}
+Object.keys(rules).forEach(k => {
+  $(k).addEventListener("blur", () => { if ($(k).value || $(k).dataset.touched) check(k); $(k).dataset.touched = "1"; });
+  $(k).addEventListener("input", () => { if ($(k).closest(".field").classList.contains("bad")) check(k); });
+});
+
+$("show").addEventListener("click", () => {
+  const p = $("password"), on = p.type === "password";
+  p.type = on ? "text" : "password";
+  $("show").textContent = on ? "Hide" : "Show";
+  $("show").setAttribute("aria-pressed", on);
+});
+
+/* submit */
+$("form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const fail = $("fail"); fail.hidden = true;
+  const lang = document.querySelector('input[name="language"]:checked');
+  $("langMsg").hidden = !!lang;
+  const results = Object.keys(rules).map(k => [k, check(k)]);
+  const firstBad = !lang ? langsEl.querySelector("input") : (results.find(r => !r[1]) || [])[0];
+  if (!lang || results.some(r => !r[1])){
+    (typeof firstBad === "string" ? $(firstBad) : firstBad).focus();
+    return;
+  }
+
+  const btn = $("go"), controls = $("form").querySelectorAll("input,button");
+  btn.textContent = "Creating account…";
+  controls.forEach(c => c.disabled = true);
+
+  try{
+    const res = await fetch(SIGNUP_URL, {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({language:lang.value, name:$("name").value.trim(), email:$("email").value.trim(), password:$("password").value})
+    });
+    if (!res.ok){
+      let reason = "";
+      try{ reason = (await res.json()).message || ""; }catch(_){}
+      throw new Error(reason || (res.status === 409
+        ? "That email is already registered. Log in instead, or use a different address."
+        : "The server couldn't create the account (error " + res.status + "). Your answers are still here. Try again in a minute."));
+    }
+    const l = LANGS.find(x => x.id === lang.value);
+    $("doneTitle").textContent = "Welcome, " + $("name").value.trim();
+    $("doneText").textContent = "Your " + l.en + " course is ready. The first word is " + l.word + ".";
+    $("formView").hidden = true; $("done").hidden = false; $("done").focus();
+  }catch(err){
+    fail.textContent = err instanceof TypeError
+      ? "Couldn't reach the server. Check your connection. Your answers are still here."
+      : err.message;
+    fail.hidden = false;
+    controls.forEach(c => c.disabled = false);
+    btn.textContent = "Create account";
+    fail.scrollIntoView({block:"nearest"});
+  }
+});
+</script>
+</body>
+</html>

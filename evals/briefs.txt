@@ -1,0 +1,10 @@
+notes-app|Make me a landing page for my note-taking app. It's called Tern.
+bakery|I need a website for my family's bakery in Lisbon, Forno da Graça.
+orders-dashboard|Build a dashboard for my small online shop so I can see my orders.
+photographer|Make a portfolio site for a freelance wedding photographer.
+pg-backup|Landing page for my open-source CLI tool that backs up Postgres databases to S3. It's called pgferry.
+pricing|Create a pricing page for a project management tool with three plans.
+signup|Make the sign-up screen for a language-learning app.
+bike-shop|Homepage for a neighbourhood bike repair shop.
+date-lib|Build the docs homepage for a small JavaScript date library.
+team-settings|Design the team settings page for a team chat app.

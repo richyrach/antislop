@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wedding photographer, portfolio and enquiries</title>
+<meta name="description" content="Freelance wedding photographer. See a wedding day in running order, from getting ready to the last dance, and send an enquiry for your date.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231c1d1b'/%3E%3Cpath d='M7 17C6 9 15 5 22 8c5 2 4 12-2 16-6 3-13 0-13-7z' fill='none' stroke='%23f0553f' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#1c1d1b">
+
+<!--
+NOTES FOR THE OWNER (not visible on the page)
+
+Direction: the page is laid out as a photographer's own documents. The home screen is a contact sheet,
+with red grease-pencil circles on the frames chosen for the gallery. The work section is the wedding
+day in running order, with one film strip per part of the day. Colours come from the edit room:
+neutral dark grey (for judging photos), amber (film edge print), red (grease pencil, used only for
+selection and the main button). The generic version would have been a full-bleed hero photo,
+a script font and three "services" cards.
+
+SLOTS TO FILL
+1. Your name: header and footer (.owner-note elements).
+2. Town / region: hero line and footer.
+3. Photographs: every .slot inside a .frame. Replace the <div class="slot">...</div> with
+   <img src="photos/name.jpg" alt="what the photo shows" width="1500" height="1000" loading="lazy">
+   (the first screen's images should not be lazy-loaded). Portrait frames use 2:3, wide frames 3:2.
+4. Email address: set EMAIL in the script at the bottom. Until then the form shows an error instead of sending.
+5. Delivery time for galleries: the note in the "Process" section.
+6. Check the descriptions of how you work and the sample timings. They describe a typical documentary approach and
+   should be changed to match your real way of working.
+Nothing on this page is a real client, review, price or statistic. Add those only if they are real.
+-->
+
+<style>
+:root{
+  --ground:#1c1d1b;
+  --surface:#262724;
+  --strip:#0b0b0a;
+  --line:#3d3e39;
+  --paper:#ece9df;
+  --muted:#aaa89e;
+  --edge:#e0a63a;
+  --red:#f0553f;
+  --err:#b3261e;
+
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:72px;--s9:112px;
+
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Charter,"Sitka Text",Georgia,serif;
+  --cond:"Bahnschrift Condensed","DIN Condensed","Avenir Next Condensed","Roboto Condensed","Arial Narrow",Impact,sans-serif;
+  --ui:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+html{color-scheme:dark;scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+body{margin:0;background:var(--ground);color:var(--paper);font-family:var(--serif);font-size:1.125rem;line-height:1.55;-webkit-font-smoothing:antialiased}
+img{max-width:100%;height:auto;display:block}
+a{color:inherit}
+::selection{background:var(--red);color:var(--ground)}
+:focus-visible{outline:3px solid var(--edge);outline-offset:3px}
+.skip{position:absolute;left:var(--s4);top:-80px;background:var(--paper);color:var(--ground);padding:var(--s3) var(--s4);z-index:10}
+.skip:focus{top:var(--s4)}
+.wrap{width:min(1280px,100% - 2*var(--s5));margin-inline:auto}
+
+/* owner note: how every missing item is shown */
+.owner-note{font-family:var(--ui);font-size:.8em;color:var(--muted);border:1px dashed var(--muted);padding:0 var(--s2);border-radius:2px;white-space:nowrap}
+
+/* header */
+header.top{display:flex;flex-wrap:wrap;gap:var(--s3) var(--s6);align-items:center;justify-content:space-between;padding-block:var(--s5)}
+.brand{display:flex;align-items:center;gap:var(--s3);text-decoration:none;font-family:var(--cond);font-size:1.5rem;letter-spacing:.04em;text-transform:uppercase;min-height:44px}
+.brand svg{width:28px;height:28px;flex:none}
+nav ul{display:flex;gap:var(--s2);list-style:none;margin:0;padding:0;flex-wrap:wrap}
+nav a{display:inline-flex;align-items:center;min-height:44px;padding-inline:var(--s3);text-decoration:none;font-family:var(--cond);font-size:1.25rem;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);transition:color .15s}
+nav a:hover{color:var(--paper);text-decoration:underline;text-decoration-color:var(--red);text-decoration-thickness:3px;text-underline-offset:8px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:var(--s3) var(--s6);background:var(--red);color:var(--ground);font-family:var(--cond);font-size:1.4rem;letter-spacing:.05em;text-transform:uppercase;text-decoration:none;border:0;border-radius:2px;cursor:pointer;transition:transform .12s ease-out,background .15s}
+.btn:hover{background:#ff6a54}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{background:var(--line);color:var(--muted);cursor:not-allowed}
+.link{display:inline-flex;align-items:center;min-height:44px;font-family:var(--cond);font-size:1.25rem;letter-spacing:.05em;text-transform:uppercase;text-underline-offset:6px;text-decoration-thickness:2px;text-decoration-color:var(--edge)}
+.link:hover{text-decoration-color:var(--red)}
+
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--s7);align-items:center;padding-block:var(--s6) var(--s9)}
+h1{font-weight:400;font-size:clamp(2.7rem,6.2vw,5.6rem);line-height:1.02;letter-spacing:-.015em;margin:0 0 var(--s5);text-wrap:balance}
+.hero p{max-width:34em;margin:0 0 var(--s4);color:#d6d3c8;text-wrap:pretty}
+.hero .where{color:var(--paper)}
+.actions{display:flex;flex-wrap:wrap;gap:var(--s3) var(--s6);align-items:center;margin-top:var(--s6)}
+
+/* frames and contact sheet */
+.frame{margin:0;min-width:0}
+.slot{position:relative;aspect-ratio:var(--w,1.5);background:var(--surface);outline:1px dashed #55564f;outline-offset:-6px;display:grid;place-items:center;text-align:center;padding:var(--s4);font-family:var(--ui);font-size:.72rem;line-height:1.35;color:var(--muted)}
+.frame figcaption{display:flex;justify-content:space-between;gap:var(--s2);padding-top:var(--s2);font-family:var(--cond);font-size:1rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.frame figcaption b{font-weight:400;color:var(--edge)}
+.sheet{background:var(--strip);padding:var(--s4) var(--s4) var(--s3)}
+.sheet-head{display:flex;justify-content:space-between;gap:var(--s3);margin-bottom:var(--s4);font-family:var(--ui);font-size:.75rem;color:var(--muted)}
+.sheet-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:var(--s4) var(--s3)}
+.sheet-grid .a{grid-column:span 4}
+.sheet-grid .b{grid-column:span 2;grid-row:span 2;display:flex;flex-direction:column}
+.sheet-grid .b .slot{aspect-ratio:auto;flex:1}
+.sheet-grid .c,.sheet-grid .d{grid-column:span 2}
+.sheet-grid .e,.sheet-grid .f{grid-column:span 3}
+.circle{position:absolute;inset:-8px;width:calc(100% + 16px);height:calc(100% + 16px);pointer-events:none;overflow:visible}
+.circle path{fill:none;stroke:var(--red);stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+
+/* sections */
+section{padding-block:var(--s9)}
+h2{font-weight:400;font-size:clamp(2.1rem,4.4vw,3.75rem);line-height:1.05;letter-spacing:-.01em;margin:0 0 var(--s5);text-wrap:balance}
+.lede{max-width:36em;color:#d6d3c8;margin:0;text-wrap:pretty}
+.order-head{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,4fr);gap:var(--s7);align-items:end;margin-bottom:var(--s8)}
+.order-head .lede{padding-bottom:var(--s2)}
+
+.moment{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:var(--s7);padding-block:var(--s7);border-top:1px solid var(--line);align-items:start}
+.moment:last-child{border-bottom:1px solid var(--line)}
+.time{font-family:var(--cond);font-size:clamp(3.4rem,6vw,5.5rem);line-height:.9;color:var(--edge);letter-spacing:.01em;margin:0 0 var(--s3);font-variant-numeric:tabular-nums}
+h3{font-weight:400;font-size:clamp(1.6rem,2.4vw,2.1rem);line-height:1.15;margin:0 0 var(--s3)}
+.moment p{margin:0;max-width:26em;color:#d6d3c8;text-wrap:pretty}
+.strip{position:relative;display:flex;gap:var(--s3);background:var(--strip);padding:calc(var(--s5) + var(--s2)) var(--s4)}
+.strip::before,.strip::after{content:"";position:absolute;left:0;right:0;height:8px;background:repeating-linear-gradient(90deg,transparent 0 6px,#4a4b46 6px 16px,transparent 16px 22px);opacity:.9}
+.strip::before{top:var(--s2)}
+.strip::after{bottom:var(--s2)}
+.strip .frame{flex:var(--w) 1 0}
+.moment:nth-child(even){grid-template-columns:minmax(0,8fr) minmax(0,4fr)}
+.moment:nth-child(even) .copy{order:2}
+
+/* process */
+.process{background:#232421}
+.process .wrap{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,7fr);gap:var(--s8)}
+ol.steps{list-style:none;margin:0;padding:0;counter-reset:s}
+ol.steps li{counter-increment:s;display:grid;grid-template-columns:72px minmax(0,1fr);gap:var(--s4);padding-block:var(--s5);border-top:1px solid var(--line)}
+ol.steps li:last-child{border-bottom:1px solid var(--line)}
+ol.steps li::before{content:counter(s);font-family:var(--cond);font-size:3.2rem;line-height:1;color:var(--edge)}
+ol.steps p{margin:0;color:#d6d3c8;max-width:34em}
+ol.steps h3{margin-bottom:var(--s2)}
+
+/* enquire */
+.enquire{background:var(--paper);color:var(--ground)}
+.enquire .wrap{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:var(--s8);align-items:start}
+.enquire .lede{color:#3a3b37}
+.enquire ul{padding-left:1.1em;margin:var(--s5) 0 0;color:#3a3b37}
+.enquire li{margin-bottom:var(--s2)}
+form{display:grid;gap:var(--s5)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:var(--s5)}
+label{display:block;font-family:var(--cond);font-size:1.15rem;letter-spacing:.05em;text-transform:uppercase;margin-bottom:var(--s2)}
+label small{font-family:var(--ui);font-size:.75rem;letter-spacing:0;text-transform:none;color:#55564f;margin-left:var(--s2)}
+input,textarea{width:100%;min-height:48px;padding:var(--s3) var(--s4);font:inherit;font-size:1.05rem;color:var(--ground);background:#fbfaf5;border:2px solid var(--ground);border-radius:2px}
+textarea{min-height:140px;resize:vertical}
+input::placeholder,textarea::placeholder{color:#6b6c65}
+input:focus-visible,textarea:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+input[aria-invalid="true"]{border-color:var(--err)}
+.err{display:block;min-height:0;margin-top:var(--s2);font-family:var(--ui);font-size:.85rem;color:var(--err)}
+.enquire .btn{background:var(--ground);color:var(--paper);justify-self:start}
+.enquire .btn:hover{background:#34352f}
+.enquire .btn:disabled{background:#b9b7ad;color:#55564f}
+.status{font-family:var(--ui);font-size:.95rem;margin:0;min-height:1.5em}
+.status.bad{color:var(--err)}
+
+footer{padding-block:var(--s7);font-family:var(--ui);font-size:.9rem;color:var(--muted)}
+footer .wrap{display:flex;flex-wrap:wrap;gap:var(--s3) var(--s6);justify-content:space-between}
+
+/* tablet and phone */
+@media (max-width:980px){
+  .hero,.order-head,.process .wrap,.enquire .wrap{grid-template-columns:minmax(0,1fr);gap:var(--s7)}
+  .moment,.moment:nth-child(even){grid-template-columns:minmax(0,1fr);gap:var(--s5)}
+  .moment:nth-child(even) .copy{order:0}
+  section{padding-block:var(--s8)}
+}
+@media (max-width:640px){
+  body{font-size:1.0625rem}
+  .hero{padding-bottom:var(--s8)}
+  .strip{display:grid;grid-template-columns:1fr 1fr;padding-inline:var(--s3)}
+  .strip .frame.wide{grid-column:1/-1}
+  .row2{grid-template-columns:1fr}
+  ol.steps li{grid-template-columns:48px minmax(0,1fr)}
+  ol.steps li::before{font-size:2.4rem}
+  .sheet-head{flex-direction:column;gap:var(--s1)}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="#top" aria-label="Home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 17C4 8 15 3 23 7c6 3 4 14-3 18-7 3-15 0-15-8z" fill="none" stroke="#f0553f" stroke-width="3" stroke-linecap="round"/></svg>
+      <span class="owner-note" style="font-family:var(--ui);text-transform:none;letter-spacing:0;font-size:.85rem">Photographer's name</span>
+    </a>
+    <nav aria-label="Main">
+      <ul>
+        <li><a href="#running-order">Running order</a></li>
+        <li><a href="#process">Process</a></li>
+        <li><a href="#enquire">Enquire</a></li>
+      </ul>
+    </nav>
+  </header>
+</div>
+
+<main id="main">
+<div class="wrap" id="top">
+  <div class="hero">
+    <div>
+      <h1>Your wedding day, photographed in the order it happens.</h1>
+      <p class="where">Freelance wedding photographer, based in <span class="owner-note">town, region</span>.</p>
+      <p>Documentary coverage from the preparations to the last dance, with a short stretch of directed portraits of the two of you in between.</p>
+      <div class="actions">
+        <a class="btn" href="#enquire">Enquire about your date</a>
+        <a class="link" href="#running-order">See a day in order</a>
+      </div>
+    </div>
+
+    <div class="sheet" role="group" aria-label="Contact sheet with six photo slots">
+      <div class="sheet-head"><span>Contact sheet: replace each slot with a photograph</span><span>Circled frames are the selects</span></div>
+      <div class="sheet-grid">
+        <figure class="frame a" style="--w:1.5">
+          <div class="slot">Photo goes here: wide shot of the ceremony room
+            <svg class="circle" viewBox="0 0 200 140" preserveAspectRatio="none" aria-hidden="true"><path d="M20 72C16 28 88 8 148 18c46 8 50 78-6 100-48 18-118 8-122-42-1-18 14-34 36-42"/></svg>
+          </div>
+          <figcaption><b>11</b><span>Ceremony</span></figcaption>
+        </figure>
+        <figure class="frame b" style="--w:.667">
+          <div class="slot">Photo goes here: portrait, 2:3</div>
+          <figcaption><b>12A</b><span>Portrait</span></figcaption>
+        </figure>
+        <figure class="frame c" style="--w:1">
+          <div class="slot">Photo goes here: rings</div>
+          <figcaption><b>13</b><span>Detail</span></figcaption>
+        </figure>
+        <figure class="frame d" style="--w:1">
+          <div class="slot">Photo goes here: guests reacting
+            <svg class="circle" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M12 46C10 18 52 6 82 20c20 10 12 56-14 68-26 10-56-4-58-30-1-8 4-14 10-20"/></svg>
+          </div>
+          <figcaption><b>14</b><span>Guests</span></figcaption>
+        </figure>
+        <figure class="frame e" style="--w:1.5">
+          <div class="slot">Photo goes here: speeches</div>
+          <figcaption><b>15</b><span>Speeches</span></figcaption>
+        </figure>
+        <figure class="frame f" style="--w:1.5">
+          <div class="slot">Photo goes here: first dance</div>
+          <figcaption><b>16</b><span>Dancing</span></figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="running-order" aria-labelledby="ro-h">
+  <div class="wrap">
+    <div class="order-head">
+      <h2 id="ro-h">A wedding day in running order</h2>
+      <p class="lede">Each film strip is one part of the day, with what I look for in it. The times are a sample day. Yours will follow your own timetable.</p>
+    </div>
+
+    <article class="moment">
+      <div class="copy">
+        <p class="time">09:00</p>
+        <h3>Getting ready</h3>
+        <p>Window light, no flash. Hands, dress, shoes and the people in the room, before anyone starts posing for the camera.</p>
+      </div>
+      <div class="strip">
+        <figure class="frame tall" style="--w:.667"><div class="slot">Photo goes here: dress by the window</div><figcaption><b>1</b><span>Dress</span></figcaption></figure>
+        <figure class="frame tall" style="--w:.667"><div class="slot">Photo goes here: hands, tying a tie or fastening a necklace</div><figcaption><b>2</b><span>Hands</span></figcaption></figure>
+        <figure class="frame wide" style="--w:1.5"><div class="slot">Photo goes here: the room full of people getting ready</div><figcaption><b>3</b><span>The room</span></figcaption></figure>
+      </div>
+    </article>
+
+    <article class="moment">
+      <div class="copy">
+        <p class="time">14:00</p>
+        <h3>Ceremony</h3>
+        <p>One wide frame of the room before anyone sits. Then faces: the walk in, the vows, whoever is crying in the third row. No flash during the ceremony.</p>
+      </div>
+      <div class="strip">
+        <figure class="frame wide" style="--w:1.5"><div class="slot">Photo goes here: the room before guests sit</div><figcaption><b>4</b><span>Wide</span></figcaption></figure>
+        <figure class="frame wide" style="--w:1.5"><div class="slot">Photo goes here: the vows</div><figcaption><b>5</b><span>Vows</span></figcaption></figure>
+        <figure class="frame tall" style="--w:.667"><div class="slot">Photo goes here: a guest's reaction</div><figcaption><b>6</b><span>Guest</span></figcaption></figure>
+      </div>
+    </article>
+
+    <article class="moment">
+      <div class="copy">
+        <p class="time">15:30</p>
+        <h3>Portraits of the two of you</h3>
+        <p>A few minutes of direction to get you started, then you talk to each other and I keep shooting. Most of the good frames come after the first few minutes.</p>
+      </div>
+      <div class="strip">
+        <figure class="frame tall" style="--w:.667"><div class="slot">Photo goes here: couple portrait</div><figcaption><b>7</b><span>Couple</span></figcaption></figure>
+        <figure class="frame wide" style="--w:1.5"><div class="slot">Photo goes here: couple in the landscape or street</div><figcaption><b>8</b><span>Location</span></figcaption></figure>
+        <figure class="frame tall" style="--w:.667"><div class="slot">Photo goes here: close portrait</div><figcaption><b>9</b><span>Close</span></figcaption></figure>
+      </div>
+    </article>
+
+    <article class="moment">
+      <div class="copy">
+        <p class="time">18:30</p>
+        <h3>Speeches and dinner</h3>
+        <p>The people listening matter as much as the person speaking. I shoot from the side of the room so I can see both.</p>
+      </div>
+      <div class="strip">
+        <figure class="frame wide" style="--w:1.5"><div class="slot">Photo goes here: speaker and listeners</div><figcaption><b>10</b><span>Speech</span></figcaption></figure>
+        <figure class="frame wide" style="--w:1.5"><div class="slot">Photo goes here: table, laughing</div><figcaption><b>11</b><span>Table</span></figcaption></figure>
+      </div>
+    </article>
+
+    <article class="moment">
+      <div class="copy">
+        <p class="time">21:00</p>
+        <h3>First dance and the evening</h3>
+        <p>Flash and a slow shutter once the light has gone, so the dance floor keeps its movement and its colour.</p>
+      </div>
+      <div class="strip">
+        <figure class="frame tall" style="--w:.667"><div class="slot">Photo goes here: first dance</div><figcaption><b>12</b><span>First dance</span></figcaption></figure>
+        <figure class="frame wide" style="--w:1.5"><div class="slot">Photo goes here: dance floor, motion blur</div><figcaption><b>13</b><span>Dance floor</span></figcaption></figure>
+        <figure class="frame tall" style="--w:.667"><div class="slot">Photo goes here: the last song</div><figcaption><b>14</b><span>Last song</span></figcaption></figure>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section class="process" id="process" aria-labelledby="pr-h">
+  <div class="wrap">
+    <div>
+      <h2 id="pr-h">From enquiry to gallery</h2>
+      <p class="lede">What happens, in the order it happens.</p>
+    </div>
+    <ol class="steps">
+      <li><div><h3>You send your date and venue</h3><p>I reply to say whether I am free, and what coverage I would suggest for your timetable.</p></div></li>
+      <li><div><h3>We plan the day</h3><p>We go through the timetable together and write down the group photos you want, so nobody has to remember them on the day.</p></div></li>
+      <li><div><h3>I photograph the wedding</h3><p>From the preparations to the point in the evening we agreed on.</p></div></li>
+      <li><div><h3>I choose, edit and deliver</h3><p>I cull the day down to the best frames, edit them, and put them in a private online gallery you can download from. Delivery time: <span class="owner-note">number of weeks</span>.</p></div></li>
+    </ol>
+  </div>
+</section>
+
+<section class="enquire" id="enquire" aria-labelledby="en-h">
+  <div class="wrap">
+    <div>
+      <h2 id="en-h">Is your date free?</h2>
+      <p class="lede">Tell me when and where. I will reply with availability and what I would suggest for your day.</p>
+      <ul>
+        <li>The date, or the months you are considering</li>
+        <li>The ceremony venue and where the party is</li>
+        <li>Roughly how many guests</li>
+        <li>How much of the day you want covered</li>
+      </ul>
+    </div>
+
+    <form id="enquiry" novalidate>
+      <div class="row2">
+        <div>
+          <label for="names">Your names</label>
+          <input id="names" name="names" autocomplete="name" required>
+          <span class="err" id="names-e" aria-live="polite"></span>
+        </div>
+        <div>
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="email" inputmode="email" required>
+          <span class="err" id="email-e" aria-live="polite"></span>
+        </div>
+      </div>
+      <div class="row2">
+        <div>
+          <label for="date">Wedding date <small>optional</small></label>
+          <input id="date" name="date" type="date">
+        </div>
+        <div>
+          <label for="venue">Venue or area <small>optional</small></label>
+          <input id="venue" name="venue">
+        </div>
+      </div>
+      <div>
+        <label for="msg">Anything else <small>optional</small></label>
+        <textarea id="msg" name="msg" placeholder="Guest numbers, the timetable so far, anything you are unsure about"></textarea>
+      </div>
+      <button class="btn" type="submit">Send enquiry</button>
+      <p class="status" id="status" role="status"></p>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span><span class="owner-note">Photographer's name</span>, wedding photographer, <span class="owner-note">town, region</span></span>
+    <span>© <span id="yr">2026</span>. All photographs by the photographer.</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // Set the photographer's email address here. The form builds a message in the visitor's email app.
+  var EMAIL = "";
+
+  document.getElementById("yr").textContent = new Date().getFullYear();
+
+  var form = document.getElementById("enquiry");
+  var status = document.getElementById("status");
+  var rules = {
+    names:{el:document.getElementById("names"),err:document.getElementById("names-e"),msg:"Enter your names so I know who to reply to."},
+    email:{el:document.getElementById("email"),err:document.getElementById("email-e"),msg:"Enter an email address like name@example.com so I can reply."}
+  };
+
+  function check(key){
+    var r = rules[key];
+    var ok = r.el.checkValidity() && r.el.value.trim() !== "";
+    r.el.setAttribute("aria-invalid", ok ? "false" : "true");
+    r.err.textContent = ok ? "" : r.msg;
+    return ok;
+  }
+  Object.keys(rules).forEach(function(k){
+    rules[k].el.addEventListener("blur", function(){ if(rules[k].el.value !== "" || rules[k].el.getAttribute("aria-invalid")==="true") check(k); });
+    rules[k].el.addEventListener("input", function(){ if(rules[k].el.getAttribute("aria-invalid")==="true") check(k); });
+  });
+
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    status.className = "status";
+    var okNames = check("names"), okEmail = check("email");
+    if(!okNames || !okEmail){
+      (okNames ? rules.email.el : rules.names.el).focus();
+      return;
+    }
+    if(!EMAIL){
+      status.className = "status bad";
+      status.textContent = "This site has no email address set yet, so nothing can be sent. Your answers are still in the form.";
+      return;
+    }
+    var d = new FormData(form);
+    var body = "Names: " + d.get("names") + "\nEmail: " + d.get("email") +
+      "\nWedding date: " + (d.get("date") || "not decided") +
+      "\nVenue or area: " + (d.get("venue") || "not decided") +
+      "\n\n" + (d.get("msg") || "");
+    var subject = "Wedding enquiry" + (d.get("date") ? ", " + d.get("date") : "");
+    status.textContent = "Opening your email app with the message filled in. Nothing is sent until you press send there.";
+    window.location.href = "mailto:" + EMAIL + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+  });
+})();
+</script>
+</body>
+</html>

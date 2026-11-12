@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<!--
+Direction: Lisbon tram-yellow ground, soot ink, oven red used only for the main action, because the bakery sits in Graça where the 28 tram runs and the oven is soot-black. The layout follows the bakery's own paper: a price board (quadro), a loaf cut open with its parts named in place of a stock photo, and opening hours as a plain week table. The generic version would have been cream paper, a serif and a terracotta accent.
+
+Slots for the owner to fill (all marked "Nota para o dono" on the page):
+1. Photo of the shop front / the bread (hero area and quadro)
+2. Real product list and prices (the names in the quadro are common Portuguese examples; confirm or replace)
+3. Address and map
+4. Opening hours
+5. Phone and email for orders
+6. Family photo and story
+-->
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Forno da Graça, padaria de família em Lisboa</title>
+<meta name="description" content="Forno da Graça, padaria de família na Graça, em Lisboa. Pão, doçaria, horário e encomendas.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23F2B722'/%3E%3Cpath d='M10 48C10 26 22 14 32 14s22 12 22 34z' fill='%231E2431'/%3E%3Cpath d='M17 48C17 32 25 21 32 21s15 11 15 27z' fill='%23FAF6EA'/%3E%3C/svg%3E">
+<style>
+:root{
+  --yellow:#F2B722;
+  --ink:#1E2431;
+  --lime:#FAF6EA;
+  --lime-2:#EFE8D2;
+  --red:#B3301D;
+  --crust:#B8742E;
+  --muted:#4B5163;
+  --on-ink-muted:#CFCAB9;
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:72px;--s9:112px;
+  --display:Rockwell,"Rockwell Nova",Superclarendon,Clarendon,Cambria,Georgia,serif;
+  --text:"Avenir Next",Seravek,"Segoe UI",Candara,Calibri,"Trebuchet MS",sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+body{margin:0;background:var(--lime);color:var(--ink);font-family:var(--text);font-size:1.125rem;line-height:1.55}
+::selection{background:var(--ink);color:var(--yellow)}
+h1,h2,h3{font-family:var(--display);font-weight:700;line-height:1.05;margin:0;text-wrap:balance;letter-spacing:-.01em}
+p{margin:0;text-wrap:pretty}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--red);outline-offset:3px}
+.board :focus-visible,.hero :focus-visible{outline-color:var(--ink)}
+.board :focus-visible{outline-color:var(--yellow)}
+.wrap{width:min(1180px,100% - 2*var(--s5));margin-inline:auto}
+
+/* header + hero */
+.hero{background:var(--yellow);padding-bottom:var(--s8)}
+header .wrap{display:flex;justify-content:space-between;align-items:center;gap:var(--s4);flex-wrap:wrap;padding-block:var(--s3)}
+.brand{font-family:var(--display);font-weight:700;font-size:1.25rem;text-decoration:none;min-height:44px;display:inline-flex;align-items:center}
+nav ul{display:flex;gap:var(--s2);list-style:none;margin:0;padding:0}
+nav a{display:inline-flex;align-items:center;min-height:44px;padding-inline:var(--s3);text-decoration:none;font-weight:600;border-radius:4px}
+nav a:hover{background:var(--ink);color:var(--yellow)}
+nav a:active{transform:translateY(1px)}
+.hero-grid{display:grid;gap:var(--s7);align-items:center;padding-top:var(--s7)}
+@media(min-width:900px){.hero-grid{grid-template-columns:1.15fr .85fr;padding-top:var(--s8)}}
+h1{font-size:clamp(3.6rem,13vw,9.5rem);line-height:.92;letter-spacing:-.03em}
+h1 span{display:block}
+.lede{font-size:clamp(1.2rem,2.4vw,1.6rem);max-width:28ch;margin-top:var(--s5);line-height:1.35}
+.actions{display:flex;flex-wrap:wrap;gap:var(--s3);margin-top:var(--s6)}
+.btn{display:inline-flex;align-items:center;min-height:48px;padding:var(--s2) var(--s5);font:inherit;font-weight:700;text-decoration:none;border-radius:4px;border:2px solid var(--ink);transition:transform .15s ease-out,background-color .15s}
+.btn:active{transform:translateY(2px)}
+.btn.primary{background:var(--red);border-color:var(--red);color:#fff}
+.btn.primary:hover{background:#8F2415;border-color:#8F2415}
+.btn.secondary{background:transparent}
+.btn.secondary:hover{background:var(--ink);color:var(--yellow)}
+.btn[disabled],.btn[aria-disabled="true"]{opacity:.5;pointer-events:none}
+figure{margin:0}
+.loaf{width:100%;height:auto;display:block}
+.loaf text{font-family:var(--text);font-size:24px;font-weight:700;fill:var(--ink)}
+figcaption{font-size:.95rem;margin-top:var(--s2)}
+
+/* quadro */
+.board{background:var(--ink);color:var(--lime);padding-block:var(--s8)}
+.board h2{font-size:clamp(2.4rem,6vw,4.5rem);color:var(--yellow)}
+.board .intro{margin-top:var(--s4);max-width:46ch;color:var(--on-ink-muted)}
+.cols{display:grid;gap:var(--s7);margin-top:var(--s7)}
+@media(min-width:860px){.cols{grid-template-columns:1fr 1fr;gap:var(--s8)}}
+table{width:100%;border-collapse:collapse}
+caption{text-align:start;font-family:var(--display);font-weight:700;font-size:1.6rem;padding-bottom:var(--s3);border-bottom:3px solid var(--yellow)}
+th,td{text-align:start;vertical-align:top;padding:var(--s4) 0;border-bottom:1px dotted #7A7F8F}
+th[scope=row]{font-family:var(--display);font-size:1.25rem;font-weight:700;padding-inline-end:var(--s4)}
+td.desc{color:var(--on-ink-muted);font-size:1rem}
+td.price{text-align:end;white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--on-ink-muted)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+.slot{border:2px dashed currentColor;border-radius:4px;padding:var(--s4) var(--s5);font-size:1rem;line-height:1.45}
+.slot b{display:block;font-size:.85rem;margin-bottom:var(--s1)}
+.board .slot{margin-top:var(--s6);color:var(--yellow)}
+
+/* visitar */
+.visit{padding-block:var(--s9) var(--s8)}
+.visit-grid{display:grid;gap:var(--s7)}
+@media(min-width:860px){.visit-grid{grid-template-columns:5fr 6fr;gap:var(--s8)}}
+h2.big{font-size:clamp(2.4rem,6vw,4.5rem)}
+h3{font-size:1.5rem;margin-bottom:var(--s3)}
+.visit .slot{margin-top:var(--s4)}
+.visit .block+.block{margin-top:var(--s7)}
+.hours{max-width:34rem}
+.hours th,.hours td{border-bottom:1px solid var(--lime-2);border-color:#D8CFB3;padding:var(--s3) 0;font-family:var(--text);font-size:1.05rem}
+.hours th{font-weight:600;width:45%}
+.hours td{color:var(--muted)}
+
+/* familia */
+.family{background:var(--lime-2);padding-block:var(--s8)}
+.family-grid{display:grid;gap:var(--s6);align-items:start}
+@media(min-width:860px){.family-grid{grid-template-columns:1fr 1fr;gap:var(--s8)}}
+.photo{aspect-ratio:4/3;display:grid;place-items:center;text-align:center}
+.family p+p{margin-top:var(--s4)}
+.family .slot{margin-top:var(--s5)}
+
+footer{background:var(--yellow);padding-block:var(--s7)}
+footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(--s4);align-items:end}
+footer .name{font-family:var(--display);font-weight:700;font-size:clamp(2rem,6vw,3.5rem);line-height:1}
+footer a{display:inline-flex;min-height:44px;align-items:center;font-weight:600}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <header>
+    <div class="wrap">
+      <a class="brand" href="#topo">Forno da Graça</a>
+      <nav aria-label="Principal">
+        <ul>
+          <li><a href="#pao">Pão e doçaria</a></li>
+          <li><a href="#visitar">Visitar</a></li>
+          <li><a href="#familia">A família</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="topo">
+    <div class="wrap hero-grid">
+      <div>
+        <h1><span>Forno</span><span>da Graça</span></h1>
+        <p class="lede">Padaria de família na Graça, em Lisboa.</p>
+        <div class="actions">
+          <a class="btn primary" href="#pao">Ver a lista do pão</a>
+          <a class="btn secondary" href="#visitar">Horário e morada</a>
+        </div>
+      </div>
+
+      <figure>
+        <svg class="loaf" viewBox="0 0 560 360" role="img" aria-labelledby="loaf-t">
+          <title id="loaf-t">Desenho de um pão cortado ao meio, com a côdea, o miolo e os alvéolos assinalados</title>
+          <path d="M50 300C50 140 150 60 260 60S470 140 470 300Z" fill="#B8742E" stroke="#1E2431" stroke-width="4" stroke-linejoin="round"/>
+          <path d="M80 300C80 160 165 90 260 90S440 160 440 300Z" fill="#FAF6EA" stroke="#1E2431" stroke-width="3"/>
+          <g fill="#EFE0B0" stroke="#1E2431" stroke-width="2">
+            <ellipse cx="200" cy="210" rx="14" ry="10"/>
+            <ellipse cx="270" cy="170" rx="9" ry="7"/>
+            <ellipse cx="320" cy="230" rx="20" ry="12"/>
+            <ellipse cx="240" cy="260" rx="8" ry="6"/>
+            <ellipse cx="370" cy="190" rx="8" ry="6"/>
+            <ellipse cx="150" cy="260" rx="7" ry="5"/>
+            <ellipse cx="290" cy="275" rx="11" ry="7"/>
+          </g>
+          <line x1="20" y1="300" x2="500" y2="300" stroke="#1E2431" stroke-width="4" stroke-linecap="round"/>
+          <g stroke="#1E2431" stroke-width="2.5" fill="none" stroke-linecap="round">
+            <path d="M62 62L68 190"/>
+            <path d="M488 82L350 150"/>
+            <path d="M262 334L322 236"/>
+          </g>
+          <text x="10" y="50">côdea</text>
+          <text x="552" y="76" text-anchor="end">miolo</text>
+          <text x="262" y="352" text-anchor="middle">alvéolos</text>
+        </svg>
+        <figcaption>Um pão cortado ao meio.</figcaption>
+      </figure>
+    </div>
+  </main>
+</div>
+
+<section class="board" id="pao" aria-labelledby="pao-h">
+  <div class="wrap">
+    <h2 id="pao-h">Pão e doçaria</h2>
+    <p class="intro">A lista tal como está no balcão. Os preços são os do dia na loja.</p>
+
+    <div class="cols">
+      <table>
+        <caption>Pão</caption>
+        <thead class="sr"><tr><th scope="col">Produto</th><th scope="col">Descrição</th><th scope="col">Preço</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Pão alentejano</th><td class="desc">Miolo denso, côdea grossa</td><td class="price">–,–– €</td></tr>
+          <tr><th scope="row">Papo-seco</th><td class="desc">Pequeno, côdea fina e estaladiça</td><td class="price">–,–– €</td></tr>
+          <tr><th scope="row">Carcaça</th><td class="desc">Pão de trigo para sandes</td><td class="price">–,–– €</td></tr>
+          <tr><th scope="row">Broa de milho</th><td class="desc">Farinha de milho e de trigo</td><td class="price">–,–– €</td></tr>
+        </tbody>
+      </table>
+
+      <table>
+        <caption>Doçaria</caption>
+        <thead class="sr"><tr><th scope="col">Produto</th><th scope="col">Descrição</th><th scope="col">Preço</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Pastel de nata</th><td class="desc">Massa folhada, creme de ovos</td><td class="price">–,–– €</td></tr>
+          <tr><th scope="row">Queijada</th><td class="desc">Queijo, ovos e açúcar</td><td class="price">–,–– €</td></tr>
+          <tr><th scope="row">Bola de Berlim</th><td class="desc">Massa frita, creme de ovos</td><td class="price">–,–– €</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="slot"><b>Nota para o dono</b>Lista de exemplo com produtos comuns em Portugal. Substituir pelos produtos reais e preencher os preços.</p>
+  </div>
+</section>
+
+<section class="visit" id="visitar" aria-labelledby="visitar-h">
+  <div class="wrap">
+    <h2 class="big" id="visitar-h">Visitar a padaria</h2>
+    <div class="visit-grid" style="margin-top:var(--s7)">
+      <div>
+        <div class="block">
+          <h3>Morada</h3>
+          <p class="slot"><b>Nota para o dono</b>Rua, número e código postal na Graça, Lisboa. Acrescentar também um mapa ou uma indicação de como chegar.</p>
+        </div>
+        <div class="block">
+          <h3>Encomendas</h3>
+          <p>Bolos, pão para um dia marcado, grandes quantidades.</p>
+          <p class="slot"><b>Nota para o dono</b>Telefone e email para encomendas, e com quantos dias de antecedência pedir.</p>
+        </div>
+      </div>
+
+      <div class="block">
+        <h3>Horário</h3>
+        <table class="hours">
+          <caption class="sr">Horário de abertura</caption>
+          <thead class="sr"><tr><th scope="col">Dia</th><th scope="col">Horário</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Segunda-feira</th><td>a preencher</td></tr>
+            <tr><th scope="row">Terça-feira</th><td>a preencher</td></tr>
+            <tr><th scope="row">Quarta-feira</th><td>a preencher</td></tr>
+            <tr><th scope="row">Quinta-feira</th><td>a preencher</td></tr>
+            <tr><th scope="row">Sexta-feira</th><td>a preencher</td></tr>
+            <tr><th scope="row">Sábado</th><td>a preencher</td></tr>
+            <tr><th scope="row">Domingo</th><td>a preencher</td></tr>
+          </tbody>
+        </table>
+        <p class="slot"><b>Nota para o dono</b>Preencher os horários reais e indicar os feriados em que fecha.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="family" id="familia" aria-labelledby="familia-h">
+  <div class="wrap family-grid">
+    <div class="slot photo"><p><b>Nota para o dono</b>Fotografia da família à porta da padaria, ou ao forno. Formato 4:3.</p></div>
+    <div>
+      <h2 class="big" id="familia-h">A família</h2>
+      <p style="margin-top:var(--s5)">O Forno da Graça é uma padaria de família, em Lisboa.</p>
+      <p class="slot"><b>Nota para o dono</b>Quem são, desde quando fazem pão e o que fazem de diferente. Duas ou três frases chegam, com nomes e datas reais.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p class="name">Forno da Graça</p>
+    <a href="#topo">Voltar ao início</a>
+  </div>
+</footer>
+
+</body>
+</html>

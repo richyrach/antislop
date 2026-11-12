@@ -1,0 +1,285 @@
+{
+  "model": "sonnet",
+  "briefs": 10,
+  "rules": 27,
+  "meanMarks": {
+    "plain": 4.4,
+    "guided": 1.3
+  },
+  "buckets": {
+    "plain": {
+      "clean": 1,
+      "mild": 2,
+      "heavy": 7
+    },
+    "guided": {
+      "clean": 5,
+      "mild": 5,
+      "heavy": 0
+    }
+  },
+  "fewerMarksWithGuide": 9,
+  "sameMarks": 0,
+  "moreMarksWithGuide": 1,
+  "perRule": [
+    {
+      "id": "default-sans",
+      "wave": 1,
+      "label": "Only the default sans-serif",
+      "plain": 8,
+      "guided": 0
+    },
+    {
+      "id": "tracked-caps",
+      "wave": 2,
+      "label": "Small labels in spaced capitals",
+      "plain": 6,
+      "guided": 5
+    },
+    {
+      "id": "glass",
+      "wave": 1,
+      "label": "Blurred glass panel",
+      "plain": 4,
+      "guided": 0
+    },
+    {
+      "id": "centred",
+      "wave": 1,
+      "label": "Centred text throughout",
+      "plain": 4,
+      "guided": 0
+    },
+    {
+      "id": "generic-cta",
+      "wave": 1,
+      "label": "\"Get started\" or \"Learn more\"",
+      "plain": 4,
+      "guided": 0
+    },
+    {
+      "id": "emoji-icons",
+      "wave": 1,
+      "label": "Emoji used as icons",
+      "plain": 3,
+      "guided": 0
+    },
+    {
+      "id": "invented-proof",
+      "wave": 0,
+      "label": "Proof nobody supplied",
+      "plain": 3,
+      "guided": 0
+    },
+    {
+      "id": "three-up",
+      "wave": 1,
+      "label": "Three equal columns of cards",
+      "plain": 2,
+      "guided": 2
+    },
+    {
+      "id": "em-dashes",
+      "wave": 2,
+      "label": "Dashes for asides",
+      "plain": 2,
+      "guided": 0
+    },
+    {
+      "id": "purple-gradient",
+      "wave": 1,
+      "label": "Purple, indigo or violet gradient",
+      "plain": 1,
+      "guided": 0
+    },
+    {
+      "id": "glow",
+      "wave": 1,
+      "label": "Coloured glow",
+      "plain": 1,
+      "guided": 0
+    },
+    {
+      "id": "fade-in",
+      "wave": 1,
+      "label": "Fade-in on scroll",
+      "plain": 1,
+      "guided": 0
+    },
+    {
+      "id": "cream-serif",
+      "wave": 2,
+      "label": "Cream paper, serif, rust or sage accent",
+      "plain": 1,
+      "guided": 2
+    },
+    {
+      "id": "accent-word",
+      "wave": 2,
+      "label": "One italic or coloured word in a heading",
+      "plain": 1,
+      "guided": 1
+    },
+    {
+      "id": "arrow-links",
+      "wave": 2,
+      "label": "Arrows glued to links",
+      "plain": 1,
+      "guided": 0
+    },
+    {
+      "id": "status-dot",
+      "wave": 2,
+      "label": "Status badge",
+      "plain": 1,
+      "guided": 0
+    },
+    {
+      "id": "placeholder",
+      "wave": 0,
+      "label": "Placeholder content",
+      "plain": 1,
+      "guided": 0
+    },
+    {
+      "id": "numbered",
+      "wave": 2,
+      "label": "01 / 02 / 03 markers",
+      "plain": 0,
+      "guided": 1
+    },
+    {
+      "id": "mono-labels",
+      "wave": 2,
+      "label": "Typewriter face on a page with no code",
+      "plain": 0,
+      "guided": 2
+    }
+  ],
+  "pages": [
+    {
+      "id": "notes-app",
+      "plain": [
+        "default-sans",
+        "centred",
+        "generic-cta",
+        "tracked-caps",
+        "status-dot",
+        "em-dashes",
+        "invented-proof"
+      ],
+      "guided": []
+    },
+    {
+      "id": "bakery",
+      "plain": [
+        "glass",
+        "emoji-icons",
+        "centred",
+        "cream-serif",
+        "tracked-caps"
+      ],
+      "guided": [
+        "cream-serif"
+      ]
+    },
+    {
+      "id": "orders-dashboard",
+      "plain": [
+        "default-sans"
+      ],
+      "guided": [
+        "tracked-caps",
+        "mono-labels"
+      ]
+    },
+    {
+      "id": "photographer",
+      "plain": [
+        "glass",
+        "centred",
+        "three-up",
+        "fade-in",
+        "tracked-caps",
+        "em-dashes",
+        "invented-proof"
+      ],
+      "guided": [
+        "cream-serif",
+        "tracked-caps"
+      ]
+    },
+    {
+      "id": "pg-backup",
+      "plain": [
+        "glass",
+        "emoji-icons",
+        "default-sans",
+        "generic-cta",
+        "tracked-caps",
+        "accent-word",
+        "arrow-links",
+        "placeholder"
+      ],
+      "guided": [
+        "three-up",
+        "tracked-caps",
+        "accent-word"
+      ]
+    },
+    {
+      "id": "pricing",
+      "plain": [
+        "default-sans",
+        "centred",
+        "generic-cta",
+        "three-up"
+      ],
+      "guided": [
+        "three-up",
+        "tracked-caps"
+      ]
+    },
+    {
+      "id": "signup",
+      "plain": [
+        "glow",
+        "default-sans"
+      ],
+      "guided": []
+    },
+    {
+      "id": "bike-shop",
+      "plain": [
+        "default-sans",
+        "invented-proof"
+      ],
+      "guided": []
+    },
+    {
+      "id": "date-lib",
+      "plain": [
+        "glass",
+        "default-sans",
+        "generic-cta",
+        "tracked-caps"
+      ],
+      "guided": [
+        "numbered"
+      ]
+    },
+    {
+      "id": "team-settings",
+      "plain": [
+        "purple-gradient",
+        "emoji-icons",
+        "default-sans",
+        "tracked-caps"
+      ],
+      "guided": [
+        "tracked-caps",
+        "mono-labels"
+      ]
+    }
+  ]
+}

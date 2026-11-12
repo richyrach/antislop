@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orders</title>
+<!--
+Direction: the page is a packing desk. Colours come from kraft cardboard, packing tape and a white shipping label;
+order numbers use the monospace of a thermal-printed label. The default view is "To pack", sorted oldest first,
+because the job of this screen is to show what is waiting to leave the building.
+All orders shown at first are sample rows, flagged as such, and can be cleared in one click.
+-->
+<style>
+:root{
+  --kraft:#e6d9c3;
+  --kraft-dark:#cdb994;
+  --label:#fbfaf6;
+  --ink:#1d1a16;
+  --muted:#5c554b;
+  --line:#d8cfbf;
+  --tape:#8a5a1c;
+  --focus:#0b57d0;
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:40px;
+  --t-sm:.875rem;--t-md:1rem;--t-lg:1.25rem;--t-xl:1.75rem;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--kraft);color:var(--ink);
+  font:var(--t-md)/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+.wrap{max-width:1080px;margin-inline:auto;padding:var(--s5) var(--s4) var(--s6)}
+header.top{display:flex;flex-wrap:wrap;gap:var(--s3);align-items:center;justify-content:space-between;margin-block-end:var(--s4)}
+h1{font-size:var(--t-xl);line-height:1.2;margin:0}
+.tools{display:flex;flex-wrap:wrap;gap:var(--s2);align-items:center}
+button,select,input,textarea{font:inherit;color:inherit}
+.btn{
+  min-height:44px;padding:0 var(--s4);border:2px solid var(--ink);background:var(--label);
+  border-radius:4px;cursor:pointer;font-weight:600;
+}
+.btn:hover{background:var(--ink);color:var(--label)}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.5;cursor:not-allowed;background:var(--label);color:var(--ink)}
+.btn.primary{background:var(--ink);color:var(--label)}
+.btn.primary:hover{background:var(--tape);border-color:var(--tape)}
+.btn.danger{border-color:#8f1d1d;color:#8f1d1d}
+.btn.danger:hover{background:#8f1d1d;color:#fff}
+.btn.small{min-height:44px;padding:0 var(--s3);font-size:var(--t-sm)}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+
+.notice{
+  background:var(--label);border:2px dashed var(--tape);border-radius:4px;
+  padding:var(--s3) var(--s4);margin-block-end:var(--s4);
+  display:flex;flex-wrap:wrap;gap:var(--s3);align-items:center;justify-content:space-between;
+}
+.notice p{margin:0}
+
+.bar{display:flex;flex-wrap:wrap;gap:var(--s3);align-items:center;justify-content:space-between;margin-block-end:var(--s3)}
+.tabs{display:flex;flex-wrap:wrap;gap:var(--s2)}
+.tab{
+  min-height:44px;padding:0 var(--s4);border:2px solid var(--ink);background:transparent;border-radius:4px;
+  cursor:pointer;font-weight:600;
+}
+.tab:hover{background:var(--label)}
+.tab[aria-pressed="true"]{background:var(--ink);color:var(--label)}
+.tab .n{font-variant-numeric:tabular-nums;margin-inline-start:var(--s2);opacity:.85}
+.search{min-height:44px;min-width:0;flex:1 1 220px;max-width:340px;padding:0 var(--s3);border:2px solid var(--ink);border-radius:4px;background:var(--label)}
+
+.sheet{background:var(--label);border:2px solid var(--ink);border-radius:4px;overflow:hidden}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:start;padding:var(--s3) var(--s4);vertical-align:middle}
+thead th{font-size:var(--t-sm);font-weight:700;border-block-end:2px solid var(--ink);background:var(--kraft-dark);color:var(--ink)}
+tbody tr+tr td{border-block-start:1px solid var(--line)}
+tbody tr:hover{background:#f3efe4}
+.num{text-align:end;font-variant-numeric:tabular-nums}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.idbtn{background:none;border:0;padding:var(--s2) 0;min-height:44px;cursor:pointer;font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.idbtn:hover{color:var(--tape)}
+.sub{display:block;color:var(--muted);font-size:var(--t-sm)}
+.tag{font-size:var(--t-sm);border:1px solid var(--muted);color:var(--muted);border-radius:3px;padding:0 var(--s1);margin-inline-start:var(--s2)}
+.pill{display:inline-block;padding:2px var(--s3);border-radius:999px;font-size:var(--t-sm);font-weight:700;white-space:nowrap}
+.pill.new{background:#f3d98b;color:#3d2c00}
+.pill.shipped{background:#cfe0ee;color:#12324d}
+.pill.delivered{background:#cfe6cf;color:#17381a}
+.pill.cancelled{background:#e4e0d8;color:#4a443b}
+.wait{color:#8f1d1d;font-weight:600}
+.empty{padding:var(--s6) var(--s4);text-align:center}
+.empty p{margin:0 0 var(--s3)}
+
+dialog{border:2px solid var(--ink);border-radius:4px;background:var(--label);color:var(--ink);padding:0;width:min(520px,calc(100% - 24px))}
+dialog::backdrop{background:rgba(29,26,22,.55)}
+.dlg{padding:var(--s5)}
+.dlg h2{margin:0 0 var(--s4);font-size:var(--t-lg)}
+.field{display:block;margin-block-end:var(--s4)}
+.field>span{display:block;font-weight:600;margin-block-end:var(--s1)}
+.field input,.field select,.field textarea{width:100%;min-height:44px;padding:var(--s2) var(--s3);border:2px solid var(--ink);border-radius:4px;background:#fff}
+.field textarea{min-height:88px;resize:vertical}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:var(--s3)}
+.err{color:#8f1d1d;font-weight:600;margin:0 0 var(--s3)}
+.actions{display:flex;flex-wrap:wrap;gap:var(--s2);justify-content:flex-end}
+.actions .spacer{margin-inline-end:auto}
+dl.facts{display:grid;grid-template-columns:auto 1fr;gap:var(--s1) var(--s4);margin:0 0 var(--s4)}
+dl.facts dt{color:var(--muted)}
+dl.facts dd{margin:0;overflow-wrap:anywhere}
+.cur{display:flex;align-items:center;gap:var(--s2);font-size:var(--t-sm)}
+.cur select{min-height:44px;border:2px solid var(--ink);border-radius:4px;background:var(--label);padding:0 var(--s2)}
+
+@media (max-width:700px){
+  thead{position:absolute;inline-size:1px;block-size:1px;overflow:hidden;clip-path:inset(50%)}
+  table,tbody,tr,td{display:block}
+  tbody tr{padding:var(--s3) var(--s4)}
+  td{display:flex;justify-content:space-between;gap:var(--s4);padding:var(--s1) 0;text-align:end}
+  td::before{content:attr(data-label);color:var(--muted);font-size:var(--t-sm);text-align:start;flex:none}
+  tbody tr+tr td{border-block-start:0}
+  tbody tr+tr{border-block-start:1px solid var(--line)}
+  td.act{justify-content:flex-end}
+  td.act::before{content:none}
+}
+@media (max-width:420px){.row2{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>Orders</h1>
+    <div class="tools">
+      <label class="cur">Currency
+        <select id="currency" aria-label="Currency">
+          <option>USD</option><option>EUR</option><option>GBP</option><option>CAD</option><option>AUD</option>
+        </select>
+      </label>
+      <button class="btn" id="csv" type="button">Download CSV</button>
+      <button class="btn primary" id="add" type="button">Add order</button>
+    </div>
+  </header>
+
+  <div class="notice" id="sampleNotice" hidden>
+    <p>These are sample orders so you can try the page. Your own orders appear after you clear them.</p>
+    <button class="btn small" id="clearSample" type="button">Clear sample orders</button>
+  </div>
+  <div class="notice" id="storageNotice" hidden>
+    <p>This browser blocked storage, so orders will be lost when you close the tab. Download the CSV before leaving.</p>
+  </div>
+
+  <div class="bar">
+    <div class="tabs" role="group" aria-label="Filter orders by status" id="tabs"></div>
+    <input class="search" id="q" type="search" placeholder="Search name, item or order number" aria-label="Search orders">
+  </div>
+
+  <main class="sheet">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Order</th>
+          <th scope="col">Placed</th>
+          <th scope="col">Customer</th>
+          <th scope="col">Items</th>
+          <th scope="col" class="num">Total</th>
+          <th scope="col">Status</th>
+          <th scope="col"><span class="sr">Next step</span></th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div class="empty" id="empty" hidden></div>
+  </main>
+</div>
+
+<dialog id="addDlg" aria-labelledby="addTitle">
+  <form class="dlg" id="addForm" novalidate>
+    <h2 id="addTitle">Add order</h2>
+    <label class="field"><span>Customer name</span><input id="aName" required autocomplete="off"></label>
+    <label class="field"><span>Items</span><textarea id="aItems" required placeholder="2 × Item name, 1 × Other item"></textarea></label>
+    <div class="row2">
+      <label class="field"><span>Total</span><input id="aTotal" type="number" inputmode="decimal" min="0" step="0.01" required></label>
+      <label class="field"><span>Date placed</span><input id="aDate" type="date" required></label>
+    </div>
+    <p class="err" id="aErr" role="alert" hidden></p>
+    <div class="actions">
+      <button class="btn" type="button" data-close>Cancel</button>
+      <button class="btn primary" type="submit">Save order</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="viewDlg" aria-labelledby="viewTitle">
+  <form class="dlg" id="viewForm" novalidate>
+    <h2 id="viewTitle"></h2>
+    <dl class="facts" id="facts"></dl>
+    <label class="field"><span>Status</span>
+      <select id="vStatus">
+        <option value="new">To pack</option>
+        <option value="shipped">Shipped</option>
+        <option value="delivered">Delivered</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+    </label>
+    <label class="field"><span>Tracking number</span><input id="vTrack" autocomplete="off"></label>
+    <p class="err" id="vErr" role="alert" hidden></p>
+    <div class="actions">
+      <button class="btn danger spacer" type="button" id="vDelete">Delete order</button>
+      <button class="btn" type="button" data-close>Close</button>
+      <button class="btn primary" type="submit">Save changes</button>
+    </div>
+  </form>
+</dialog>
+
+<style>.sr{position:absolute;inline-size:1px;block-size:1px;overflow:hidden;clip-path:inset(50%)}</style>
+
+<script>
+(function(){
+  var KEY="orders-v1", CKEY="orders-currency";
+  var LABEL={new:"To pack",shipped:"Shipped",delivered:"Delivered",cancelled:"Cancelled"};
+  var memoryOnly=false;
+  var state={orders:[],filter:"new",q:"",currency:"USD",openId:null};
+
+  function iso(offset){
+    var d=new Date(); d.setDate(d.getDate()-offset);
+    return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  }
+  function sample(){
+    var s=[
+      [1048,0,"Customer A","1 × Item one",24.00,"new",""],
+      [1047,1,"Customer B","2 × Item two, 1 × Item three",61.50,"new",""],
+      [1046,3,"Customer C","3 × Item one",72.00,"new",""],
+      [1045,4,"Customer D","1 × Item four",38.00,"shipped","SAMPLE-TRACK-1045"],
+      [1044,6,"Customer E","1 × Item two, 1 × Item one",44.50,"shipped","SAMPLE-TRACK-1044"],
+      [1043,9,"Customer F","4 × Item three",56.00,"delivered","SAMPLE-TRACK-1043"],
+      [1042,12,"Customer G","1 × Item four",38.00,"delivered","SAMPLE-TRACK-1042"],
+      [1041,15,"Customer H","2 × Item one",48.00,"cancelled",""]
+    ];
+    return s.map(function(r){return{id:r[0],date:iso(r[1]),customer:r[2],items:r[3],total:r[4],status:r[5],tracking:r[6],sample:true}});
+  }
+  function load(){
+    try{
+      var raw=localStorage.getItem(KEY);
+      state.orders=raw?JSON.parse(raw):sample();
+      state.currency=localStorage.getItem(CKEY)||"USD";
+      if(!Array.isArray(state.orders)) state.orders=sample();
+    }catch(e){
+      memoryOnly=true; state.orders=sample();
+    }
+  }
+  function save(){
+    try{
+      localStorage.setItem(KEY,JSON.stringify(state.orders));
+      localStorage.setItem(CKEY,state.currency);
+    }catch(e){memoryOnly=true}
+    document.getElementById("storageNotice").hidden=!memoryOnly;
+  }
+
+  function el(tag,attrs,kids){
+    var n=document.createElement(tag);
+    if(attrs) for(var k in attrs){
+      if(k==="text") n.textContent=attrs[k];
+      else if(k==="class") n.className=attrs[k];
+      else n.setAttribute(k,attrs[k]);
+    }
+    (kids||[]).forEach(function(c){n.appendChild(c)});
+    return n;
+  }
+  function money(v){
+    try{return new Intl.NumberFormat(undefined,{style:"currency",currency:state.currency}).format(v)}
+    catch(e){return Number(v).toFixed(2)}
+  }
+  function parseDate(s){var p=s.split("-");return new Date(+p[0],+p[1]-1,+p[2])}
+  function fmtDate(s){return parseDate(s).toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"})}
+  function daysAgo(s){
+    var t=new Date(); t=new Date(t.getFullYear(),t.getMonth(),t.getDate());
+    return Math.round((t-parseDate(s))/86400000);
+  }
+  function waitText(o){
+    var d=daysAgo(o.date);
+    if(d<=0) return "Today";
+    return d+(d===1?" day":" days")+" waiting";
+  }
+
+  function visible(){
+    var q=state.q.trim().toLowerCase();
+    var list=state.orders.filter(function(o){
+      if(state.filter!=="all" && o.status!==state.filter) return false;
+      if(!q) return true;
+      return (o.customer+" "+o.items+" #"+o.id+" "+o.tracking).toLowerCase().indexOf(q)>-1;
+    });
+    list.sort(function(a,b){
+      var c=a.date<b.date?-1:a.date>b.date?1:a.id-b.id;
+      return state.filter==="new"?c:-c;
+    });
+    return list;
+  }
+
+  function renderTabs(){
+    var box=document.getElementById("tabs"); box.textContent="";
+    var defs=[["new","To pack"],["shipped","Shipped"],["delivered","Delivered"],["cancelled","Cancelled"],["all","All"]];
+    defs.forEach(function(d){
+      var n=d[0]==="all"?state.orders.length:state.orders.filter(function(o){return o.status===d[0]}).length;
+      var b=el("button",{type:"button","class":"tab","aria-pressed":String(state.filter===d[0])},[
+        document.createTextNode(d[1]), el("span",{"class":"n",text:String(n)})
+      ]);
+      b.addEventListener("click",function(){state.filter=d[0];render()});
+      box.appendChild(b);
+    });
+  }
+
+  function advance(o){
+    if(o.status==="new") o.status="shipped";
+    else if(o.status==="shipped") o.status="delivered";
+    save(); render();
+  }
+
+  function renderRows(){
+    var body=document.getElementById("rows"); body.textContent="";
+    var list=visible();
+    var empty=document.getElementById("empty"); empty.textContent="";
+    empty.hidden=list.length>0;
+    if(!list.length){
+      if(state.q){
+        empty.appendChild(el("p",{text:"No orders match \u201C"+state.q+"\u201D. Check the spelling or switch to All."}));
+      }else if(!state.orders.length){
+        empty.appendChild(el("p",{text:"No orders yet. Add the first one by hand."}));
+      }else if(state.filter==="new"){
+        empty.appendChild(el("p",{text:"Nothing waiting to be packed."}));
+      }else{
+        empty.appendChild(el("p",{text:"No orders with this status."}));
+      }
+    }
+    list.forEach(function(o){
+      var tr=el("tr");
+      var idBtn=el("button",{type:"button","class":"idbtn mono","aria-label":"Open order "+o.id},[document.createTextNode("#"+o.id)]);
+      idBtn.addEventListener("click",function(){openView(o.id)});
+      var c1=el("td",{"data-label":"Order"},[idBtn]);
+      if(o.sample) c1.appendChild(el("span",{"class":"tag",text:"sample"}));
+      var placed=el("td",{"data-label":"Placed"},[el("span",{text:fmtDate(o.date)})]);
+      if(o.status==="new"&&daysAgo(o.date)>=2){
+        var w=el("span",{"class":"sub wait",text:waitText(o)});
+        placed.firstChild.appendChild(w);
+        placed.firstChild.style.textAlign="end";
+      }
+      var cust=el("td",{"data-label":"Customer",text:o.customer});
+      var items=el("td",{"data-label":"Items",text:o.items});
+      var tot=el("td",{"data-label":"Total","class":"num",text:money(o.total)});
+      var st=el("td",{"data-label":"Status"},[el("span",{"class":"pill "+o.status,text:LABEL[o.status]})]);
+      var act=el("td",{"class":"act"});
+      if(o.status==="new"||o.status==="shipped"){
+        var b=el("button",{type:"button","class":"btn small",text:o.status==="new"?"Mark shipped":"Mark delivered"});
+        b.addEventListener("click",function(){advance(o)});
+        act.appendChild(b);
+      }
+      [c1,placed,cust,items,tot,st,act].forEach(function(c){tr.appendChild(c)});
+      body.appendChild(tr);
+    });
+    document.getElementById("sampleNotice").hidden=!state.orders.some(function(o){return o.sample});
+  }
+
+  function render(){
+    document.getElementById("currency").value=state.currency;
+    renderTabs(); renderRows();
+  }
+
+  /* add */
+  var addDlg=document.getElementById("addDlg");
+  document.getElementById("add").addEventListener("click",function(){
+    document.getElementById("addForm").reset();
+    document.getElementById("aDate").value=iso(0);
+    document.getElementById("aErr").hidden=true;
+    addDlg.showModal();
+    document.getElementById("aName").focus();
+  });
+  document.getElementById("addForm").addEventListener("submit",function(e){
+    e.preventDefault();
+    var name=document.getElementById("aName").value.trim();
+    var items=document.getElementById("aItems").value.trim();
+    var total=parseFloat(document.getElementById("aTotal").value);
+    var date=document.getElementById("aDate").value;
+    var err=document.getElementById("aErr");
+    var msg="";
+    if(!name) msg="Enter the customer\u2019s name.";
+    else if(!items) msg="List what was ordered.";
+    else if(isNaN(total)||total<0) msg="Enter the total as a number, for example 24.50.";
+    else if(!date) msg="Pick the date the order was placed.";
+    if(msg){err.textContent=msg;err.hidden=false;return}
+    var id=state.orders.reduce(function(m,o){return Math.max(m,o.id)},1039)+1;
+    state.orders.push({id:id,date:date,customer:name,items:items,total:total,status:"new",tracking:"",sample:false});
+    save(); addDlg.close(); state.filter="new"; state.q=""; document.getElementById("q").value=""; render();
+  });
+
+  /* view */
+  var viewDlg=document.getElementById("viewDlg");
+  function find(id){return state.orders.filter(function(o){return o.id===id})[0]}
+  function openView(id){
+    var o=find(id); if(!o) return;
+    state.openId=id;
+    document.getElementById("viewTitle").textContent="Order #"+o.id;
+    var f=document.getElementById("facts"); f.textContent="";
+    [["Customer",o.customer],["Placed",fmtDate(o.date)],["Items",o.items],["Total",money(o.total)]].forEach(function(r){
+      f.appendChild(el("dt",{text:r[0]})); f.appendChild(el("dd",{text:r[1]}));
+    });
+    document.getElementById("vStatus").value=o.status;
+    document.getElementById("vTrack").value=o.tracking||"";
+    document.getElementById("vErr").hidden=true;
+    viewDlg.showModal();
+  }
+  document.getElementById("viewForm").addEventListener("submit",function(e){
+    e.preventDefault();
+    var o=find(state.openId); if(!o) return;
+    o.status=document.getElementById("vStatus").value;
+    o.tracking=document.getElementById("vTrack").value.trim();
+    save(); viewDlg.close(); render();
+  });
+  document.getElementById("vDelete").addEventListener("click",function(){
+    var o=find(state.openId); if(!o) return;
+    if(!confirm("Delete order #"+o.id+" for "+o.customer+"? This cannot be undone.")) return;
+    state.orders=state.orders.filter(function(x){return x.id!==o.id});
+    save(); viewDlg.close(); render();
+  });
+
+  document.querySelectorAll("[data-close]").forEach(function(b){
+    b.addEventListener("click",function(){b.closest("dialog").close()});
+  });
+
+  document.getElementById("clearSample").addEventListener("click",function(){
+    if(!confirm("Remove all sample orders? Orders you added yourself stay.")) return;
+    state.orders=state.orders.filter(function(o){return !o.sample});
+    save(); render();
+  });
+  document.getElementById("q").addEventListener("input",function(e){state.q=e.target.value;renderRows()});
+  document.getElementById("currency").addEventListener("change",function(e){state.currency=e.target.value;save();render()});
+
+  /* csv */
+  function cell(v){
+    v=String(v==null?"":v);
+    if(/^[=+\-@\t\r]/.test(v)) v="'"+v;
+    return '"'+v.replace(/"/g,'""')+'"';
+  }
+  document.getElementById("csv").addEventListener("click",function(){
+    var rows=[["Order","Date","Customer","Items","Total","Currency","Status","Tracking"]];
+    state.orders.slice().sort(function(a,b){return a.id-b.id}).forEach(function(o){
+      rows.push([o.id,o.date,o.customer,o.items,o.total.toFixed(2),state.currency,LABEL[o.status],o.tracking]);
+    });
+    var text=rows.map(function(r){return r.map(cell).join(",")}).join("\r\n");
+    var url=URL.createObjectURL(new Blob(["\ufeff"+text],{type:"text/csv;charset=utf-8"}));
+    var a=document.createElement("a"); a.href=url; a.download="orders-"+iso(0)+".csv";
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  });
+
+  load();
+  if(!state.orders.some(function(o){return o.status==="new"})) state.filter="all";
+  save(); render();
+})();
+</script>
+</body>
+</html>

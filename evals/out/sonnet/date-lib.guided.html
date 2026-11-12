@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!--
+  "calends" is a stand-in package name. Replace the name and the install command
+  with the real ones. The demo in the hero runs a small implementation included in
+  the script at the bottom of this file, so what it shows is what that code does.
+-->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>calends documentation: parse, format and add dates in JavaScript</title>
+<meta name="description" content="calends is a small JavaScript date library. Adding a month to January 31 gives February 28, dates are never mutated, and date-only strings are read as local time.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='3' fill='%2314181f'/%3E%3Crect y='0' width='32' height='9' rx='3' fill='%23b8231a'/%3E%3Ctext x='16' y='27' font-family='Helvetica,Arial,sans-serif' font-size='17' font-weight='700' text-anchor='middle' fill='%23fff'%3E31%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --ground:#e8ebed;
+  --sheet:#fbfbf9;
+  --ink:#14181f;
+  --ink-2:#444c58;
+  --rule:#c3c9cf;
+  --red:#b8231a;
+  --red-dark:#8f1a13;
+  --blue:#1f3f8f;
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:72px;--s9:112px;
+  --sans:"Helvetica Neue",Helvetica,"Segoe UI",Arial,sans-serif;
+  --cond:"Avenir Next Condensed","DIN Condensed","Bahnschrift Condensed","Arial Narrow",var(--sans);
+  --mono:ui-monospace,Menlo,"Cascadia Mono",Consolas,"Courier New",monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.55}
+::selection{background:var(--blue);color:#fff}
+.wrap{max-width:1200px;margin-inline:auto;padding-inline:var(--s5)}
+@media (min-width:900px){.wrap{padding-inline:var(--s6)}}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+code,pre,kbd{font-family:var(--mono);font-size:.9em}
+.skip{position:absolute;left:-999px;top:var(--s2);background:var(--ink);color:#fff;padding:var(--s2) var(--s4);z-index:5}
+.skip:focus{left:var(--s2)}
+
+/* header */
+header.top{padding-block:var(--s5)}
+header.top .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--s3) var(--s5)}
+.brand{font-weight:800;font-size:1.5rem;letter-spacing:-.03em;text-decoration:none;min-height:44px;display:inline-flex;align-items:center}
+nav ul{display:flex;flex-wrap:wrap;gap:0 var(--s5);list-style:none;margin:0;padding:0}
+nav a{display:inline-flex;align-items:center;min-height:44px;text-decoration:none;color:var(--ink-2);border-bottom:2px solid transparent}
+nav a:hover{color:var(--ink);border-bottom-color:var(--ink)}
+
+/* hero */
+.hero{padding-block:var(--s7) var(--s9)}
+.hero .wrap{display:grid;gap:var(--s7);grid-template-columns:minmax(0,1fr)}
+@media (min-width:960px){.hero .wrap{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:var(--s8);align-items:start}}
+h1{font-size:clamp(2.6rem,7.4vw,5.4rem);line-height:.98;font-weight:800;letter-spacing:-.04em;margin:0 0 var(--s5);text-wrap:balance}
+.lede{font-size:1.2rem;max-width:34em;margin:0 0 var(--s6);color:var(--ink-2);text-wrap:pretty}
+.lede strong{color:var(--ink);font-weight:700}
+.actions{display:flex;flex-wrap:wrap;gap:var(--s3);align-items:stretch}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 var(--s5);background:var(--red);color:#fff;font:700 1rem var(--sans);text-decoration:none;border:2px solid var(--red);border-radius:2px;cursor:pointer;transition:background-color .15s,border-color .15s}
+.btn:hover{background:var(--red-dark);border-color:var(--red-dark)}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.install{display:flex;align-items:stretch;background:var(--ink);color:#fff;border-radius:2px;min-width:0}
+.install code{display:flex;align-items:center;padding:0 var(--s4);font-size:.95rem;white-space:nowrap}
+.install button{min-width:80px;background:transparent;color:#fff;border:0;border-left:1px solid #4a5260;font:600 .9rem var(--sans);cursor:pointer;padding:0 var(--s4);transition:background-color .15s}
+.install button:hover{background:#2a313c}
+.install button:active{background:#383f4b}
+.install button:disabled{opacity:.5;cursor:not-allowed}
+.install button:focus-visible{outline-color:#fff;outline-offset:-4px}
+
+/* calendar sheet */
+.sheet{background:var(--sheet);border-radius:3px;box-shadow:0 18px 32px -18px rgba(20,24,31,.45);overflow:hidden}
+.sheet-head{background:var(--ink);color:#fff;padding:var(--s4) var(--s5);display:flex;align-items:baseline;justify-content:space-between;gap:var(--s4)}
+.sheet-head h2{margin:0;font:800 2.25rem/1 var(--cond);letter-spacing:.01em}
+.sheet-head span{font:500 1.1rem var(--cond);opacity:.8}
+.cal{width:100%;border-collapse:collapse;table-layout:fixed;font-variant-numeric:tabular-nums}
+.cal th{font-weight:600;font-size:.8rem;color:var(--ink-2);padding:var(--s2) var(--s2);text-align:left;border-bottom:1px solid var(--rule)}
+.cal td{height:48px;padding:var(--s1) var(--s2);vertical-align:top;border:1px solid var(--rule);border-top:0;font-size:.95rem}
+.cal td:first-child{border-left:0}.cal td:last-child{border-right:0}
+.cal th:nth-child(7),.cal td:nth-child(7){color:var(--red)}
+.cal td.to{background:var(--blue);color:#fff;font-weight:800}
+.cal td.from{box-shadow:inset 0 0 0 3px var(--ink);font-weight:800}
+.controls{padding:var(--s5);border-top:2px solid var(--ink);display:grid;grid-template-columns:repeat(auto-fit,minmax(8rem,1fr));gap:var(--s4)}
+.controls label{display:block;font-size:.85rem;font-weight:600;margin-bottom:var(--s1);color:var(--ink-2)}
+.controls input,.controls select{width:100%;height:44px;padding:0 var(--s3);font:500 1rem var(--sans);color:var(--ink);background:#fff;border:1px solid var(--ink-2);border-radius:2px}
+.controls input:hover,.controls select:hover{border-color:var(--ink)}
+.controls .wide{grid-column:1/-1}
+.out{padding:0 var(--s5) var(--s5)}
+.out pre{margin:0 0 var(--s3);padding:var(--s3) var(--s4);background:#fff;border-left:4px solid var(--blue);overflow-x:auto;line-height:1.7}
+.out .res{color:var(--blue);font-weight:700}
+.out p{margin:0 0 var(--s2);font-size:.95rem;color:var(--ink-2)}
+.out p.err{color:var(--red);font-weight:600}
+
+/* sections */
+section.doc{border-top:2px solid var(--ink);padding-block:var(--s8) var(--s9)}
+.split{display:grid;gap:var(--s6);grid-template-columns:minmax(0,1fr)}
+@media (min-width:900px){.split{grid-template-columns:minmax(0,3fr) minmax(0,8fr);gap:var(--s7)}}
+h2.sec{font-size:clamp(1.9rem,4vw,2.6rem);line-height:1.05;letter-spacing:-.03em;margin:0 0 var(--s4);font-weight:800;text-wrap:balance}
+.split>div>p{color:var(--ink-2);margin:0 0 var(--s4);max-width:30em;text-wrap:pretty}
+.split>div>p code{color:var(--ink)}
+table.ref{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;background:var(--sheet)}
+table.ref th,table.ref td{text-align:left;padding:var(--s2) var(--s4);border-bottom:1px solid var(--rule);height:42px}
+table.ref thead th{font-size:.85rem;color:var(--ink-2);border-bottom:2px solid var(--ink)}
+table.ref tbody th{font-weight:800;font-family:var(--cond);font-size:1.05rem;background:var(--ground);border-bottom:1px solid var(--ink)}
+table.ref td:first-child{font-family:var(--mono);font-weight:700;width:7em}
+table.ref td.val{font-family:var(--mono);color:var(--blue);font-weight:700}
+.tryline{margin-top:var(--s5)}
+
+pre.code{margin:0;padding:var(--s4);background:var(--sheet);border-left:4px solid var(--ink);overflow-x:auto;line-height:1.7}
+pre.code .res{color:var(--blue);font-weight:700}
+
+.fn{display:grid;gap:var(--s3);grid-template-columns:minmax(0,1fr);padding-block:var(--s6);border-bottom:1px solid var(--rule)}
+.fn:first-of-type{padding-top:0}
+@media (min-width:900px){.fn{grid-template-columns:minmax(0,2fr) minmax(0,5fr);gap:var(--s6)}}
+.fn h3{margin:0;font:800 2rem/1 var(--cond);letter-spacing:.01em}
+.fn .sig{margin:0 0 var(--s3);font-family:var(--mono);font-size:.9rem;color:var(--ink-2);overflow-x:auto;white-space:nowrap}
+.fn p{margin:0 0 var(--s4);max-width:36em;text-wrap:pretty}
+.usage{margin-bottom:var(--s6)}
+
+table.diff{width:100%;border-collapse:collapse;background:var(--sheet)}
+table.diff th,table.diff td{text-align:left;vertical-align:top;padding:var(--s4);border-bottom:1px solid var(--rule)}
+table.diff thead th{border-bottom:2px solid var(--ink);font-size:.9rem;color:var(--ink-2)}
+table.diff tbody th{font-weight:700;width:18%}
+table.diff td:last-child{border-left:4px solid var(--blue)}
+@media (max-width:760px){
+  table.diff thead{position:absolute;left:-999px}
+  table.diff,table.diff tbody,table.diff tr,table.diff th,table.diff td{display:block;width:auto!important}
+  table.diff tr{border-bottom:2px solid var(--ink)}
+  table.diff td{border-bottom:0;border-left:0!important}
+  table.diff td::before{content:attr(data-label);display:block;font-size:.8rem;font-weight:700;color:var(--ink-2);margin-bottom:var(--s1)}
+}
+
+footer{border-top:2px solid var(--ink);padding-block:var(--s6)}
+footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(--s3) var(--s5);color:var(--ink-2);font-size:.95rem}
+footer a{display:inline-flex;align-items:center;min-height:44px}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top">calends</a>
+    <nav aria-label="Documentation">
+      <ul>
+        <li><a href="#tokens">Format tokens</a></li>
+        <li><a href="#api">API</a></li>
+        <li><a href="#differences">Compared with Date</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+<section class="hero" id="top">
+  <div class="wrap">
+    <div>
+      <h1>January 31 plus one month is February 28.</h1>
+      <p class="lede">calends is a JavaScript library for parsing, formatting and adding to calendar dates. Months stop at their last day instead of spilling into the next one, <strong>the date you pass in is never changed</strong>, and <code>"2026-11-12"</code> is November 12 in every time zone.</p>
+      <div class="actions">
+        <a class="btn" href="#api">Read the API</a>
+        <div class="install">
+          <code id="installCmd">npm install calends</code>
+          <button type="button" id="copyBtn" aria-describedby="copyStatus">Copy</button>
+        </div>
+      </div>
+      <p id="copyStatus" role="status" style="margin:var(--s3) 0 0;font-size:.9rem;color:var(--ink-2);min-height:1.5em"></p>
+    </div>
+
+    <div class="sheet">
+      <div class="sheet-head">
+        <h2 id="calHead">February</h2><span id="calYear">2026</span>
+      </div>
+      <table class="cal" aria-labelledby="calHead">
+        <thead><tr><th scope="col">Mon</th><th scope="col">Tue</th><th scope="col">Wed</th><th scope="col">Thu</th><th scope="col">Fri</th><th scope="col">Sat</th><th scope="col">Sun</th></tr></thead>
+        <tbody id="calBody">
+          <tr><td></td><td></td><td></td><td></td><td></td><td></td><td>1</td></tr>
+          <tr><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td></tr>
+          <tr><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td><td>14</td><td>15</td></tr>
+          <tr><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td><td>21</td><td>22</td></tr>
+          <tr><td>23</td><td>24</td><td>25</td><td>26</td><td>27</td><td class="to">28</td><td></td></tr>
+        </tbody>
+      </table>
+      <form class="controls" id="demo" onsubmit="return false" aria-label="Try add()">
+        <div class="wide">
+          <label for="start">Start date</label>
+          <input id="start" type="date" value="2026-01-31" required>
+        </div>
+        <div>
+          <label for="amount">Add</label>
+          <input id="amount" type="number" step="1" value="1" inputmode="numeric" required>
+        </div>
+        <div>
+          <label for="unit">Unit</label>
+          <select id="unit">
+            <option value="years">years</option>
+            <option value="months" selected>months</option>
+            <option value="weeks">weeks</option>
+            <option value="days">days</option>
+          </select>
+        </div>
+      </form>
+      <div class="out" aria-live="polite">
+        <pre><code id="outCode">add(parse("2026-01-31"), { months: 1 })
+<span class="res">→ "2026-02-28"</span></code></pre>
+        <p id="outNote">February 2026 has no day 31, so the result stops at day 28.</p>
+        <p id="outNative">Date.setMonth gives 2026-03-03.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="doc" id="tokens">
+  <div class="wrap split">
+    <div>
+      <h2 class="sec">Format tokens</h2>
+      <p>Pass a pattern to <code>format(date, pattern)</code>. The outputs below are for Wednesday 4 March 2026, 09:05:07. Without a pattern, <code>format</code> uses <code>YYYY-MM-DD</code>.</p>
+    </div>
+    <div>
+      <table class="ref">
+        <thead><tr><th scope="col">Token</th><th scope="col">Output</th><th scope="col">Meaning</th></tr></thead>
+        <tbody>
+          <tr><th colspan="3" scope="colgroup">Date</th></tr>
+          <tr><td>YYYY</td><td class="val">2026</td><td>Year</td></tr>
+          <tr><td>YY</td><td class="val">26</td><td>Year, last two digits</td></tr>
+          <tr><td>MMMM</td><td class="val">March</td><td>Month name</td></tr>
+          <tr><td>MMM</td><td class="val">Mar</td><td>Month name, short</td></tr>
+          <tr><td>MM</td><td class="val">03</td><td>Month number, two digits</td></tr>
+          <tr><td>M</td><td class="val">3</td><td>Month number</td></tr>
+          <tr><td>dddd</td><td class="val">Wednesday</td><td>Weekday name</td></tr>
+          <tr><td>ddd</td><td class="val">Wed</td><td>Weekday name, short</td></tr>
+          <tr><td>DD</td><td class="val">04</td><td>Day of month, two digits</td></tr>
+          <tr><td>D</td><td class="val">4</td><td>Day of month</td></tr>
+          <tr><th colspan="3" scope="colgroup">Time</th></tr>
+          <tr><td>HH</td><td class="val">09</td><td>Hour, 24-hour clock, two digits</td></tr>
+          <tr><td>H</td><td class="val">9</td><td>Hour, 24-hour clock</td></tr>
+          <tr><td>mm</td><td class="val">05</td><td>Minute, two digits</td></tr>
+          <tr><td>m</td><td class="val">5</td><td>Minute</td></tr>
+          <tr><td>ss</td><td class="val">07</td><td>Second, two digits</td></tr>
+          <tr><td>s</td><td class="val">7</td><td>Second</td></tr>
+        </tbody>
+      </table>
+      <pre class="code tryline"><code>format(parse("2026-03-04 09:05"), "dddd D MMMM, HH:mm")
+<span class="res">→ "Wednesday 4 March, 09:05"</span></code></pre>
+    </div>
+  </div>
+</section>
+
+<section class="doc" id="api">
+  <div class="wrap split">
+    <div>
+      <h2 class="sec">API</h2>
+      <p>Six functions, all exported by name. Every function that returns a date returns a new <code>Date</code> and leaves its arguments alone. All dates are in the local time zone.</p>
+    </div>
+    <div>
+      <pre class="code usage"><code>import { parse, format, add, startOf, diff, daysInMonth } from "calends";</code></pre>
+
+      <article class="fn" id="parse">
+        <h3>parse</h3>
+        <div>
+          <p class="sig">parse(text: string): Date</p>
+          <p>Reads <code>YYYY-MM-DD</code>, optionally followed by a space or <code>T</code> and <code>HH:mm</code> or <code>HH:mm:ss</code>. A date-only string means midnight local time. Throws a <code>RangeError</code> for text it cannot read and for days that do not exist, such as <code>2026-02-30</code>.</p>
+          <pre class="code"><code>format(parse("2026-11-12"), "D MMM YYYY")
+<span class="res">→ "12 Nov 2026"</span></code></pre>
+        </div>
+      </article>
+
+      <article class="fn" id="format">
+        <h3>format</h3>
+        <div>
+          <p class="sig">format(date: Date, pattern?: string): string</p>
+          <p>Replaces the tokens listed above. The default pattern is <code>YYYY-MM-DD</code>. Month and weekday names are English.</p>
+          <pre class="code"><code>format(parse("2026-03-04"), "ddd, DD/MM/YY")
+<span class="res">→ "Wed, 04/03/26"</span></code></pre>
+        </div>
+      </article>
+
+      <article class="fn" id="add">
+        <h3>add</h3>
+        <div>
+          <p class="sig">add(date: Date, amount: { years?, months?, weeks?, days? }): Date</p>
+          <p>Years and months keep the day number when the target month has it, and otherwise stop at that month's last day. Weeks and days are plain calendar days. Negative numbers subtract. Time of day is kept.</p>
+          <pre class="code"><code>format(add(parse("2024-02-29"), { years: 1 }))
+<span class="res">→ "2025-02-28"</span></code></pre>
+        </div>
+      </article>
+
+      <article class="fn" id="startOf">
+        <h3>startOf</h3>
+        <div>
+          <p class="sig">startOf(date: Date, unit: "day" | "week" | "month" | "year"): Date</p>
+          <p>Returns midnight at the start of the unit. Weeks start on Monday.</p>
+          <pre class="code"><code>format(startOf(parse("2026-11-12"), "week"))
+<span class="res">→ "2026-11-09"</span></code></pre>
+        </div>
+      </article>
+
+      <article class="fn" id="diff">
+        <h3>diff</h3>
+        <div>
+          <p class="sig">diff(a: Date, b: Date, unit: "days" | "weeks" | "months" | "years"): number</p>
+          <p>Whole units from <code>b</code> to <code>a</code>. The result is positive when <code>a</code> is later and negative when it is earlier. A part-completed unit counts as zero.</p>
+          <pre class="code"><code>diff(parse("2026-12-25"), parse("2026-11-12"), "days")
+<span class="res">→ 43</span></code></pre>
+        </div>
+      </article>
+
+      <article class="fn" id="daysInMonth">
+        <h3>daysInMonth</h3>
+        <div>
+          <p class="sig">daysInMonth(date: Date): number</p>
+          <p>The number of days in the month the date falls in, leap years included.</p>
+          <pre class="code"><code>daysInMonth(parse("2028-02-01"))
+<span class="res">→ 29</span></code></pre>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="doc" id="differences">
+  <div class="wrap split">
+    <div>
+      <h2 class="sec">Compared with Date</h2>
+      <p>Four cases where the built-in <code>Date</code> surprises people, and what calends does instead.</p>
+    </div>
+    <div>
+      <table class="diff">
+        <thead><tr><th scope="col">Case</th><th scope="col">Built-in Date</th><th scope="col">calends</th></tr></thead>
+        <tbody>
+          <tr>
+            <th scope="row">Add a month to January 31</th>
+            <td data-label="Built-in Date"><code>d.setMonth(d.getMonth() + 1)</code> lands on March 3, because February 31 overflows.</td>
+            <td data-label="calends"><code>add(d, { months: 1 })</code> gives February 28, or 29 in a leap year.</td>
+          </tr>
+          <tr>
+            <th scope="row">Read a date-only string</th>
+            <td data-label="Built-in Date"><code>new Date("2026-11-12")</code> is midnight UTC, so <code>getDate()</code> returns 11 in time zones west of Greenwich.</td>
+            <td data-label="calends"><code>parse("2026-11-12")</code> is midnight local time, so <code>getDate()</code> returns 12 everywhere.</td>
+          </tr>
+          <tr>
+            <th scope="row">Add a day</th>
+            <td data-label="Built-in Date"><code>d.setDate(d.getDate() + 1)</code> changes <code>d</code> itself, and every other variable that points at it.</td>
+            <td data-label="calends"><code>add(d, { days: 1 })</code> returns a new date. <code>d</code> is untouched.</td>
+          </tr>
+          <tr>
+            <th scope="row">Find the start of the week</th>
+            <td data-label="Built-in Date"><code>getDay()</code> counts Sunday as 0, so Monday-first weeks need arithmetic.</td>
+            <td data-label="calends"><code>startOf(d, "week")</code> returns that week's Monday.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>calends documentation</span>
+    <a href="#top">Back to top</a>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* The library the demo runs. The same logic is what the docs describe. */
+  var MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  var DAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  function pad(n){ return String(n).padStart(2, "0"); }
+  function dim(y, m){ return new Date(y, m + 1, 0).getDate(); }
+  function daysInMonth(d){ return dim(d.getFullYear(), d.getMonth()); }
+
+  function parse(text){
+    var m = /^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2})(?::(\d{2}))?)?$/.exec(String(text).trim());
+    if (!m) throw new RangeError('Cannot read "' + text + '". Use YYYY-MM-DD, optionally followed by HH:mm.');
+    var n = m.slice(1).map(function (x) { return x === undefined ? 0 : +x; });
+    var r = new Date(n[0], n[1] - 1, n[2], n[3], n[4], n[5]);
+    if (r.getFullYear() !== n[0] || r.getMonth() !== n[1] - 1 || r.getDate() !== n[2] || n[3] > 23 || n[4] > 59 || n[5] > 59)
+      throw new RangeError('"' + text + '" is not a date that exists.');
+    return r;
+  }
+
+  function format(d, pattern){
+    var map = {
+      YYYY: d.getFullYear(), YY: pad(d.getFullYear() % 100),
+      MMMM: MONTHS[d.getMonth()], MMM: MONTHS[d.getMonth()].slice(0, 3),
+      MM: pad(d.getMonth() + 1), M: d.getMonth() + 1,
+      dddd: DAYS[d.getDay()], ddd: DAYS[d.getDay()].slice(0, 3),
+      DD: pad(d.getDate()), D: d.getDate(),
+      HH: pad(d.getHours()), H: d.getHours(),
+      mm: pad(d.getMinutes()), m: d.getMinutes(),
+      ss: pad(d.getSeconds()), s: d.getSeconds()
+    };
+    return (pattern || "YYYY-MM-DD").replace(/YYYY|YY|MMMM|MMM|MM|M|dddd|ddd|DD|D|HH|H|mm|m|ss|s/g, function (t) { return map[t]; });
+  }
+
+  function add(d, a){
+    a = a || {};
+    var t = d.getFullYear() * 12 + d.getMonth() + (a.years || 0) * 12 + (a.months || 0);
+    var y = Math.floor(t / 12), m = t - y * 12;
+    var r = new Date(d.getTime());
+    r.setFullYear(y, m, Math.min(d.getDate(), dim(y, m)));
+    r.setDate(r.getDate() + (a.weeks || 0) * 7 + (a.days || 0));
+    return r;
+  }
+
+  /* Demo */
+  var elStart = document.getElementById("start"),
+      elAmount = document.getElementById("amount"),
+      elUnit = document.getElementById("unit"),
+      body = document.getElementById("calBody"),
+      head = document.getElementById("calHead"),
+      yearEl = document.getElementById("calYear"),
+      code = document.getElementById("outCode"),
+      note = document.getElementById("outNote"),
+      nativeP = document.getElementById("outNative");
+
+  function drawMonth(r, s){
+    var y = r.getFullYear(), m = r.getMonth();
+    var lead = (new Date(y, m, 1).getDay() + 6) % 7, total = dim(y, m), html = "", day = 1 - lead;
+    while (day <= total) {
+      html += "<tr>";
+      for (var i = 0; i < 7; i++, day++) {
+        if (day < 1 || day > total) { html += "<td></td>"; continue; }
+        var cls = "";
+        if (day === r.getDate()) cls = "to";
+        else if (s.getFullYear() === y && s.getMonth() === m && day === s.getDate()) cls = "from";
+        html += "<td" + (cls ? ' class="' + cls + '"' : "") + ">" + day + "</td>";
+      }
+      html += "</tr>";
+    }
+    body.innerHTML = html;
+    head.textContent = MONTHS[m];
+    yearEl.textContent = y;
+  }
+
+  function showError(msg){
+    code.textContent = "";
+    note.textContent = msg;
+    note.className = "err";
+    nativeP.textContent = "";
+  }
+
+  function update(){
+    note.className = "";
+    var n = parseInt(elAmount.value, 10), unit = elUnit.value, s;
+    if (!elStart.value) return showError("Pick a start date.");
+    if (isNaN(n)) return showError("Enter a whole number to add. Negative numbers subtract.");
+    try { s = parse(elStart.value); } catch (e) { return showError(e.message); }
+    var amt = {}; amt[unit] = n;
+    var r = add(s, amt);
+    drawMonth(r, s);
+    code.innerHTML = "";
+    code.appendChild(document.createTextNode('add(parse("' + elStart.value + '"), { ' + unit + ": " + n + " })\n"));
+    var res = document.createElement("span");
+    res.className = "res";
+    res.textContent = '→ "' + format(r) + '"';
+    code.appendChild(res);
+
+    var monthly = unit === "months" || unit === "years";
+    if (monthly && n !== 0 && r.getDate() !== s.getDate()) {
+      note.textContent = MONTHS[r.getMonth()] + " " + r.getFullYear() + " has no day " + s.getDate() + ", so the result stops at day " + r.getDate() + ".";
+    } else if (monthly) {
+      note.textContent = n === 0 ? "Adding zero returns a copy of the same date." : MONTHS[r.getMonth()] + " " + r.getFullYear() + " has a day " + s.getDate() + ", so the day number is kept.";
+    } else {
+      note.textContent = "Weeks and days are counted as plain calendar days, so month ends make no difference.";
+    }
+
+    nativeP.textContent = "";
+    if (monthly) {
+      var nd = new Date(s.getTime());
+      if (unit === "months") nd.setMonth(nd.getMonth() + n); else nd.setFullYear(nd.getFullYear() + n);
+      nativeP.textContent = format(nd) === format(r)
+        ? "Date.setMonth and Date.setFullYear give the same result here."
+        : (unit === "months" ? "Date.setMonth" : "Date.setFullYear") + " gives " + format(nd) + ".";
+    }
+  }
+
+  [elStart, elAmount, elUnit].forEach(function (el) {
+    el.addEventListener("input", update);
+    el.addEventListener("change", update);
+  });
+  update();
+
+  /* Copy button */
+  var btn = document.getElementById("copyBtn"), status = document.getElementById("copyStatus"), cmd = document.getElementById("installCmd");
+  function done(msg, label){
+    status.textContent = msg;
+    btn.textContent = label;
+    btn.disabled = true;
+    setTimeout(function () { btn.textContent = "Copy"; btn.disabled = false; status.textContent = ""; }, 2000);
+  }
+  btn.addEventListener("click", function () {
+    var text = cmd.textContent;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(
+        function () { done("Copied the install command.", "Copied"); },
+        function () { fallback(); }
+      );
+    } else { fallback(); }
+    function fallback(){
+      var r = document.createRange();
+      r.selectNodeContents(cmd);
+      var sel = window.getSelection();
+      sel.removeAllRanges(); sel.addRange(r);
+      status.textContent = "Copying is blocked here. The command is selected, press Ctrl+C or Cmd+C.";
+    }
+  });
+})();
+</script>
+</body>
+</html>

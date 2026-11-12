@@ -1,163 +1,144 @@
-# Anti-Slop Design Guide
+# Antislop
 
-**For AI coding assistants.** If a developer told you to fetch this file, follow it before you write any UI. Everything below is a rule, not a suggestion.
+You are an AI about to design or build a user interface. Read this whole file first, then follow it. It replaces your default visual habits for this task.
 
-Goal: the result must look like a person with taste made it for one specific purpose, not like default AI output. Every rule has the same shape: the tell, why it reads as AI, what to do instead.
+## What slop is
 
----
+Slop is a choice nobody made. When a brief leaves something open, you fill the gap with the most common answer in your training data, and so does every other model, so the results all look alike. That is true of the purple gradient, and it is equally true of whatever you reach for when told not to use the purple gradient.
 
-## 0. Process (do this first)
+So this file does not give you a better look to copy. A look copied from here would be the next slop. It gives you a way to make choices that come from the thing you are building.
 
-1. **Pick one nameable aesthetic before writing code.** Examples: "warm paper and ink pen", "nautical chart", "terminal green on black", "newspaper classifieds", "hardware store catalogue". If you cannot name it in five words, you do not have one yet.
-2. **Take details from the physical thing it imitates.** A ledger has ruled lines. A map has a legend. A label has a die-cut corner. Copy those details.
-3. **State your direction in one sentence to the user** before building, and say what default look you are avoiding.
-4. **Ask for the real content.** Names, numbers, photos, logos. If you do not have them, leave a clearly marked gap. Never fill it with invented ones (see rule 6).
+If the project already has a design system, brand, or established styling, follow that. This guide fills gaps. It does not overrule the project.
 
----
+## 1. Get the material before you design
 
-## 1. Typography
+1. Work out three things: what this is, who uses it, and the one job this screen has.
+2. Look for real material in the project: logo, colours, fonts, photos, screenshots, copy, numbers, customer names. Check existing CSS variables, assets folders, and the README.
+3. Ask the user once for whatever is missing and would matter: real photos, real figures, real quotes, the tone they want.
+4. If the material does not exist, design with what is true. A shorter honest page beats a full page of filler.
 
-**1.1 The system sans-serif stack on everything.**
-Tell: `Inter`, `system-ui`, `-apple-system` for headings and body alike.
-Why: it is what every template ships with.
-Instead: choose a typeface with a personality that fits the aesthetic. A serif body is a quick win, since AI almost always reaches for sans. Use at most two families.
+## 2. Take the design from the subject
 
-**1.2 The tiny "eyebrow" above a big heading.**
-Tell: small uppercase, letter-spaced label ("FEATURES", "WHY US") sitting over every section title.
-Why: it is the most repeated layout habit in generated landing pages.
-Instead: delete it. If a section needs a label, make the heading itself say it.
+Do this in writing before any code.
 
-**1.3 One gradient word in the headline.**
-Tell: the key word of the hero heading filled with a purple-to-blue gradient.
-Instead: plain text. Emphasis through weight, italics, or a hand-drawn underline.
+1. **List the subject's world.** Write at least eight concrete things that belong to it: objects, materials, tools, places, documents, signage, packaging, uniforms. For a bakery: flour sacks, proofing baskets, the chalk price board, waxed paper, the oven door. For a database tool: query plans, index cards, ledger rows, rack labels.
+2. **Find its native document.** Every field already has a way of laying out information: a timetable, a menu, a receipt, a spec sheet, a field guide, a score sheet, a map legend, a parts catalogue, a prescription label. Borrow that structure. It will fit the content better than a hero plus three cards.
+3. **Derive each choice from the list.**
+   - Colour: sampled from real things in that world, each colour given a job.
+   - Type: what that world prints itself in, and why.
+   - Layout: the native document's structure.
+   - Detail: marks that carry information in that world (a stamp that says a date, a rule that separates fare zones), never marks that only decorate.
+4. **Run the swap test.** Imagine the product name replaced by a competitor's, then by a company in a different industry. If the design still fits, it is generic. Go back to step 1.
+5. **Run the because test.** For each visible decision, finish the sentence "because..." with a fact about the subject or the user. "Because it looks clean", "modern", "premium", or "less AI" are not reasons.
+6. **Tell the user your direction in two sentences,** including what the generic version would have been, then build.
 
-**1.4 Everything centered, everything the same size.**
-Tell: centered heading, centered subtitle, two centered buttons.
-Instead: left-align text. Use a real size scale with big contrast between levels.
+One idea carried all the way through beats ten decorations. Do not reuse the direction from your last build.
 
-**1.5 Heading Title Case With A Colon: Subtitle.**
-Tell: "Supercharge Your Workflow: The Future Of Productivity".
-Instead: write sentences like a person. Short, specific, lowercase after the first word.
+## 3. The defaults you will reach for
 
----
+Each time one look gets called out, models move to the next. Read these lists to learn the mechanism, then assume there is a newer one not written here yet.
 
-## 2. Color
+**Wave 1: template SaaS.**
+Inter or the system sans on everything. Indigo, violet, or blue-to-purple gradients, often on one headline word and the main button. Dark navy background with blurred colour blobs. A pill badge above a centred headline, a one-line subtitle, two buttons ("Get started", "Learn more"). Three identical rounded cards, each with an icon or emoji, a bold title, two lines of text. Glass panels with backdrop blur. A glowing "live" dot. One large radius and one soft shadow on every element. Everything fading up on scroll. A logo row and "Trusted by 10,000+".
 
-**2.1 Purple, indigo, or electric blue accent.**
-Tell: `#6366f1`-ish buttons and links, blue-to-purple gradients, glowing blue shadows.
-Instead: derive the palette from the aesthetic. Ink blue and red pencil. Mustard and brown. Forest green and cream. Two or three colors with jobs, not a rainbow.
+**Wave 2: tasteful slop.** This is what you produce when told "don't look AI". It is now as recognisable as wave 1.
+- Cream or warm paper background with a serif headline and a terracotta, rust, or sage accent.
+- Near-black background with a single acid green, orange, or vermilion accent.
+- The broadsheet look: hairline rules, zero radius, newspaper columns, for something that is not a newspaper.
+- One italic or coloured word inside an otherwise plain headline.
+- A small tracked uppercase label above every heading, often in monospace.
+- Monospace for small labels and metadata on a page that has nothing to do with code.
+- Facts strung together with middle dots under a title ("Open source · MIT · One file").
+- "01", "02", "03" in front of things that are not a sequence.
+- An arrow glued to the end of every link.
+- A bento grid: the same icon cards as before, now in boxes of uneven size.
+- Grain or noise laid over the whole page, things rotated one degree, scribbled underlines, and faux handwriting, added to seem hand-made.
+- A drawn browser window or fake terminal as the hero image.
+- Fashionable type pairings of the moment (a grotesque with a display serif and a mono).
 
-**2.2 Flat white or flat near-black background.**
-Tell: `#fff` or `#0b0b0f` with nothing else.
-Why: reads as "nobody finished this".
-Instead: warm paper tones, or add texture (see 5.1). Dark mode should have a real tint, not neutral black.
+**Wave 3: whatever you are about to choose because it seems like the non-AI option.** Catch that thought. Choosing something to avoid looking generated is the same reflex as choosing the default.
 
-**2.3 Neon glow dots and blurred color blobs.**
-Tell: pulsing green "live" dots with a glow, giant blurred circles behind the hero, "aurora" backgrounds.
-Instead: no glow. If something is live, say "live" in words or use a plain solid mark.
+**What stays the same in every wave.** These are the real tells:
+- **Uniformity.** One radius, one shadow, one spacing value, one animation, applied to everything.
+- **Decoration that says nothing.** Labels, dots, numbers, borders, and badges that would not be missed.
+- **Template structure.** Three cards because three fills a row. A section because pages have that section.
+- **Words any site could use.**
+- **Invented proof.**
 
-**2.4 Glassmorphism by default.**
-Tell: translucent blurred cards over a gradient.
-Instead: opaque surfaces with a clear edge, unless the design is truly about layered glass.
+None of the items above is banned when the subject gives a reason. A purple brand should be purple. A newspaper should look like one. The problem is a cluster of them with no reason behind any.
 
----
+## 4. Honesty (never waived)
 
-## 3. Layout and components
+- Never invent numbers, customers, testimonials, reviews, ratings, logos, awards, press mentions, team members, or addresses.
+- Never show a "Trusted by" row, a star rating, or a user count unless the user gave you the real one.
+- Sample data in a demo UI must look like sample data and be labelled as such.
+- Do not ship a form, signup box, or button that does nothing.
+- Do not leave placeholders ("Lorem ipsum", "Acme", "John Doe", "Feature one").
+- Do not use stock or generated images as if they showed the real product, place, or people.
+- If a section feels empty without proof, remove the section.
 
-**3.1 The identical card grid.**
-Tell: three (or six) equal rounded cards in a row, each with an icon, a bold title, and two lines of text.
-Instead: vary the sizes. Make one thing big because it matters. Use lists, tables, or running text where a card adds nothing.
+## 5. Words
 
-**3.2 The same radius, border, and shadow on everything.**
-Tell: `border-radius: 8px` or `12px` everywhere, a 1px gray border, a soft drop shadow.
-Instead: pick radii on purpose. Zero for a printed look, or deliberately uneven for a hand-cut look. Pick border OR shadow, rarely both.
+**Say the concrete thing.** The headline states what this is or does. If a competitor could use the sentence unchanged, rewrite it. "Prints a shipping label in one click" beats "Streamline your logistics".
 
-**3.3 The generic hero.**
-Tell: big headline, one-line subtitle, two buttons ("Get started", "Learn more"), a mock screenshot or abstract art below.
-Instead: open with the actual thing: the product working, a real photo, the real data, the actual first step.
+**Do not narrate.** Cut every piece of text that describes the page, labels something already obvious, or exists to fill a gap: taglines under the logo, captions restating the heading, metadata nobody asked for, lines explaining how the design was made or how honest it is. If removing it loses no information, remove it.
 
-**3.4 Perfect symmetry and equal spacing.**
-Tell: every gap the same, every column the same width.
-Instead: let rhythm vary. Tight within a group, loose between groups. Break the grid once on purpose.
+**Name sections by their content.** Not "Features", "Why us", "How it works", "What people say". Buttons name the action: "Download the PDF", not "Get started".
 
-**3.5 Pill badges, "New" chips, and status tags everywhere.**
-Instead: only use a tag when it carries information the reader needs.
+**Cut these words:** seamless, robust, powerful, elevate, empower, unlock, supercharge, streamline, leverage, cutting-edge, next-generation, revolutionary, effortless, world-class, tailored, holistic, innovative, game-changing, "in today's fast-paced world", "take it to the next level", "your trusted partner".
 
-**3.6 Full-width dark footer with four link columns for a one-page site.**
-Instead: a footer should hold what the site actually has.
+**Cut these patterns:**
+- "It's not just X, it's Y." Also "X, not Y." as a slogan.
+- Three adjectives or three short fragments in a row for rhythm ("Fast. Simple. Yours.").
+- A question answered at once ("The result? Fewer outages.").
+- "Whether you're X, Y, or Z."
+- Dashes used for asides. Use a comma or a full stop.
+- Title Case Headings. Use sentence case.
+- Emoji as bullets or in headings. Bold scattered through sentences.
+- Hedging ("can help you", "may potentially").
 
----
+**Other languages.** Write the copy in the page's language from the start. Do not translate English marketing idiom. These patterns have equivalents in every language. Cut those too.
 
-## 4. Icons, imagery, emoji
+## 6. Craft floor
 
-**4.1 Emoji as icons.**
-Tell: a rocket, a lightning bolt, or a shield in a colored circle above every feature.
-Instead: no icon, or an icon drawn for this project.
+A page that fails these looks unfinished, and unfinished reads as generated.
 
-**4.2 A stock icon set with default stroke.**
-Tell: Lucide, Feather, Heroicons, or Font Awesome used at default weight everywhere.
-Why: it is itself a tell once you have seen it a hundred times.
-Instead: hand-write a few SVG paths with slight irregularity, or use a distinctive set at a deliberate weight and size.
+- **Contrast** meets WCAG AA. Check grey text and text over images or colour.
+- **Every control** has designed hover, focus-visible, active, and disabled states. Hover is more than a fade.
+- **Every view** has its empty, loading, and error state. Errors say what happened and how to fix it.
+- **Responsive** from 360px wide with no horizontal scroll. Tap targets at least 44px.
+- **Type.** A real scale with clear steps between levels. Body lines 45 to 75 characters. At most two families unless the subject calls for more.
+- **Spacing.** One scale, used everywhere. Tight inside a group, loose between groups.
+- **Motion.** Only where it explains a change of state. Animate transform and opacity only. Respect `prefers-reduced-motion`. Content is visible without JavaScript.
+- **Structure.** Semantic HTML, one `h1`, heading levels in order, labels on inputs, alt text on images.
+- **Fonts and scripts.** Self-host them or use fonts already on the device. Many networks block or throttle third-party font and script hosts, and a blocking request to one leaves a blank page. The page must render fully with every third-party host unreachable.
+- **Right-to-left and non-Latin scripts.** Set `lang` and `dir`. Use logical properties (`margin-inline`, `padding-inline`, `inset-inline`, `text-align: start`). Use a typeface drawn for the script. No letter-spacing, uppercase, or italics on Arabic-script text. Give it more line height. Mirror directional icons, not logos or media controls.
 
-**4.3 Abstract 3D blobs, floating shapes, and generated "tech" art.**
-Instead: real photographs, real screenshots, or simple drawn illustrations in the same style as the rest of the page.
+## 7. Product UI: dashboards, forms, tables, settings
 
-**4.4 Stock people in front of laptops.**
-Instead: the real team, the real product, or nothing.
+Slop here looks different from landing pages.
 
----
+- A row of four stat cards (big number, small label, green arrow with a percentage) at the top of every dashboard. Show a number only if the user acts on it.
+- A chart because dashboards have charts. Pick the chart from the question it answers. No donut for two values.
+- Every block wrapped in a card, and cards inside cards. Use space and alignment first.
+- Tabular data forced into cards. Use a table. Right-align numbers, use tabular figures.
+- A sidebar with icons for three destinations.
+- A modal for everything. A skeleton shimmer on everything.
+- Metrics, activity feeds, and user names invented to fill the screen. Use the real schema, or clearly marked sample rows.
+- Forms: visible labels above fields, the right input type, validation that says how to fix the problem, and a button that names what happens.
+- Density follows use. A tool used all day is denser than a marketing page.
 
-## 5. Texture and detail
+## 8. Before you hand it back
 
-**5.1 Nothing to look at up close.**
-Instead: add one real surface detail. A low-opacity grain (an inline SVG `feTurbulence` filter at about 0.1 to 0.15 opacity; above 0.2 it looks dirty), a ruled grid, paper fibers, a subtle misregistration on a stamp. Keep it quiet.
+Answer each one. Fix anything that fails.
 
-**5.2 Everything dead straight.**
-Instead: rotate one or two decorative elements by a fraction of a degree (0.3 to 1 degree). Do not overdo it.
+1. Does it pass the swap test from section 2?
+2. Can you give a "because" from the subject for the palette, the type, and the layout?
+3. Count the items from section 3 on the page. Does each have a reason from the subject?
+4. Is every number, name, quote, and logo real or supplied by the user?
+5. Read every line of text. Would the page lose information without it? Could a competitor use it unchanged?
+6. Does it pass every line of the craft floor? Check it at 360px, with the keyboard only, and with third-party hosts blocked.
+7. Remove one decorative element. Did the page get worse? If not, leave it out and repeat.
+8. If you can take a screenshot, look at it. What is the first thing the eye lands on? Is that the most important thing?
 
-**5.3 Animation on everything.**
-Tell: every section fades up on scroll, every card lifts on hover, shimmer on every button.
-Instead: one meaningful motion, or none.
-
----
-
-## 6. Content (the biggest tell)
-
-**6.1 Invented stats, testimonials, logos, and reviews.**
-Tell: "10,000+ happy users", "4.9 stars", "Trusted by teams at...", a row of fake company logos, quotes from "Sarah, Product Manager".
-Why: readers spot it instantly, and it is dishonest.
-Instead: use real numbers or none. If there are no users yet, say what the thing is and show it working. An empty slot is better than a fake one.
-
-**6.2 Made-up brand names and logos for third parties.**
-Instead: use the real logo with permission, or plain text.
-
-**6.3 Marketing filler.**
-Tell: "seamless", "robust", "empower", "unlock", "supercharge", "next-generation", "revolutionize", "elevate your workflow".
-Instead: say the concrete thing. "Prints a shipping label in one click" beats "streamlines your logistics".
-
-**6.4 Dashes and rhythm.**
-Tell: em dashes in every second sentence, lists of exactly three adjectives, "It's not just X, it's Y".
-Instead: write plainly. Vary sentence length. Use commas and full stops.
-
-**6.5 Placeholder text left in.**
-Tell: "Lorem ipsum", "John Doe", "Acme Inc", "example@email.com", "Feature One".
-Instead: real copy, or a visible TODO the developer will see.
-
----
-
-## 7. Before you hand it back
-
-Run this checklist. If you answer yes to any item, fix it first.
-
-- [ ] Can I name the aesthetic in five words, and does every part follow it?
-- [ ] Is the font stack the default sans on everything?
-- [ ] Is there an eyebrow label over any heading?
-- [ ] Is there a purple, indigo, or blue-purple gradient anywhere?
-- [ ] Is the background flat with no texture or tint?
-- [ ] Are there three or more identical rounded cards in a row?
-- [ ] Are there emoji or default-weight stock icons used as decoration?
-- [ ] Is there any number, name, logo, or quote I made up?
-- [ ] Do any of the banned filler words appear?
-- [ ] Is anything glowing, blurred for effect, or animating without a reason?
-
-Then tell the user which direction you committed to and what you chose not to do.
+Then report to the user in a few lines: the direction you chose and why, what you left out because the real material is missing, and anything you could not check.

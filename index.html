@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A field guide to AI slop</title>
+<meta name="description" content="The four most common kinds of AI-built page, the marks that give each away, and a file to hand your AI before it builds the next one.">
+<style>
+:root{
+  --paper:#f8f9f6; --ink:#161815; --soft:#4a4f49; --plate:#dbe3e5; --cloth:#17443c; --line:#161815;
+  --sans:"Gill Sans","Gill Sans MT","Gill Sans Nova",Calibri,"Trebuchet MS",sans-serif;
+  --serif:Baskerville,"Baskerville Old Face","Palatino Linotype","Book Antiqua",Georgia,serif;
+  --mono:ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font:1.1875rem/1.55 var(--serif)}
+a{color:inherit;text-underline-offset:.18em;text-decoration-thickness:1px}
+a:hover{color:var(--cloth);text-decoration-thickness:2px}
+:focus-visible{outline:3px solid var(--cloth);outline-offset:3px}
+.wrap{max-width:68rem;margin:0 auto;padding:0 1.25rem}
+
+.top{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;padding:1.25rem 0;border-bottom:3px solid var(--line);font-family:var(--sans)}
+.top strong{font-size:1.25rem;letter-spacing:.01em}
+.top nav{display:flex;gap:1.5rem;font-size:1.0625rem}
+
+.open{display:grid;gap:2rem;padding:3rem 0 4rem}
+h1{font:700 clamp(2.9rem,9.2vw,6rem)/.93 var(--sans);letter-spacing:-.015em;max-width:9ch}
+.lede{font-size:clamp(1.25rem,2.1vw,1.5rem);line-height:1.4;max-width:30em;margin-top:1.5rem}
+.hand{border:2px solid var(--line);background:#fff;padding:1.25rem 1.25rem 1.5rem;align-self:end}
+.hand h2{font:700 1.375rem/1.2 var(--sans)}
+.hand p{font-size:1.0625rem;margin-top:.5rem;color:var(--soft)}
+.prompt{display:block;margin-top:1rem;padding:.875rem 1rem;background:var(--plate);font:.875rem/1.6 var(--mono);white-space:pre-wrap;overflow-wrap:anywhere;color:var(--ink)}
+.acts{display:flex;flex-wrap:wrap;align-items:center;gap:.75rem 1.25rem;margin-top:1rem;font-family:var(--sans);font-size:1.0625rem}
+button{font:700 1.0625rem/1 var(--sans);color:#fff;background:var(--cloth);border:2px solid var(--cloth);padding:.8rem 1.1rem;min-height:2.75rem;cursor:pointer}
+button:hover{background:#fff;color:var(--cloth)}
+button:active{transform:translateY(1px)}
+
+.acct{display:grid;gap:1.5rem 3rem;padding:3rem 0;border-top:1px solid var(--line)}
+.acct h2{font:700 clamp(1.75rem,3.6vw,2.375rem)/1.1 var(--sans)}
+.latin{font-style:italic;font-size:1.25rem;margin-top:.25rem}
+.status{margin-top:1rem;max-width:32em}
+.acct h3{font:700 1.125rem/1.2 var(--sans);margin-top:1.5rem}
+.marks{list-style:none;padding:0;margin-top:.5rem;counter-reset:m}
+.marks li{counter-increment:m;position:relative;padding-left:2.25rem;margin-top:.5rem;max-width:30em}
+.marks li::before{content:counter(m);position:absolute;left:0;top:.2em;width:1.5rem;height:1.5rem;border-radius:50%;background:var(--ink);color:#fff;font:700 .875rem/1.5rem var(--sans);text-align:center}
+.also,.voice{margin-top:.5rem;max-width:32em}
+.voice{font-style:italic}
+.full{font-family:var(--sans);font-size:1.0625rem;margin-top:1.25rem}
+
+figure{background:var(--plate);padding:clamp(.75rem,2.5vw,1.75rem);align-self:start}
+figcaption{font:1rem/1.3 var(--sans);margin-top:.75rem}
+figcaption b{font-weight:700}
+.spec{container-type:inline-size;position:relative;aspect-ratio:40/26;overflow:hidden;box-shadow:0 1px 0 #0003,0 .5rem 1.25rem -0.5rem #0006}
+.in{position:absolute;inset:0;font-size:2.5cqw;line-height:1.3;font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+.in p,.in div,.in span,.in b,.in i,.in em,.in small,.in code{display:block;font-style:normal;font-weight:400}
+.k{position:absolute;z-index:5;left:calc(var(--x)*2.5cqw);top:calc(var(--y)*2.5cqw);width:1.5em;height:1.5em;border-radius:50%;background:#161815;color:#fff;font:700 1.3em/1.5em var(--sans);text-align:center;box-shadow:0 0 0 .14em #fff}
+
+/* plate 1 */
+.s1{background:#0b0b14;color:#e8e8f0;text-align:center}
+.s1 .blob{position:absolute;left:8em;top:-7em;width:24em;height:16em;background:radial-gradient(closest-side,#6366f1b0,transparent);filter:blur(1.2em)}
+.s1 .pill{position:relative;width:max-content;margin:2em auto 0;padding:.3em .9em .3em 1.9em;border:.08em solid #fff3;border-radius:9em;background:#ffffff12;font-size:.85em}
+.s1 .pill b{position:absolute;left:.7em;top:.65em;width:.6em;height:.6em;border-radius:50%;background:#2f8;box-shadow:0 0 .7em #2f8}
+.s1 .h{position:relative;font-size:2.5em;font-weight:700;line-height:1.1;margin-top:.35em}
+.s1 .h em{display:inline;font-weight:700;background:linear-gradient(90deg,#6366f1,#c084fc);-webkit-background-clip:text;background-clip:text;color:transparent}
+.s1 .sub{position:relative;color:#a0a0b8;margin-top:.5em}
+.s1 .btns{position:relative;display:flex;justify-content:center;gap:.7em;margin-top:.9em}
+.s1 .btns span{padding:.5em 1.1em;border-radius:.6em;font-weight:600;font-size:.9em}
+.s1 .b1{background:linear-gradient(90deg,#6366f1,#8b5cf6);box-shadow:0 .4em 1.4em #6366f188}
+.s1 .b2{border:.08em solid #fff4}
+.s1 .cards{position:absolute;left:3em;right:3em;top:15.7em;display:grid;grid-template-columns:repeat(3,1fr);gap:1em}
+.s1 .cards div{background:#ffffff0d;border:.08em solid #fff2;border-radius:.9em;padding:.8em}
+.s1 .cards i{font-size:1.3em;line-height:1.2}
+.s1 .cards b{font-weight:700;font-size:.9em;margin-top:.2em}
+.s1 .cards span{height:.3em;border-radius:1em;background:#fff3;margin:.45em auto 0;width:86%}
+.s1 .cards span+span{width:60%}
+.s1 .logos{position:absolute;left:0;right:0;bottom:.8em;color:#77779a;font-size:.8em}
+.s1 .logos b{display:inline;font-weight:700;margin-left:1em;font-size:1.15em}
+
+/* plate 2 */
+.s2{background:#f4f1ea;color:#2a2622;font-family:Georgia,"Times New Roman",serif;padding:1.6em 2.4em}
+.s2::after{content:"";position:absolute;inset:0;opacity:.5;mix-blend-mode:multiply;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 .5 0 0 0 0 .45 0 0 0 0 .4 0 0 0 .5 0'/></filter><rect width='120' height='120' filter='url(%23n)'/></svg>")}
+.s2 .nav{display:flex;justify-content:space-between;font-size:.85em;padding-bottom:.6em;border-bottom:.06em solid #2a2622}
+.s2 .nav b{font-weight:700;font-size:1.15em}
+.s2 .eb{font:.68em/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.22em;text-transform:uppercase;color:#8a7f70;margin-top:2.6em}
+.s2 .h{font-size:3.1em;line-height:1.02;margin-top:.25em;letter-spacing:-.02em}
+.s2 .h em{display:inline;font-style:italic;color:#c8623f}
+.s2 .dots{font-size:.85em;color:#6f665a;margin-top:.7em}
+.s2 .row{display:flex;align-items:center;gap:1.4em;margin-top:1em;font-size:.9em}
+.s2 .btn{background:#c8623f;color:#fff;padding:.5em 1.2em;border-radius:9em}
+.s2 .lnk{text-decoration:underline}
+.s2 .cols{position:absolute;left:2.4em;right:2.4em;bottom:1.6em;display:grid;grid-template-columns:repeat(3,1fr);gap:1.6em;border-top:.06em solid #2a2622;padding-top:.7em}
+.s2 .cols i{font:.68em/1 ui-monospace,Menlo,Consolas,monospace;color:#c8623f}
+.s2 .cols b{font-size:1.15em;margin-top:.25em;transform:rotate(-1deg);transform-origin:left}
+.s2 .cols span{height:.25em;background:#2a262233;margin-top:.5em}
+.s2 .cols span+span{width:70%}
+
+/* plate 3 */
+.s3{background:#0a0a0a;color:#d9d9d2;font-family:ui-monospace,Menlo,Consolas,monospace;padding:1.5em 2em}
+.s3 .st{position:relative;padding-left:1.4em;font-size:.72em;color:#8b8b84}
+.s3 .st b{position:absolute;left:0;top:.3em;width:.7em;height:.7em;border-radius:50%;background:#c6ff3d;box-shadow:0 0 .8em #c6ff3d}
+.s3 .h{font-size:3em;font-weight:700;line-height:1;margin-top:.7em;letter-spacing:-.04em}
+.s3 .h u{display:inline;text-decoration:none;color:#c6ff3d}
+.s3 .sub{font-size:.8em;color:#8b8b84;margin-top:.8em;width:17em}
+.s3 .btn{width:max-content;margin-top:1em;background:#c6ff3d;color:#0a0a0a;font-weight:700;font-size:.85em;padding:.55em 1em}
+.s3 .term{position:absolute;right:2em;top:3.2em;width:15.5em;border:.08em solid #2c2c2a;border-radius:.6em;background:#121211}
+.s3 .term p{display:flex;gap:.35em;padding:.55em .7em;border-bottom:.08em solid #2c2c2a}
+.s3 .term p i{width:.6em;height:.6em;border-radius:50%;background:#3a3a37}
+.s3 .term code{font:inherit;font-size:.74em;line-height:1.7;padding:.7em .9em 1em;color:#b9b9b0}
+.s3 .term code b{display:inline;color:#c6ff3d}
+.s3 .bento{position:absolute;left:2em;right:2em;bottom:1.5em;height:7.6em;display:grid;grid-template-columns:1.6fr 1fr 1fr;grid-template-rows:1fr 1fr;gap:.6em}
+.s3 .bento div{border:.08em solid #2c2c2a;border-radius:.6em;background:#121211;padding:.6em .7em}
+.s3 .bento div:first-child{grid-row:span 2}
+.s3 .bento div:nth-child(2){grid-column:span 2}
+.s3 .bento small{font-size:.62em;letter-spacing:.14em;color:#8b8b84}
+.s3 .bento span{height:.25em;background:#3a3a37;margin-top:.5em;width:70%}
+
+/* plate 4 */
+.s4{background:#f4f5f7;color:#111827;display:grid;grid-template-columns:3.4em 1fr}
+.s4 .side{background:#fff;border-right:.08em solid #e5e7eb;padding:1em .8em}
+.s4 .side b{width:1.8em;height:1.8em;border-radius:.5em;background:#4f46e5}
+.s4 .side i{width:1.2em;height:1.2em;border-radius:.3em;background:#d1d5db;margin:1.1em auto 0}
+.s4 .main{padding:1.2em 1.6em}
+.s4 .hi{font-size:1.45em;font-weight:700}
+.s4 .hi+p{font-size:.78em;color:#6b7280}
+.s4 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:.8em;margin-top:.9em}
+.s4 .stats div,.s4 .panels>div{background:#fff;border:.08em solid #e5e7eb;border-radius:.8em;box-shadow:0 .1em .3em #0000000f;padding:.7em .8em}
+.s4 .stats small{font-size:.66em;color:#6b7280}
+.s4 .stats b{font-size:1.35em;font-weight:700;line-height:1.25}
+.s4 .stats em{font-size:.66em;color:#16a34a}
+.s4 .panels{display:grid;grid-template-columns:1.7fr 1fr;gap:.8em;margin-top:.8em;height:12.6em}
+.s4 .panels small{font-size:.72em;font-weight:700}
+.s4 .inner{border:.08em solid #e5e7eb;border-radius:.6em;margin-top:.5em;height:9em;padding:.5em;background:#fafafa}
+.s4 svg{display:block;width:100%;height:100%}
+.s4 .donut{width:7em;height:7em;border-radius:50%;margin:.8em auto 0;background:conic-gradient(#4f46e5 0 64%,#c7d2fe 0);-webkit-mask:radial-gradient(circle,transparent 42%,#000 43%);mask:radial-gradient(circle,transparent 42%,#000 43%)}
+
+.why{padding:3.5rem 0;border-top:3px solid var(--line)}
+.why h2,.more h2{font:700 clamp(1.75rem,3.6vw,2.375rem)/1.1 var(--sans);max-width:18em}
+.why>p{margin-top:1.25rem;max-width:34em}
+.steps{margin-top:1.5rem;padding-left:1.4em;max-width:34em}
+.steps li{margin-top:.75rem;padding-left:.4em}
+.steps li::marker{font-family:var(--sans);font-weight:700}
+.more{padding:3.5rem 0;border-top:1px solid var(--line)}
+.more h3{font:700 1.25rem/1.2 var(--sans);margin-top:2rem}
+.more p{margin-top:.5rem;max-width:34em}
+.more .prompt{max-width:44rem}
+code.i{font:.9em var(--mono);background:var(--plate);padding:.1em .35em}
+footer{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.75rem 2rem;padding:1.5rem 0 3rem;border-top:3px solid var(--line);font:1.0625rem var(--sans)}
+
+@media (min-width:56rem){
+  .open{grid-template-columns:1.15fr .85fr;gap:3.5rem;padding:4.5rem 0 5.5rem}
+  .acct{grid-template-columns:.8fr 1.2fr;padding:4rem 0}
+  .acct figure{grid-column:2;grid-row:1 / span 2}
+}
+@media (prefers-reduced-motion:no-preference){button{transition:background-color .12s,color .12s}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <strong>Antislop</strong>
+  <nav><a href="https://github.com/richyrach/antislop/blob/main/GUIDE.md">The guide</a><a href="https://github.com/richyrach/antislop">GitHub</a></nav>
+</header>
+
+<main>
+<section class="open">
+  <div>
+    <h1>A field guide to AI slop</h1>
+    <p class="lede">Ask an AI for a web page and you get one of a few pages everyone has already seen. Here are the four most common kinds and the marks that give each away, with a file to hand your AI before it builds the next one.</p>
+  </div>
+  <div class="hand">
+    <h2>Hand it to your AI</h2>
+    <p>Paste this before you ask for any UI. It works in any AI tool that can open a link.</p>
+    <code class="prompt" id="p">Before you design or build any UI, fetch this file and follow it:
+https://raw.githubusercontent.com/richyrach/antislop/main/GUIDE.md</code>
+    <div class="acts"><button type="button" id="c">Copy the prompt</button><a href="https://github.com/richyrach/antislop/blob/main/GUIDE.md">Read the guide first</a></div>
+  </div>
+</section>
+
+<section class="acct">
+  <div>
+    <h2>Template SaaS</h2>
+    <p class="latin">Sloppus violaceus</p>
+    <p class="status">Everywhere from 2023 to 2025, and still what most tools hand back when asked for a landing page.</p>
+  </div>
+  <figure>
+    <div class="spec" role="img" aria-label="Drawing of a dark landing page with a purple gradient headline, a pill badge, two buttons, three identical cards and a row of company names.">
+      <div class="in s1" aria-hidden="true">
+        <i class="blob"></i>
+        <span class="pill"><b></b>New: v2.0 is live</span>
+        <p class="h">Supercharge your workflow<br>with <em>next-gen AI</em></p>
+        <p class="sub">The all-in-one platform to unlock seamless productivity.</p>
+        <p class="btns"><span class="b1">Get started</span><span class="b2">Learn more</span></p>
+        <div class="cards"><div><i>🚀</i><b>Lightning fast</b><span></span><span></span></div><div><i>🛡️</i><b>Secure by default</b><span></span><span></span></div><div><i>✨</i><b>Beautiful results</b><span></span><span></span></div></div>
+        <p class="logos">Trusted by 10,000+ teams<b>Acme</b><b>Globex</b><b>Initech</b></p>
+        <span class="k" style="--x:11.2;--y:1.5">1</span>
+        <span class="k" style="--x:30.6;--y:7.5">2</span>
+        <span class="k" style="--x:10.2;--y:12.3">3</span>
+        <span class="k" style="--x:1.2;--y:16.4">4</span>
+        <span class="k" style="--x:7.4;--y:23.3">5</span>
+      </div>
+    </div>
+    <figcaption><b>Plate 1.</b> Template SaaS, adult</figcaption>
+  </figure>
+  <div>
+    <h3>Field marks</h3>
+    <ol class="marks">
+      <li>A pill badge with a glowing dot, sitting over a centred headline.</li>
+      <li>A purple gradient on one part of the headline, and again on the main button.</li>
+      <li>Two buttons, "Get started" and "Learn more".</li>
+      <li>Three identical cards with an emoji on each.</li>
+      <li>A row of company names and a user count nobody can check.</li>
+    </ol>
+    <p class="also">Also the same sans-serif on every line, one corner radius and one soft shadow on every box, and every section fading up as you scroll.</p>
+    <h3>Voice</h3>
+    <p class="voice">"Supercharge your workflow." "Unlock seamless productivity."</p>
+    <p class="full"><a href="specimens/template-saas.html">See one full size</a></p>
+  </div>
+</section>
+
+<section class="acct">
+  <div>
+    <h2>Tasteful editorial</h2>
+    <p class="latin">Sloppus cremeus</p>
+    <p class="status">Common since 2025. It is what a model makes when told not to make the first one, so it turns up on a lot of pages that claim to be hand-made.</p>
+  </div>
+  <figure>
+    <div class="spec" role="img" aria-label="Drawing of a cream page with a serif headline, one italic rust word, a spaced capital label, facts joined by dots, and three numbered columns.">
+      <div class="in s2" aria-hidden="true">
+        <p class="nav"><b>Atelier</b><span>Journal &nbsp; Work &nbsp; About</span></p>
+        <p class="eb">Introducing — Atelier 2.0</p>
+        <p class="h">Software, made <em>considered.</em></p>
+        <p class="dots">Open source · MIT licence · One file</p>
+        <p class="row"><span class="btn">Start a project</span><span class="lnk">Read the manifesto →</span></p>
+        <div class="cols"><div><i>01</i><b>Craft</b><span></span><span></span></div><div><i>02</i><b>Clarity</b><span></span><span></span></div><div><i>03</i><b>Calm</b><span></span><span></span></div></div>
+        <span class="k" style="--x:17.2;--y:5.2">1</span>
+        <span class="k" style="--x:18.3;--y:10.3">2</span>
+        <span class="k" style="--x:16.5;--y:13.2">3</span>
+        <span class="k" style="--x:5.6;--y:20.1">4</span>
+        <span class="k" style="--x:21;--y:15.6">5</span>
+      </div>
+    </div>
+    <figcaption><b>Plate 2.</b> Tasteful editorial, cream form</figcaption>
+  </figure>
+  <div>
+    <h3>Field marks</h3>
+    <ol class="marks">
+      <li>A small label in spaced capitals over the heading, often in a typewriter face.</li>
+      <li>One italic word in a rust colour inside a serif headline.</li>
+      <li>Facts strung together with dots.</li>
+      <li>Numbers in front of things that are not steps.</li>
+      <li>An arrow stuck on the end of a link.</li>
+    </ol>
+    <p class="also">Also cream paper, a film of grain over the whole page, and something tilted by one degree.</p>
+    <h3>Voice</h3>
+    <p class="voice">"Software, made considered." "No fluff. Just craft."</p>
+    <p class="full"><a href="specimens/tasteful-editorial.html">See one full size</a></p>
+  </div>
+</section>
+
+<section class="acct">
+  <div>
+    <h2>Acid terminal</h2>
+    <p class="latin">Sloppus viridis</p>
+    <p class="status">The same reflex as the last one, pointed at developer tools.</p>
+  </div>
+  <figure>
+    <div class="spec" role="img" aria-label="Drawing of a near-black page in a typewriter face with an acid green accent, a status dot, a drawn terminal window and a grid of boxes in uneven sizes.">
+      <div class="in s3" aria-hidden="true">
+        <p class="st"><b></b>All systems operational</p>
+        <p class="h">ship faster<u>_</u></p>
+        <p class="sub">The developer platform built for builders.</p>
+        <span class="btn">Get started →</span>
+        <div class="term"><p><i></i><i></i><i></i></p><code>$ npx create-thing@latest<br><b>✓</b> ready in 0.4s<br>$ <b>▍</b></code></div>
+        <div class="bento"><div><small>[01] SPEED</small><span></span><span></span></div><div><small>[02] SCALE</small><span></span></div><div><small>[03] DX</small><span></span></div><div><small>[04] EDGE</small><span></span></div></div>
+        <span class="k" style="--x:14.4;--y:.9">1</span>
+        <span class="k" style="--x:16.3;--y:8.5">2</span>
+        <span class="k" style="--x:36.6;--y:2.2">3</span>
+        <span class="k" style="--x:13;--y:19.8">4</span>
+        <span class="k" style="--x:11.1;--y:11.1">5</span>
+      </div>
+    </div>
+    <figcaption><b>Plate 3.</b> Acid terminal, dark form</figcaption>
+  </figure>
+  <div>
+    <h3>Field marks</h3>
+    <ol class="marks">
+      <li>A status dot reporting that all systems are fine.</li>
+      <li>A typewriter face on everything, blinking cursor included.</li>
+      <li>A drawn terminal window where a picture of the product should be.</li>
+      <li>The three cards again, now in boxes of different sizes.</li>
+      <li>One acid colour on a near-black page.</li>
+    </ol>
+    <h3>Voice</h3>
+    <p class="voice">"Ship faster." "Built for builders."</p>
+  </div>
+</section>
+
+<section class="acct">
+  <div>
+    <h2>Stat-card dashboard</h2>
+    <p class="latin">Sloppus tabularis</p>
+    <p class="status">Lives inside apps. It appears when the request is "a dashboard" and nobody says what the dashboard is for.</p>
+  </div>
+  <figure>
+    <div class="spec" role="img" aria-label="Drawing of an app dashboard with an icon sidebar, a greeting, four cards each showing a number and a green percentage, a line chart and a doughnut chart.">
+      <div class="in s4" aria-hidden="true">
+        <div class="side"><b></b><i></i><i></i><i></i><i></i></div>
+        <div class="main">
+          <p class="hi">Welcome back, John 👋</p>
+          <p>Here's what's happening with your business today.</p>
+          <div class="stats"><div><small>Total revenue</small><b>$45,231</b><em>▲ 12.5%</em></div><div><small>Active users</small><b>2,350</b><em>▲ 8.1%</em></div><div><small>Conversion</small><b>3.24%</b><em>▲ 2.4%</em></div><div><small>Growth</small><b>18.2%</b><em>▲ 4.3%</em></div></div>
+          <div class="panels"><div><small>Overview</small><div class="inner"><svg viewBox="0 0 100 40" preserveAspectRatio="none"><polyline points="0,32 14,26 28,29 42,17 56,21 70,10 84,14 100,4" fill="none" stroke="#4f46e5" stroke-width="1.6"/></svg></div></div><div><small>Traffic</small><i class="donut"></i></div></div>
+        </div>
+        <span class="k" style="--x:2.6;--y:6.2">1</span>
+        <span class="k" style="--x:21.6;--y:.9">2</span>
+        <span class="k" style="--x:11.6;--y:5.6">3</span>
+        <span class="k" style="--x:36.4;--y:14.4">4</span>
+        <span class="k" style="--x:22.6;--y:16.6">5</span>
+      </div>
+    </div>
+    <figcaption><b>Plate 4.</b> Stat-card dashboard</figcaption>
+  </figure>
+  <div>
+    <h3>Field marks</h3>
+    <ol class="marks">
+      <li>A sidebar of icons for a handful of pages.</li>
+      <li>A greeting to a user who does not exist.</li>
+      <li>Four cards, each a big number with a green arrow, none of them real.</li>
+      <li>A doughnut chart splitting two values.</li>
+      <li>Boxes inside boxes.</li>
+    </ol>
+    <h3>Voice</h3>
+    <p class="voice">"Welcome back!" "+12.5% from last month"</p>
+  </div>
+</section>
+
+<section class="why">
+  <h2>They keep changing, so the guide is not a list of bans</h2>
+  <p>The second and third kinds exist because people told their AI to avoid the first. A model that is only told what to avoid moves to its next most likely answer, and that answer is the same for everyone. So the guide gives your AI no look to copy. It makes it do this:</p>
+  <ol class="steps">
+    <li>Find the real material first: the logo, the photos, the actual numbers. Ask for what is missing.</li>
+    <li>Write down what belongs to the subject's world, and take the colour, type and layout from that.</li>
+    <li>Borrow the layout the subject already uses, such as a menu, a timetable, a receipt or a spec sheet.</li>
+    <li>Swap in a competitor's name. If the design still fits, start again.</li>
+    <li>Never invent a customer, a figure, a review or a logo. With no proof to show, make the page shorter.</li>
+    <li>Check the result on a phone, with a keyboard, right to left, and with outside font hosts blocked.</li>
+  </ol>
+</section>
+
+<section class="more">
+  <h2>Other ways to use it</h2>
+  <h3>Keep a copy in your project</h3>
+  <p>Save the guide next to your code, then tell your agent to read it before UI work in <code class="i">CLAUDE.md</code>, <code class="i">AGENTS.md</code> or your Cursor rules.</p>
+  <code class="prompt">curl -fsSL https://raw.githubusercontent.com/richyrach/antislop/main/GUIDE.md -o DESIGN.md</code>
+  <h3>Install it as an agent skill</h3>
+  <p>For Claude Code, Codex, Cursor and other tools that load skills.</p>
+  <code class="prompt">npx skills add richyrach/antislop</code>
+</section>
+</main>
+
+<footer>
+  <a href="https://github.com/richyrach/antislop/blob/main/GUIDE.md">Read the guide</a>
+  <a href="https://github.com/richyrach/antislop/issues/new">Report a kind that is missing</a>
+  <a href="https://github.com/richyrach/antislop/blob/main/LICENSE">MIT licence</a>
+</footer>
+</div>
+<script>
+var b=document.getElementById('c');
+b.addEventListener('click',function(){
+  var t=document.getElementById('p').textContent;
+  (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(function(){
+    b.textContent='Copied';setTimeout(function(){b.textContent='Copy the prompt'},1800);
+  },function(){
+    var r=document.createRange();r.selectNodeContents(document.getElementById('p'));
+    var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Selected, now press copy';
+  });
+});
+</script>
+</body>
+</html>
